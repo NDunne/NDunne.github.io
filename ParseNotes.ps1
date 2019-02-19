@@ -42,13 +42,13 @@ class Case
 
 Function toHTML($cases_map)
 {
-	$data = "data.addColumn('string', 'Week');"
+	$data = "data.addColumn({type:'string', role:'domain', label:'Week'});"
 	
 	$sortedEnum = $($cases_map.GetEnumerator() | sort -Property name)
 	
 	foreach( $k in $sortedEnum.Name)
 	{
-		$data = $data + "`ndata.addColumn('number', '$k');`ndata.addColumn({type: 'string', role: 'tooltip'});"
+		$data = $data + "`ndata.addColumn({type:'number', role:'data', label:'" + $k + "'});`ndata.addColumn({type:'string', role:'tooltip', label:'" + $k + "T'});"
 	}
 	$i = 1
 	

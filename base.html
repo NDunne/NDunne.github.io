@@ -2,8 +2,10 @@
   <head>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
-      google.charts.load('current', {'packages':['corechart']});
-      google.charts.setOnLoadCallback(drawChart);
+      
+	  google.charts.load('current', {'packages':['corechart', 'controls']});
+      
+	  google.charts.setOnLoadCallback(drawChart);
 
 	  function printObject(o) {
 		var out = '';
@@ -20,7 +22,7 @@
 		var data = new google.visualization.DataTable();
           $str
 
-        var options = {
+        var opts = {
           title: 'Case Worklog',
           interpolateNulls: true,
 		  height: 600,
@@ -39,12 +41,6 @@
 			showTextEvery: 1,
 			allowContainerBoundaryTextCufoff: false
 		  },
-		  animation:
-		  {
-			duration: 1000,
-			easing: 'out',
-			startup: true
-		  },
 		  vAxis: 
 		  { 
 			title: 'Weeks spent on Case'
@@ -57,31 +53,54 @@
 
         var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
 		
-        chart.draw(data, options);
+        //chart.draw(data, opts);
 		
-		google.visualization.events.addListener(chart, 'select', function()
-		{
-			selection = chart.getSelection();
-			
-			row = selection[0].row;
-			val = data.getValue(row, selection[0].column);
-			limit = data.getNumberOfColumns();
-			
-			document.getElementById("CaseLog").innerHTML = "<p>";
-			for (i = 0; i < limit; i++)
-			{
-				if (val == data.getValue(row, i))
-				{
-					caseNumber = data.getColumnLabel(i);
-					document.getElementById("CaseLog").innerHTML += "<b>" + caseNumber + ": " + CaseInfo[caseNumber][0] +"</b><br>" + CaseInfo[caseNumber][1] + "<br></p>";
-				}
+		wrapper = new google.visualization.ChartWrapper(
+			{	
+				chartType: 'LineChart',
+				dataTable: data,
+				options: opts,
+				containerId: 'vis',
 			}
-			
-			//caseNumber = data.getColumnLabel(number)
-			//document.getElementById("CaseLog").innerHTML = "<b>" + caseNumber + ": " + CaseInfo[caseNumber][0] +"</b><br>" + CaseInfo[caseNumber][1];
-		});
-      }
-    </script>
+		);
+		
+		google.visualization.events.addListener(wrapper, 'ready', onReady);
+		
+		wrapper.draw(document.getElementById('curve_chart2'));
+		
+		function onReady()
+		{
+			google.visualization.events.addListener(wrapper, 'select', function()
+			{		
+				selection = wrapper.getChart().getSelection();
+				
+				row = selection[0].row;
+				val = data.getValue(row, selection[0].column);
+				limit = data.getNumberOfColumns();
+				
+				document.getElementById("CaseLog").innerHTML = "<p>";
+				for (i = 0; i < limit; i++)
+				{
+					if (val == data.getValue(row, i))
+					{
+						caseNumber = data.getColumnLabel(i);
+						document.getElementById("CaseLog").innerHTML += "<b>" + caseNumber + ": " + CaseInfo[caseNumber][0] +"</b><br>" + CaseInfo[caseNumber][1] + "<br></p>";
+					}
+				}
+				
+				var view = new google.visualization.DataView(data);
+				view.setColumns([0,'00000','00000'+'T','00001','00001T','17965','17965T']);
+				wrapper.setView(view.toJSON());
+				alert(wrapper.getView());
+				
+				wrapper.draw(document.getElementById('curve_chart'));
+				
+				//caseNumber = data.getColumnLabel(number)
+				//document.getElementById("CaseLog").innerHTML = "<b>" + caseNumber + ": " + CaseInfo[caseNumber][0] +"</b><br>" + CaseInfo[caseNumber][1];
+			});
+		}
+	}
+	</script>
 	<style>
 		#CaseLog 
 		{
@@ -97,6 +116,7 @@
   </head>
   <body>
     <div id="curve_chart"></div>
+	<div id="curve_chart2"></div>
 	<div class="container">
 		<div id="CaseLog"></div>
 	</div>

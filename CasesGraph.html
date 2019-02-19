@@ -2,8 +2,10 @@
   <head>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
-      google.charts.load('current', {'packages':['corechart']});
-      google.charts.setOnLoadCallback(drawChart);
+      
+	  google.charts.load('current', {'packages':['corechart', 'controls']});
+      
+	  google.charts.setOnLoadCallback(drawChart);
 
 	  function printObject(o) {
 		var out = '';
@@ -72,115 +74,115 @@ CaseInfo['17965'] = ['Missing Exchange auto-exclusions','<b>W31:</b> detects exc
 ;		
 		
 		var data = new google.visualization.DataTable();
-          data.addColumn('string', 'Week');
-data.addColumn('number', '00000');
-data.addColumn({type: 'string', role: 'tooltip'});
-data.addColumn('number', '00001');
-data.addColumn({type: 'string', role: 'tooltip'});
-data.addColumn('number', '12724');
-data.addColumn({type: 'string', role: 'tooltip'});
-data.addColumn('number', '13785');
-data.addColumn({type: 'string', role: 'tooltip'});
-data.addColumn('number', '14171');
-data.addColumn({type: 'string', role: 'tooltip'});
-data.addColumn('number', '14202');
-data.addColumn({type: 'string', role: 'tooltip'});
-data.addColumn('number', '14566');
-data.addColumn({type: 'string', role: 'tooltip'});
-data.addColumn('number', '14952');
-data.addColumn({type: 'string', role: 'tooltip'});
-data.addColumn('number', '14996');
-data.addColumn({type: 'string', role: 'tooltip'});
-data.addColumn('number', '15037');
-data.addColumn({type: 'string', role: 'tooltip'});
-data.addColumn('number', '15302');
-data.addColumn({type: 'string', role: 'tooltip'});
-data.addColumn('number', '15413');
-data.addColumn({type: 'string', role: 'tooltip'});
-data.addColumn('number', '15452');
-data.addColumn({type: 'string', role: 'tooltip'});
-data.addColumn('number', '15532');
-data.addColumn({type: 'string', role: 'tooltip'});
-data.addColumn('number', '15616');
-data.addColumn({type: 'string', role: 'tooltip'});
-data.addColumn('number', '15728');
-data.addColumn({type: 'string', role: 'tooltip'});
-data.addColumn('number', '16251');
-data.addColumn({type: 'string', role: 'tooltip'});
-data.addColumn('number', '16337');
-data.addColumn({type: 'string', role: 'tooltip'});
-data.addColumn('number', '16385');
-data.addColumn({type: 'string', role: 'tooltip'});
-data.addColumn('number', '16477');
-data.addColumn({type: 'string', role: 'tooltip'});
-data.addColumn('number', '16527');
-data.addColumn({type: 'string', role: 'tooltip'});
-data.addColumn('number', '16554');
-data.addColumn({type: 'string', role: 'tooltip'});
-data.addColumn('number', '16598');
-data.addColumn({type: 'string', role: 'tooltip'});
-data.addColumn('number', '16624');
-data.addColumn({type: 'string', role: 'tooltip'});
-data.addColumn('number', '16665');
-data.addColumn({type: 'string', role: 'tooltip'});
-data.addColumn('number', '16666');
-data.addColumn({type: 'string', role: 'tooltip'});
-data.addColumn('number', '16734');
-data.addColumn({type: 'string', role: 'tooltip'});
-data.addColumn('number', '16765');
-data.addColumn({type: 'string', role: 'tooltip'});
-data.addColumn('number', '16828');
-data.addColumn({type: 'string', role: 'tooltip'});
-data.addColumn('number', '16842');
-data.addColumn({type: 'string', role: 'tooltip'});
-data.addColumn('number', '16852');
-data.addColumn({type: 'string', role: 'tooltip'});
-data.addColumn('number', '16857');
-data.addColumn({type: 'string', role: 'tooltip'});
-data.addColumn('number', '16859');
-data.addColumn({type: 'string', role: 'tooltip'});
-data.addColumn('number', '16879');
-data.addColumn({type: 'string', role: 'tooltip'});
-data.addColumn('number', '16988');
-data.addColumn({type: 'string', role: 'tooltip'});
-data.addColumn('number', '16995');
-data.addColumn({type: 'string', role: 'tooltip'});
-data.addColumn('number', '17157');
-data.addColumn({type: 'string', role: 'tooltip'});
-data.addColumn('number', '17232');
-data.addColumn({type: 'string', role: 'tooltip'});
-data.addColumn('number', '17279');
-data.addColumn({type: 'string', role: 'tooltip'});
-data.addColumn('number', '17289');
-data.addColumn({type: 'string', role: 'tooltip'});
-data.addColumn('number', '17319');
-data.addColumn({type: 'string', role: 'tooltip'});
-data.addColumn('number', '17344');
-data.addColumn({type: 'string', role: 'tooltip'});
-data.addColumn('number', '17374');
-data.addColumn({type: 'string', role: 'tooltip'});
-data.addColumn('number', '17382');
-data.addColumn({type: 'string', role: 'tooltip'});
-data.addColumn('number', '17442');
-data.addColumn({type: 'string', role: 'tooltip'});
-data.addColumn('number', '17557');
-data.addColumn({type: 'string', role: 'tooltip'});
-data.addColumn('number', '17584');
-data.addColumn({type: 'string', role: 'tooltip'});
-data.addColumn('number', '17595');
-data.addColumn({type: 'string', role: 'tooltip'});
-data.addColumn('number', '17610');
-data.addColumn({type: 'string', role: 'tooltip'});
-data.addColumn('number', '17706');
-data.addColumn({type: 'string', role: 'tooltip'});
-data.addColumn('number', '17783');
-data.addColumn({type: 'string', role: 'tooltip'});
-data.addColumn('number', '17886');
-data.addColumn({type: 'string', role: 'tooltip'});
-data.addColumn('number', '17922');
-data.addColumn({type: 'string', role: 'tooltip'});
-data.addColumn('number', '17965');
-data.addColumn({type: 'string', role: 'tooltip'});
+          data.addColumn({type:'string', role:'domain', label:'Week'});
+data.addColumn({type:'number', role:'data', label:'00000'});
+data.addColumn({type:'string', role:'tooltip', label:'00000T'});
+data.addColumn({type:'number', role:'data', label:'00001'});
+data.addColumn({type:'string', role:'tooltip', label:'00001T'});
+data.addColumn({type:'number', role:'data', label:'12724'});
+data.addColumn({type:'string', role:'tooltip', label:'12724T'});
+data.addColumn({type:'number', role:'data', label:'13785'});
+data.addColumn({type:'string', role:'tooltip', label:'13785T'});
+data.addColumn({type:'number', role:'data', label:'14171'});
+data.addColumn({type:'string', role:'tooltip', label:'14171T'});
+data.addColumn({type:'number', role:'data', label:'14202'});
+data.addColumn({type:'string', role:'tooltip', label:'14202T'});
+data.addColumn({type:'number', role:'data', label:'14566'});
+data.addColumn({type:'string', role:'tooltip', label:'14566T'});
+data.addColumn({type:'number', role:'data', label:'14952'});
+data.addColumn({type:'string', role:'tooltip', label:'14952T'});
+data.addColumn({type:'number', role:'data', label:'14996'});
+data.addColumn({type:'string', role:'tooltip', label:'14996T'});
+data.addColumn({type:'number', role:'data', label:'15037'});
+data.addColumn({type:'string', role:'tooltip', label:'15037T'});
+data.addColumn({type:'number', role:'data', label:'15302'});
+data.addColumn({type:'string', role:'tooltip', label:'15302T'});
+data.addColumn({type:'number', role:'data', label:'15413'});
+data.addColumn({type:'string', role:'tooltip', label:'15413T'});
+data.addColumn({type:'number', role:'data', label:'15452'});
+data.addColumn({type:'string', role:'tooltip', label:'15452T'});
+data.addColumn({type:'number', role:'data', label:'15532'});
+data.addColumn({type:'string', role:'tooltip', label:'15532T'});
+data.addColumn({type:'number', role:'data', label:'15616'});
+data.addColumn({type:'string', role:'tooltip', label:'15616T'});
+data.addColumn({type:'number', role:'data', label:'15728'});
+data.addColumn({type:'string', role:'tooltip', label:'15728T'});
+data.addColumn({type:'number', role:'data', label:'16251'});
+data.addColumn({type:'string', role:'tooltip', label:'16251T'});
+data.addColumn({type:'number', role:'data', label:'16337'});
+data.addColumn({type:'string', role:'tooltip', label:'16337T'});
+data.addColumn({type:'number', role:'data', label:'16385'});
+data.addColumn({type:'string', role:'tooltip', label:'16385T'});
+data.addColumn({type:'number', role:'data', label:'16477'});
+data.addColumn({type:'string', role:'tooltip', label:'16477T'});
+data.addColumn({type:'number', role:'data', label:'16527'});
+data.addColumn({type:'string', role:'tooltip', label:'16527T'});
+data.addColumn({type:'number', role:'data', label:'16554'});
+data.addColumn({type:'string', role:'tooltip', label:'16554T'});
+data.addColumn({type:'number', role:'data', label:'16598'});
+data.addColumn({type:'string', role:'tooltip', label:'16598T'});
+data.addColumn({type:'number', role:'data', label:'16624'});
+data.addColumn({type:'string', role:'tooltip', label:'16624T'});
+data.addColumn({type:'number', role:'data', label:'16665'});
+data.addColumn({type:'string', role:'tooltip', label:'16665T'});
+data.addColumn({type:'number', role:'data', label:'16666'});
+data.addColumn({type:'string', role:'tooltip', label:'16666T'});
+data.addColumn({type:'number', role:'data', label:'16734'});
+data.addColumn({type:'string', role:'tooltip', label:'16734T'});
+data.addColumn({type:'number', role:'data', label:'16765'});
+data.addColumn({type:'string', role:'tooltip', label:'16765T'});
+data.addColumn({type:'number', role:'data', label:'16828'});
+data.addColumn({type:'string', role:'tooltip', label:'16828T'});
+data.addColumn({type:'number', role:'data', label:'16842'});
+data.addColumn({type:'string', role:'tooltip', label:'16842T'});
+data.addColumn({type:'number', role:'data', label:'16852'});
+data.addColumn({type:'string', role:'tooltip', label:'16852T'});
+data.addColumn({type:'number', role:'data', label:'16857'});
+data.addColumn({type:'string', role:'tooltip', label:'16857T'});
+data.addColumn({type:'number', role:'data', label:'16859'});
+data.addColumn({type:'string', role:'tooltip', label:'16859T'});
+data.addColumn({type:'number', role:'data', label:'16879'});
+data.addColumn({type:'string', role:'tooltip', label:'16879T'});
+data.addColumn({type:'number', role:'data', label:'16988'});
+data.addColumn({type:'string', role:'tooltip', label:'16988T'});
+data.addColumn({type:'number', role:'data', label:'16995'});
+data.addColumn({type:'string', role:'tooltip', label:'16995T'});
+data.addColumn({type:'number', role:'data', label:'17157'});
+data.addColumn({type:'string', role:'tooltip', label:'17157T'});
+data.addColumn({type:'number', role:'data', label:'17232'});
+data.addColumn({type:'string', role:'tooltip', label:'17232T'});
+data.addColumn({type:'number', role:'data', label:'17279'});
+data.addColumn({type:'string', role:'tooltip', label:'17279T'});
+data.addColumn({type:'number', role:'data', label:'17289'});
+data.addColumn({type:'string', role:'tooltip', label:'17289T'});
+data.addColumn({type:'number', role:'data', label:'17319'});
+data.addColumn({type:'string', role:'tooltip', label:'17319T'});
+data.addColumn({type:'number', role:'data', label:'17344'});
+data.addColumn({type:'string', role:'tooltip', label:'17344T'});
+data.addColumn({type:'number', role:'data', label:'17374'});
+data.addColumn({type:'string', role:'tooltip', label:'17374T'});
+data.addColumn({type:'number', role:'data', label:'17382'});
+data.addColumn({type:'string', role:'tooltip', label:'17382T'});
+data.addColumn({type:'number', role:'data', label:'17442'});
+data.addColumn({type:'string', role:'tooltip', label:'17442T'});
+data.addColumn({type:'number', role:'data', label:'17557'});
+data.addColumn({type:'string', role:'tooltip', label:'17557T'});
+data.addColumn({type:'number', role:'data', label:'17584'});
+data.addColumn({type:'string', role:'tooltip', label:'17584T'});
+data.addColumn({type:'number', role:'data', label:'17595'});
+data.addColumn({type:'string', role:'tooltip', label:'17595T'});
+data.addColumn({type:'number', role:'data', label:'17610'});
+data.addColumn({type:'string', role:'tooltip', label:'17610T'});
+data.addColumn({type:'number', role:'data', label:'17706'});
+data.addColumn({type:'string', role:'tooltip', label:'17706T'});
+data.addColumn({type:'number', role:'data', label:'17783'});
+data.addColumn({type:'string', role:'tooltip', label:'17783T'});
+data.addColumn({type:'number', role:'data', label:'17886'});
+data.addColumn({type:'string', role:'tooltip', label:'17886T'});
+data.addColumn({type:'number', role:'data', label:'17922'});
+data.addColumn({type:'string', role:'tooltip', label:'17922T'});
+data.addColumn({type:'number', role:'data', label:'17965'});
+data.addColumn({type:'string', role:'tooltip', label:'17965T'});
 data. addRows([
 ['1',null,'',null,'',null,'',null,'',null,'',null,'',0,'14566: Spreadsheets flagged as &quot;Script/Markup&quot;',0,'14952: IE hanging on some downloads',null,'',0,'15037: SAV install failing on Custom action',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,''],
 ['2',null,'',null,'',null,'',null,'',null,'',null,'',1,'14566: Spreadsheets flagged as &quot;Script/Markup&quot;',1,'14952: IE hanging on some downloads',0,'14996: Lack of USB Block Notifications',1,'15037: SAV install failing on Custom action',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,''],
@@ -217,7 +219,7 @@ data. addRows([
 ['33',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',2,'17922: SD card reader explorer hang',null,''],
 ['34',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,''],]);
 
-        var options = {
+        var opts = {
           title: 'Case Worklog',
           interpolateNulls: true,
 		  height: 600,
@@ -236,12 +238,6 @@ data. addRows([
 			showTextEvery: 1,
 			allowContainerBoundaryTextCufoff: false
 		  },
-		  animation:
-		  {
-			duration: 1000,
-			easing: 'out',
-			startup: true
-		  },
 		  vAxis: 
 		  { 
 			title: 'Weeks spent on Case'
@@ -254,31 +250,54 @@ data. addRows([
 
         var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
 		
-        chart.draw(data, options);
+        //chart.draw(data, opts);
 		
-		google.visualization.events.addListener(chart, 'select', function()
-		{
-			selection = chart.getSelection();
-			
-			row = selection[0].row;
-			val = data.getValue(row, selection[0].column);
-			limit = data.getNumberOfColumns();
-			
-			document.getElementById("CaseLog").innerHTML = "<p>";
-			for (i = 0; i < limit; i++)
-			{
-				if (val == data.getValue(row, i))
-				{
-					caseNumber = data.getColumnLabel(i);
-					document.getElementById("CaseLog").innerHTML += "<b>" + caseNumber + ": " + CaseInfo[caseNumber][0] +"</b><br>" + CaseInfo[caseNumber][1] + "<br></p>";
-				}
+		wrapper = new google.visualization.ChartWrapper(
+			{	
+				chartType: 'LineChart',
+				dataTable: data,
+				options: opts,
+				containerId: 'vis',
 			}
-			
-			//caseNumber = data.getColumnLabel(number)
-			//document.getElementById("CaseLog").innerHTML = "<b>" + caseNumber + ": " + CaseInfo[caseNumber][0] +"</b><br>" + CaseInfo[caseNumber][1];
-		});
-      }
-    </script>
+		);
+		
+		google.visualization.events.addListener(wrapper, 'ready', onReady);
+		
+		wrapper.draw(document.getElementById('curve_chart2'));
+		
+		function onReady()
+		{
+			google.visualization.events.addListener(wrapper, 'select', function()
+			{		
+				selection = wrapper.getChart().getSelection();
+				
+				row = selection[0].row;
+				val = data.getValue(row, selection[0].column);
+				limit = data.getNumberOfColumns();
+				
+				document.getElementById("CaseLog").innerHTML = "<p>";
+				for (i = 0; i < limit; i++)
+				{
+					if (val == data.getValue(row, i))
+					{
+						caseNumber = data.getColumnLabel(i);
+						document.getElementById("CaseLog").innerHTML += "<b>" + caseNumber + ": " + CaseInfo[caseNumber][0] +"</b><br>" + CaseInfo[caseNumber][1] + "<br></p>";
+					}
+				}
+				
+				var view = new google.visualization.DataView(data);
+				view.setColumns([0,'00000','00000'+'T','00001','00001T','17965','17965T']);
+				wrapper.setView(view.toJSON());
+				alert(wrapper.getView());
+				
+				wrapper.draw(document.getElementById('curve_chart'));
+				
+				//caseNumber = data.getColumnLabel(number)
+				//document.getElementById("CaseLog").innerHTML = "<b>" + caseNumber + ": " + CaseInfo[caseNumber][0] +"</b><br>" + CaseInfo[caseNumber][1];
+			});
+		}
+	}
+	</script>
 	<style>
 		#CaseLog 
 		{
@@ -294,6 +313,7 @@ data. addRows([
   </head>
   <body>
     <div id="curve_chart"></div>
+	<div id="curve_chart2"></div>
 	<div class="container">
 		<div id="CaseLog"></div>
 	</div>
