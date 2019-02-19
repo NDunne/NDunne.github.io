@@ -1,0 +1,104 @@
+<html>
+  <head>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart);
+
+	  function printObject(o) {
+		var out = '';
+		for (var p in o) {
+			out += p + ': ' + o[p] + '\n';
+        }
+        alert(out);
+	  }
+	  
+      function drawChart() {
+        var CaseInfo = new Object();
+		$addCaseInfo;		
+		
+		var data = new google.visualization.DataTable();
+          $str
+
+        var options = {
+          title: 'Case Worklog',
+          interpolateNulls: true,
+		  height: 600,
+		  pointsVisible: true,
+		  //selectionMode: 'multiple',
+		  //aggregationTarget: 'category',
+		  //focusTarget: 'category',
+		  legend: 
+		  { 
+			position: 'top',
+			maxLines: 10
+		  },
+		  hAxis: 
+		  { 
+			title: 'Week Number',
+			showTextEvery: 1,
+			allowContainerBoundaryTextCufoff: false
+		  },
+		  animation:
+		  {
+			duration: 1000,
+			easing: 'out',
+			startup: true
+		  },
+		  vAxis: 
+		  { 
+			title: 'Weeks spent on Case'
+		  },
+		  tooltip:
+		  {
+			isHtml: true,
+		  }
+		};
+
+        var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+		
+        chart.draw(data, options);
+		
+		google.visualization.events.addListener(chart, 'select', function()
+		{
+			selection = chart.getSelection();
+			
+			row = selection[0].row;
+			val = data.getValue(row, selection[0].column);
+			limit = data.getNumberOfColumns();
+			
+			document.getElementById("CaseLog").innerHTML = "<p>";
+			for (i = 0; i < limit; i++)
+			{
+				if (val == data.getValue(row, i))
+				{
+					caseNumber = data.getColumnLabel(i);
+					document.getElementById("CaseLog").innerHTML += "<b>" + caseNumber + ": " + CaseInfo[caseNumber][0] +"</b><br>" + CaseInfo[caseNumber][1] + "<br></p>";
+				}
+			}
+			
+			//caseNumber = data.getColumnLabel(number)
+			//document.getElementById("CaseLog").innerHTML = "<b>" + caseNumber + ": " + CaseInfo[caseNumber][0] +"</b><br>" + CaseInfo[caseNumber][1];
+		});
+      }
+    </script>
+	<style>
+		#CaseLog 
+		{
+			display: inline-block;
+			width: 50vw;
+			text-align: left;
+		}
+		.container
+		{
+			text-align: center;
+		}
+	</style>
+  </head>
+  <body>
+    <div id="curve_chart"></div>
+	<div class="container">
+		<div id="CaseLog"></div>
+	</div>
+  </body>
+</html>
