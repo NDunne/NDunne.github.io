@@ -15,8 +15,12 @@ class Case
 	#Maps [W#] -> [#W] Week number to number of weeks worked on.
 	$workLog
 	
+	#End state of case
+	$result
+	
+	
 	#Create new case from first note
-	Case($num, $desc, $initCaseLog, $initWeek)
+	Case($num, $desc, $initCaseLog, $initWeek, $resolve)
 	{
 		"CONSTRUCTOR"
 		$this.number = $num
@@ -29,14 +33,16 @@ class Case
 		$this.workLog = @{}
 		$this.workLog["W$($initWeek - 1)"] = 0
 		$this.workLog["W$initWeek"] = $this.weekCount
+		$this.result = $resolve
 	}
 	
 	#Append log to existing case and update worklog
-	Add($newCaseLog, $week)
+	Add($newCaseLog, $week, $resolve)
 	{
 		$this.caseLog = $this.caseLog + "<br><br><b>W" + $week + ":</b> " + $newCaseLog
 		$this.weekCount += 1
-		$this.workLog["W$week"] = $this.weekCount
+		$this.workLog["W$week"] = $this.weekCount	
+		$this.result = $resolve;
 	}
 }
 
@@ -70,16 +76,13 @@ Function toHTML($cases_map)
 				$tooltip = "'" + $case.value.number + ": " + $case.value.description + "'"
 			}
 			$data = $data + "," + $val + "," + $tooltip
-			$addCaseInfo = $addCaseInfo + "CaseInfo['" + $case.value.number + "'] = ['" + $case.value.description + "','" + $case.value.caseLog + "']`n"
+			$addCaseInfo = $addCaseInfo + "CaseInfo['" + $case.value.number + "'] = ['" + $case.value.description + "','" + $case.value.caseLog + "','" + $case.value.result+ "']`n"
 		}
 		$data = $data + "],"
 		$i++
 	}
-	while($i -lt 35)
+	while($i -lt 52)
 	$data = $data + "]);"
-	
-	#todo https://developers.google.com/chart/interactive/docs/customizing_tooltip_content
-	# tooltip action to show case log in another div
 	
 	$pwd = Get-Location
 	$base = [IO.File]::ReadAllText("$pwd\base.html") 
@@ -132,24 +135,35 @@ Function main
 				#Match Case number, description in * * and contents
 				
 				if ($f2)
-				{
+				{				
 					$CaseNum = $matches[1]
+					$CaseDesc = $matches[2]
+					$CaseLog = $matches[3]
+					
+					if($CaseLog -match '###(.*?)###')
+					{
+						$result = $matches[1]
+						$CaseLog = $CaseLog -replace '###(.*?)###',''
+					}
+					else
+					{
+						$result = "Unresolved"
+					}
 					if ($cases_map[$CaseNum] -eq $null)
 					{
 						#Create object if doesn't exist
-						$cases_map[$CaseNum] = New-Object -TypeName Case -ArgumentList $CaseNum,$matches[2],$matches[3],$week
+						$cases_map[$CaseNum] = New-Object -TypeName Case -ArgumentList $CaseNum,$CaseDesc,$CaseLog,$week,$result
 					}
 					else
 					{
 						#Add to existing object
-						$cases_map[$CaseNum].add($matches[3],$week)
+						$cases_map[$CaseNum].add($CaseLog,$week,$result)
 					}
 				}
 			}
 		}		
 	}
 	toHTML($cases_map)
-	#Read-Host -Prompt "Press Enter to Exit"
 }
 
 main

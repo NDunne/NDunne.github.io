@@ -3,103 +3,129 @@
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
       
-	  google.charts.load('current', {'packages':['corechart', 'controls']});
-      
-	  google.charts.setOnLoadCallback(drawChart);
-
-	  function printObject(o) {
-		var out = '';
-		for (var p in o) {
-			out += p + ': ' + o[p] + '\n';
-        }
-        alert(out);
-	  }
+		google.charts.load('current', {'packages':['corechart', 'controls']});
+		google.charts.setOnLoadCallback(drawChart);
 	  
-      function drawChart() {
-        var CaseInfo = new Object();
-		$addCaseInfo;		
-		
-		var data = new google.visualization.DataTable();
-          $str
-
-        var opts = {
-          title: 'Case Worklog',
-          interpolateNulls: true,
-		  height: 600,
-		  pointsVisible: true,
-		  //selectionMode: 'multiple',
-		  //aggregationTarget: 'category',
-		  //focusTarget: 'category',
-		  legend: 
-		  { 
-			position: 'top',
-			maxLines: 10
-		  },
-		  hAxis: 
-		  { 
-			title: 'Week Number',
-			showTextEvery: 1,
-			allowContainerBoundaryTextCufoff: false
-		  },
-		  vAxis: 
-		  { 
-			title: 'Weeks spent on Case'
-		  },
-		  tooltip:
-		  {
-			isHtml: true,
-		  }
-		};
-
-        var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
-		
-        //chart.draw(data, opts);
-		
-		wrapper = new google.visualization.ChartWrapper(
+		var CaseInfo = new Object();
+		$addCaseInfo;
+	  
+		var data;
+	  
+		function drawChart() 
+		{		
+			data = new google.visualization.DataTable();
+			$str
+			
+			var opts = {
+				title: 'Case Worklog',
+				interpolateNulls: true,
+				height: 600,
+				pointsVisible: true,
+				//selectionMode: 'multiple',
+				//aggregationTarget: 'category',
+				//focusTarget: 'category',
+				legend: 
+				{ 
+					position: 'top',
+					maxLines: 10
+				},
+				hAxis: 
+				{ 
+					title: 'Week Number',
+					showTextEvery: 1,
+					allowContainerBoundaryTextCufoff: false
+				},
+				vAxis: 
+				{ 
+					title: 'Weeks spent on Case'
+				},
+				tooltip:
+				{
+					isHtml: true,
+				}
+			};
+			
+			wrapper = new google.visualization.ChartWrapper(
 			{	
 				chartType: 'LineChart',
 				dataTable: data,
 				options: opts,
 				containerId: 'vis',
-			}
-		);
-		
-		google.visualization.events.addListener(wrapper, 'ready', onReady);
-		
-		wrapper.draw(document.getElementById('curve_chart2'));
+			});
+			
+			google.visualization.events.addListener(wrapper, 'ready', onReady);
+			
+			wrapper.draw(document.getElementById('curve_chart'));
+		}
 		
 		function onReady()
 		{
-			google.visualization.events.addListener(wrapper, 'select', function()
-			{		
-				selection = wrapper.getChart().getSelection();
-				
-				row = selection[0].row;
-				val = data.getValue(row, selection[0].column);
-				limit = data.getNumberOfColumns();
-				
-				document.getElementById("CaseLog").innerHTML = "<p>";
-				for (i = 0; i < limit; i++)
+			google.visualization.events.addListener(wrapper, 'select', onSelect);
+		}
+		
+		function onSelect()
+		{		
+			selection = wrapper.getChart().getSelection();
+			
+			row = selection[0].row;
+			val = data.getValue(row, selection[0].column);
+			limit = data.getNumberOfColumns();
+			
+			document.getElementById("CaseLog").innerHTML = "<p>";
+			for (i = 0; i < limit; i++)
+			{
+				if (val == data.getValue(row, i))
 				{
-					if (val == data.getValue(row, i))
+					caseNumber = data.getColumnLabel(i);
+					try
 					{
-						caseNumber = data.getColumnLabel(i);
 						document.getElementById("CaseLog").innerHTML += "<b>" + caseNumber + ": " + CaseInfo[caseNumber][0] +"</b><br>" + CaseInfo[caseNumber][1] + "<br></p>";
 					}
-				}
-				
-				var view = new google.visualization.DataView(data);
-				view.setColumns([0,'00000','00000'+'T','00001','00001T','17965','17965T']);
-				wrapper.setView(view.toJSON());
-				alert(wrapper.getView());
-				
-				wrapper.draw(document.getElementById('curve_chart'));
-				
-				//caseNumber = data.getColumnLabel(number)
-				//document.getElementById("CaseLog").innerHTML = "<b>" + caseNumber + ": " + CaseInfo[caseNumber][0] +"</b><br>" + CaseInfo[caseNumber][1];
-			});
+					catch(err) {} //Sometimes tries to read from tooltip columns, not sure why
+					}
+			}
 		}
-	}
+		
+		function listFromResolution(result)
+		{
+			var list = [0];
+			for (var key in CaseInfo)
+			{
+				if (CaseInfo[key][2] == result)
+				{
+					list.push(key);
+					list.push(key+'T');
+				}
+			}
+			return list;
+		}
+		
+		function randomFilter()
+		{
+			filterGraph([0,'00000','00000'+'T','00001','00001T','17965','17965T']);
+		}
+		
+		function testFilter()
+		{
+			filterGraph(listFromResolution("Code Change"));
+		}
+		
+		function filterGraph(columns)
+		{
+			var view = new google.visualization.DataView(data);
+			view.setColumns(columns);
+			wrapper.setView(view.toJSON());
+			
+			wrapper.draw(document.getElementById('curve_chart'));
+		}
+		
+		function showAll()
+		{
+			var view = new google.visualization.DataView(data);
+			wrapper.setView(view.toJSON());
+			
+			wrapper.draw(document.getElementById('curve_chart'));
+		}
 	</script>
 	<style>
 		#CaseLog 
@@ -116,7 +142,11 @@
   </head>
   <body>
     <div id="curve_chart"></div>
-	<div id="curve_chart2"></div>
+	<div id="controls">
+		<button onclick="showAll()" id="filterButton1">ALL</button>
+		<button onclick="randomFilter()" id="filterButton2">FILTER</button>
+		<button onclick="testFilter()" id="filterButton3">TEST</button>
+	</div>
 	<div class="container">
 		<div id="CaseLog"></div>
 	</div>
