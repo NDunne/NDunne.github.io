@@ -105,9 +105,9 @@
 			filterGraph([0,'00000','00000'+'T','00001','00001T','17965','17965T']);
 		}
 		
-		function testFilter()
+		function getFilter(result)
 		{
-			filterGraph(listFromResolution("Suggested Fix"));
+			filterGraph(listFromResolution(result));
 		}
 		
 		function filterGraph(columns)
@@ -144,8 +144,16 @@
     <div id="curve_chart"></div>
 	<div id="controls">
 		<button onclick="showAll()" id="filterButton1">ALL</button>
-		<button onclick="randomFilter()" id="filterButton2">FILTER</button>
-		<button onclick="testFilter()" id="filterButton3">TEST</button>
+		<button onclick="getFilter(this.innerHTML)">Suggested Fix</button>
+		<button onclick="getFilter(this.innerHTML)">New Bug</button>
+		<button onclick="getFilter(this.innerHTML)">Known Bug</button>
+		<button onclick="getFilter(this.innerHTML)">Environment Issue</button>
+		<button onclick="getFilter(this.innerHTML)">Feature Request</button>
+		<button onclick="getFilter(this.innerHTML)">Expected</button>
+		<button onclick="getFilter(this.innerHTML)">Workaround</button>
+		<button onclick="getFilter(this.innerHTML)">Transferred</button>
+		<button onclick="getFilter(this.innerHTML)">No Response</button>
+		<button onclick="getFilter(this.innerHTML)">Unresolved</button>
 	</div>
 	<div class="container">
 		<div id="CaseLog"></div>
