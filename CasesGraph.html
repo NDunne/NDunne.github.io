@@ -2,17 +2,22 @@
   <head>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
-      
+        //Load google things
 		google.charts.load('current', {'packages':['corechart', 'controls']});
+		
+		//once loaded call drawChar
 		google.charts.setOnLoadCallback(drawChart);
 	  
+		//global CaseInfo object
 		var CaseInfo = new Object();
+		
+		//powershell variable replaced by values
 		CaseInfo['00000'] = ['Health Trails Tool','<b>W5:</b> Creating a C++/.NET tool to view and query JSON objects created by SophosHealth in a GUI.<br><br><b>W6:</b>  Functional now, but more to do<br>~ Groups Health Events by various categories<br>~ Sorts<br>~ View data<br><br><b>W7:</b> Added setup batch file to install C++ redistributale, and create reg keys to allow context right-click launch for sdu root and Trails folder.<br>Also updated UI to show a table of a child events when parent is clicked. More css is required tho!','Unresolved']
 CaseInfo['00001'] = ['Case Grapher','<b>W32:</b> Working on powershell/javascript to parse case notes into progress graph using google charts api. Clicking on graph shows case history, and now all cases below the point clicked (this is not in the api as far as I can see). Powershell is used to take html notes files and compress cases into objects, then tabulate in javascript and draw with google charts. Output is a single html file that is easily trans<br><br><b>W33:</b> Working in Javascript to allow filtering of the graph using DataView class from Google charts API. Also commited to github for easier working.<br>','Unresolved']
 CaseInfo['12724'] = ['Detection of &#39;both&#39; location takes 5 minutes','<b>W21:</b> Logs suggest system is waiting for a lot of DNS queries to time out, as each adapter has multiple ip addresses, and each one is retried 3 times, taking 12 seconds each time. In code found a reg key to alter retry number, requested cx change to 1 to lower delay? ','Unresolved']
 CaseInfo['13785'] = ['Only one confirmation dialogue with attaching files to email for ~3s','<b>W4:</b> Initially believed to be caching action and retrieving incorrect cached action, dug through *lots* of data control code to determine key. Issue appears to actually be with repeat acknowledgement suppressor, meant to be for the same action and file in a short time. Equality operator of Acknowledgement objects reference attribute SourceFilename not set in DataControlRequest objects where Check Type is File Open (which attaching to email does). <br><br>Confirmed behaviour is the same with other File Open actions. Confirmed lack of string in local values by breaking in with debugger, comparing FileOpen locals to FileCopy (which displays all acknowledgement dialogues). FileOpen has blank strings where FileCopy has the full file path. Suggested a 1 line fix based on similar operation in the caching logic. <br>Potential Workaround of setting old Ack. timeouts to 0 not configurable :/','Suggested Fix']
 CaseInfo['13854'] = ['Wifi adapter device instance ID script','<b>W1:</b> Wrote powershell script to help Emile with this case. Retrieves instance ID from active Wifi adapter device. <br>','Transferred']
-CaseInfo['14171'] = ['SSPService crashing infrequently','<b>W4:</b> Logging generally unhelpful, dumps give stack trace. Code analysis allows crashing code to be exercised, does not crash every time, possible deadlock with spinlock timeout? <br><br><b>W5:</b> Update: Primary cause of crashes (for which dumps were provided) turns out to be duplicate. Recommended workaround from other ticket, investigation continues for non-duplicate crashes','Unresolved']
+CaseInfo['14171'] = ['SSPService crashing infrequently','<b>W4:</b> Logging generally unhelpful, dumps give stack trace. Code analysis allows crashing code to be exercised, does not crash every time, possible deadlock with spinlock timeout? <br><br><b>W5:</b> Update: Primary cause of crashes (for which dumps were provided) turns out to be duplicate. Recommended workaround from other ticket, investigation continues for non-duplicate crashes','Known Bug']
 CaseInfo['14202'] = ['Multiple Emails from single Virus detections','<b>W4:</b> (OPM) - Confirmed with original dev that multiple log detections is sometimes expected as shell extensions can open file on double click, and Windows indexer etc. Noted events are written as JSON to a folder for SMTPConsumer to send out, dug into smtp consumer. Noted events are batched until queue is idle, 25 events are batched or user attached to batch changes. Shell extensions where accessing file as both current User &amp; System, and switch resulted in email sent, so worst case new email for every shell extension (if alternating). Confirmed behaviour by accessing file (via &gt;runas) with dummy user after double click but before cleanup and observing seperate email.<br>Suggested System user not trigger new batch, as System events can be generated by a user action. ','New Bug']
 CaseInfo['14566'] = ['Spreadsheets flagged as &quot;Script/Markup&quot;','<b>W2:</b> Data Control policy flags .xlsx files as &quot;Script/Markup&quot; type. Issue believed to be browser specific so assigned to WINEP, however proved that issue only occurs on IE download as IE is the only one to perform a Data Control scan on download, other browsers do not perform file open action. <br>Uploading .xlsx files to all browsers but Edge (not supported) resulted in a flag, due to XML content of extracted archive. ','Expected']
 CaseInfo['14780'] = ['Edge failing to access intranet sites','<b>W1:</b> With Sophos Web Intelligence Filter (swi_fc) running Edge cannot connect to intranet sites. Reg key allows access, not created with swi_fc. Added url to Intranet zone to work around, and raised ticket with Microsoft inquiring about new behaviour. ','Transferred']
@@ -68,10 +73,12 @@ CaseInfo['17965'] = ['Missing Exchange auto-exclusions','<b>W31:</b> detects exc
 ;
 	  
 		var data;
+		var view;
 	  
 		function drawChart() 
 		{		
 			data = new google.visualization.DataTable();
+			//powershell variable replaced by values
 			data.addColumn({type:'string', role:'domain', label:'Week'});
 data.addColumn({type:'number', role:'data', label:'00000'});
 data.addColumn({type:'string', role:'tooltip', label:'00000T'});
@@ -243,14 +250,12 @@ data. addRows([
 ['50',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,''],
 ['51',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,''],]);
 			
+			//Graph options
 			var opts = {
 				title: 'Case Worklog',
 				interpolateNulls: true,
 				height: 600,
 				pointsVisible: true,
-				//selectionMode: 'multiple',
-				//aggregationTarget: 'category',
-				//focusTarget: 'category',
 				legend: 
 				{ 
 					position: 'top',
@@ -272,6 +277,7 @@ data. addRows([
 				}
 			};
 			
+			//Define chart type with wrapper
 			wrapper = new google.visualization.ChartWrapper(
 			{	
 				chartType: 'LineChart',
@@ -280,30 +286,46 @@ data. addRows([
 				containerId: 'vis',
 			});
 			
+			//Once ready event is fired the onReady function is called
 			google.visualization.events.addListener(wrapper, 'ready', onReady);
 			
+			//Chart must always have a view for CaseLog functionality when filtered
+			view = new google.visualization.DataView(data);
+			wrapper.setView(view.toJSON());
+			
+			//Draw to html div with ID curve_chart
 			wrapper.draw(document.getElementById('curve_chart'));
 		}
 		
+		//onSelect Listener can only be added once ready
 		function onReady()
 		{
 			google.visualization.events.addListener(wrapper, 'select', onSelect);
 		}
 		
+		//Show CaseLog in div below. This is non-trivial as multiple cases might have a point behind the one clicked,
+		//but getSelection only returns the top one
 		function onSelect()
 		{		
 			selection = wrapper.getChart().getSelection();
 			
 			row = selection[0].row;
-			val = data.getValue(row, selection[0].column);
-			limit = data.getNumberOfColumns();
+			
+			//This must be the view rather than the DataTable as otherwise the column will likely be wrong
+			val = view.getValue(row, selection[0].column);
+			
+			//loop limit
+			limit = view.getNumberOfColumns();
 			
 			document.getElementById("CaseLog").innerHTML = "<p>";
-			for (i = 0; i < limit; i++)
+			
+			//If value in this row (week) is the same for another column(case) they share this point on the graph
+			for (i = 1; i < limit; i+=2)
 			{
-				if (val == data.getValue(row, i))
+				console.log(view.getValue(row, i))
+				if (val == view.getValue(row, i))
 				{
-					caseNumber = data.getColumnLabel(i);
+					caseNumber = view.getColumnLabel(i);
 					try
 					{
 						document.getElementById("CaseLog").innerHTML += "<b>" + caseNumber + ": " + CaseInfo[caseNumber][0] +"</b><br>" + CaseInfo[caseNumber][1] + "<br></p>";
@@ -313,6 +335,7 @@ data. addRows([
 			}
 		}
 		
+		//If case has passed result, push case number and case number tooltip to list of included columns
 		function listFromResolution(result)
 		{
 			var list = [0];
@@ -327,28 +350,26 @@ data. addRows([
 			return list;
 		}
 		
-		function randomFilter()
-		{
-			filterGraph([0,'00000','00000'+'T','00001','00001T','17965','17965T']);
-		}
-		
+		//Passed a string to find the columns for
 		function getFilter(result)
 		{
 			filterGraph(listFromResolution(result));
 		}
 		
+		//Re-Draw graph with only given columns
 		function filterGraph(columns)
 		{
-			var view = new google.visualization.DataView(data);
+			view = new google.visualization.DataView(data);
 			view.setColumns(columns);
 			wrapper.setView(view.toJSON());
 			
 			wrapper.draw(document.getElementById('curve_chart'));
 		}
 		
+		//Re-Draw graph with no filter
 		function showAll()
 		{
-			var view = new google.visualization.DataView(data);
+			view = new google.visualization.DataView(data);
 			wrapper.setView(view.toJSON());
 			
 			wrapper.draw(document.getElementById('curve_chart'));
@@ -369,20 +390,20 @@ data. addRows([
   </head>
   <body>
     <div id="curve_chart"></div>
-	<div id="controls">
-		<button onclick="showAll()" id="filterButton1">ALL</button>
-		<button onclick="getFilter(this.innerHTML)">Suggested Fix</button>
-		<button onclick="getFilter(this.innerHTML)">New Bug</button>
-		<button onclick="getFilter(this.innerHTML)">Known Bug</button>
-		<button onclick="getFilter(this.innerHTML)">Environment Issue</button>
-		<button onclick="getFilter(this.innerHTML)">Feature Request</button>
-		<button onclick="getFilter(this.innerHTML)">Expected</button>
-		<button onclick="getFilter(this.innerHTML)">Workaround</button>
-		<button onclick="getFilter(this.innerHTML)">Transferred</button>
-		<button onclick="getFilter(this.innerHTML)">No Response</button>
-		<button onclick="getFilter(this.innerHTML)">Unresolved</button>
-	</div>
 	<div class="container">
+		<div id="controls">
+			<button onclick="showAll()" id="filterButton1">ALL</button>
+			<button onclick="getFilter(this.innerHTML)">Suggested Fix</button>
+			<button onclick="getFilter(this.innerHTML)">New Bug</button>
+			<button onclick="getFilter(this.innerHTML)">Known Bug</button>
+			<button onclick="getFilter(this.innerHTML)">Environment Issue</button>
+			<button onclick="getFilter(this.innerHTML)">Feature Request</button>
+			<button onclick="getFilter(this.innerHTML)">Expected</button>
+			<button onclick="getFilter(this.innerHTML)">Workaround</button>
+			<button onclick="getFilter(this.innerHTML)">Transferred</button>
+			<button onclick="getFilter(this.innerHTML)">No Response</button>
+			<button onclick="getFilter(this.innerHTML)">Unresolved</button>
+		</div>
 		<div id="CaseLog"></div>
 	</div>
   </body>

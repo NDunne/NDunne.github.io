@@ -2,28 +2,33 @@
   <head>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
-      
+        //Load google things
 		google.charts.load('current', {'packages':['corechart', 'controls']});
+		
+		//once loaded call drawChar
 		google.charts.setOnLoadCallback(drawChart);
 	  
+		//global CaseInfo object
 		var CaseInfo = new Object();
+		
+		//powershell variable replaced by values
 		$addCaseInfo;
 	  
 		var data;
+		var view;
 	  
 		function drawChart() 
 		{		
 			data = new google.visualization.DataTable();
+			//powershell variable replaced by values
 			$str
 			
+			//Graph options
 			var opts = {
 				title: 'Case Worklog',
 				interpolateNulls: true,
 				height: 600,
 				pointsVisible: true,
-				//selectionMode: 'multiple',
-				//aggregationTarget: 'category',
-				//focusTarget: 'category',
 				legend: 
 				{ 
 					position: 'top',
@@ -45,6 +50,7 @@
 				}
 			};
 			
+			//Define chart type with wrapper
 			wrapper = new google.visualization.ChartWrapper(
 			{	
 				chartType: 'LineChart',
@@ -53,30 +59,46 @@
 				containerId: 'vis',
 			});
 			
+			//Once ready event is fired the onReady function is called
 			google.visualization.events.addListener(wrapper, 'ready', onReady);
 			
+			//Chart must always have a view for CaseLog functionality when filtered
+			view = new google.visualization.DataView(data);
+			wrapper.setView(view.toJSON());
+			
+			//Draw to html div with ID curve_chart
 			wrapper.draw(document.getElementById('curve_chart'));
 		}
 		
+		//onSelect Listener can only be added once ready
 		function onReady()
 		{
 			google.visualization.events.addListener(wrapper, 'select', onSelect);
 		}
 		
+		//Show CaseLog in div below. This is non-trivial as multiple cases might have a point behind the one clicked,
+		//but getSelection only returns the top one
 		function onSelect()
 		{		
 			selection = wrapper.getChart().getSelection();
 			
 			row = selection[0].row;
-			val = data.getValue(row, selection[0].column);
-			limit = data.getNumberOfColumns();
+			
+			//This must be the view rather than the DataTable as otherwise the column will likely be wrong
+			val = view.getValue(row, selection[0].column);
+			
+			//loop limit
+			limit = view.getNumberOfColumns();
 			
 			document.getElementById("CaseLog").innerHTML = "<p>";
-			for (i = 0; i < limit; i++)
+			
+			//If value in this row (week) is the same for another column(case) they share this point on the graph
+			//+= 2 to skip over tooltip columns
+			for (i = 1; i < limit; i+=2)
 			{
-				if (val == data.getValue(row, i))
+				if (val == view.getValue(row, i))
 				{
-					caseNumber = data.getColumnLabel(i);
+					caseNumber = view.getColumnLabel(i);
 					try
 					{
 						document.getElementById("CaseLog").innerHTML += "<b>" + caseNumber + ": " + CaseInfo[caseNumber][0] +"</b><br>" + CaseInfo[caseNumber][1] + "<br></p>";
@@ -86,6 +108,7 @@
 			}
 		}
 		
+		//If case has passed result, push case number and case number tooltip to list of included columns
 		function listFromResolution(result)
 		{
 			var list = [0];
@@ -100,28 +123,26 @@
 			return list;
 		}
 		
-		function randomFilter()
-		{
-			filterGraph([0,'00000','00000'+'T','00001','00001T','17965','17965T']);
-		}
-		
+		//Passed a string to find the columns for
 		function getFilter(result)
 		{
 			filterGraph(listFromResolution(result));
 		}
 		
+		//Re-Draw graph with only given columns
 		function filterGraph(columns)
 		{
-			var view = new google.visualization.DataView(data);
+			view = new google.visualization.DataView(data);
 			view.setColumns(columns);
 			wrapper.setView(view.toJSON());
 			
 			wrapper.draw(document.getElementById('curve_chart'));
 		}
 		
+		//Re-Draw graph with no filter
 		function showAll()
 		{
-			var view = new google.visualization.DataView(data);
+			view = new google.visualization.DataView(data);
 			wrapper.setView(view.toJSON());
 			
 			wrapper.draw(document.getElementById('curve_chart'));
@@ -142,20 +163,20 @@
   </head>
   <body>
     <div id="curve_chart"></div>
-	<div id="controls">
-		<button onclick="showAll()" id="filterButton1">ALL</button>
-		<button onclick="getFilter(this.innerHTML)">Suggested Fix</button>
-		<button onclick="getFilter(this.innerHTML)">New Bug</button>
-		<button onclick="getFilter(this.innerHTML)">Known Bug</button>
-		<button onclick="getFilter(this.innerHTML)">Environment Issue</button>
-		<button onclick="getFilter(this.innerHTML)">Feature Request</button>
-		<button onclick="getFilter(this.innerHTML)">Expected</button>
-		<button onclick="getFilter(this.innerHTML)">Workaround</button>
-		<button onclick="getFilter(this.innerHTML)">Transferred</button>
-		<button onclick="getFilter(this.innerHTML)">No Response</button>
-		<button onclick="getFilter(this.innerHTML)">Unresolved</button>
-	</div>
 	<div class="container">
+		<div id="controls">
+			<button onclick="showAll()" id="filterButton1">ALL</button>
+			<button onclick="getFilter(this.innerHTML)">Suggested Fix</button>
+			<button onclick="getFilter(this.innerHTML)">New Bug</button>
+			<button onclick="getFilter(this.innerHTML)">Known Bug</button>
+			<button onclick="getFilter(this.innerHTML)">Environment Issue</button>
+			<button onclick="getFilter(this.innerHTML)">Feature Request</button>
+			<button onclick="getFilter(this.innerHTML)">Expected</button>
+			<button onclick="getFilter(this.innerHTML)">Workaround</button>
+			<button onclick="getFilter(this.innerHTML)">Transferred</button>
+			<button onclick="getFilter(this.innerHTML)">No Response</button>
+			<button onclick="getFilter(this.innerHTML)">Unresolved</button>
+		</div>
 		<div id="CaseLog"></div>
 	</div>
   </body>
