@@ -56,7 +56,7 @@ Function toHTML($cases_map)
 	{
 		$data = $data + "`ndata.addColumn({type:'number', role:'data', label:'" + $k + "'});`ndata.addColumn({type:'string', role:'tooltip', label:'" + $k + "T'});"
 	}
-	$i = 1
+	$i = 0
 	
 	$data = $data + "`n" + "data. addRows(["
 	do
