@@ -54,6 +54,8 @@ class Case
 	}
 }
 
+#TODO: column role style can set colour, allow colour to be persisited through filter by using case number somehow (hash?)
+
 Function toHTML($cases_map)
 {
 	#$data is a javascript string that will be added to the base html file
@@ -117,7 +119,7 @@ Function toHTML($cases_map)
 	
 	#Read base HTML file
 	$pwd = Get-Location
-	$base = [IO.File]::ReadAllText("$pwd\base.html") 
+	$base = [IO.File]::ReadAllText("$pwd\ParseNotesBase.html") 
 
 	#Replace variables
 	$page = $base.replace('$addCaseInfo', $addCaseInfo).replace('$str',$data)
