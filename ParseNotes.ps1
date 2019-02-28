@@ -1,3 +1,5 @@
+# https://accounts.google.com/b/0/DisplayUnlockCaptcha
+
 class Case
 {
 	#Case number WINEP - #####
@@ -56,8 +58,10 @@ class Case
 
 #TODO: column role style can set colour, allow colour to be persisited through filter by using case number somehow (hash?)
 
-Function toHTML($cases_map)
+Function toHTML
 {
+	$cases_map = $args[0]
+
 	#$data is a javascript string that will be added to the base html file
 	#it contains the dataTable for the charts api
 	$data = "data.addColumn({type:'string', role:'domain', label:'Week'});"
@@ -129,20 +133,169 @@ Function toHTML($cases_map)
 	Invoke-Item CasesGraph.html #open html file with default reader (browser).
 }
 
+Function parseWeek
+{
+	$cases_map = $args[0]
+	$week = $args[1]
+	$text = $args[2]
+	
+	"WEEK:"
+	$week
+
+	$s_content = $text -split "(<br>)+? *- " #Split case notes on line breaks and hyphen bullet points
+			
+	foreach ($case in $s_content)
+	{
+		if ($case -eq "<br>") { continue } #Skip delimiters
+	
+		$f2 = $case -match '(?: - )*([0-9]+) \*(.*?)\* (.*)' #Brackets return to matches variable in case you forgot. (?: ...) groups but doesn't return.
+		#Match Case number, description in * * and contents
+		
+		if ($f2)
+		{				
+			$CaseNum = $matches[1]
+			$CaseDesc = $matches[2]
+			$CaseLog = $matches[3]
+			
+			if($CaseLog -match '###(.*?)###') #Get result tag if it exisits
+			{
+				$result = $matches[1]
+				$CaseLog = $CaseLog -replace '###(.*?)###','' #Remove tag from CaseLog
+			}
+			else
+			{
+				$result = "Unresolved"
+			}
+			if ($cases_map[$CaseNum] -eq $null)
+			{
+				#Create object if doesn't exist
+				$cases_map[$CaseNum] = New-Object -TypeName Case -ArgumentList $CaseNum,$CaseDesc,$CaseLog,$week,$result
+			}
+			else
+			{
+				#Add to existing object
+				$cases_map[$CaseNum].add($CaseLog,$week,$result)
+			}
+		<#" "
+		$cases_map[$caseNum].description
+		$cases_map[$caseNum].caseLog
+		#>
+		}
+	}
+}
+
+Function pause ($message)
+{
+    # Check if running Powershell ISE
+    if ($psISE)
+    {
+        Add-Type -AssemblyName System.Windows.Forms
+        [System.Windows.Forms.MessageBox]::Show("$message")
+    }
+    else
+    {
+        Write-Host "$message" -ForegroundColor Yellow
+        $x = $host.ui.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+    }
+}
+
 Function main
 {
 	#Map [Case Number] -> [Case Object]
 	$cases_map = @{} 
+	
+	$attempts = 5
+	
+	do
+	{
+		try
+		{
+			$cred = Get-Credential
+		}
+		catch
+		{
+			"Get-Credential Cancelled"
+			return
+		}
+		if ($cred -eq $null)
+		{
+			"Error getting credentials, null"
+		}
+		else
+		{
+			$command = ".\pyScraper.py " + $cred.UserName + " " + $cred.GetNetworkCredential().Password
+		
+			$Raw = Invoke-Expression $command
+			
+			if ($Raw -match 'Success')
+			{
+				"Login Succesful"
+				break
+			}
+			if ($Raw -match "<class 'gkeepapi.exception.LoginException'>")
+			{
+				if ($Raw -match "BadAuthentication")
+				{
+					"Login Details Incorrect"
+					
+				}
+				elseif ($Raw -match "NeedsBrowser")
+				{
+					Start-Process -FilePath "https://accounts.google.com/b/0/DisplayUnlockCaptcha"
+					pause("Press Enter once Captcha is accepted...")
+				}
+				
+			}
+		}
+		$attempts -= 1
+		Write-Host $attempts "Attempts remaining"
+	}
+	while($attempts -gt 0)
+	
+	if ($attempts -eq 0)
+	{
+		"Too many failed login attempts"
+		return
+	}
+	
+	$buf = ""
+	$key = ""
+	
+	foreach ($line in $Raw)
+	{
+		if ($line -match 'W([1-9][0-9]*):')
+		{
+			if ($key -ne "")
+			{
+				parseWeek $cases_map $key $buf
+			}
+			
+			$buf = ""
+			$key = $matches[1]
+		}
+		else
+		{
+			$buf = $buf + "<br>" + $line
+		}
+	}
+	parseWeek $cases_map $key $buf
+	toHTML $cases_map
+}
 
-	$pwd = Get-Location
+Function old
+{
+	#Map [Case Number] -> [Case Object]
+	$cases_map = @{} 
+
+	#$pwd = Get-Location
 	
 	#Get files from Keep only where they are a Case log. Could have parse the file for the tag but this is quicker than opening and reading them all
-	$files = (Get-ChildItem "$pwd\Keep\" | Where-Object {$_.Name -match "W.*"}).Name -replace "W([0-9]) ", "W0`$1 "
+	#$files = (Get-ChildItem "$pwd\Keep\" | Where-Object {$_.Name -match "W.*"}).Name -replace "W([0-9]) ", "W0`$1 "
 	
 	#Sort to get caseLogs in chronological order. Above W[1-9] is replaced by W0[1-9] to allow sorting
-	$files = $files | Sort-Object
+	#$files = $files | Sort-Object
 	#Get all files sorted and excluding non related files
-	
+
 	foreach ($file in $files)
 	{	
 		
