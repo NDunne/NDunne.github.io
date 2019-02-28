@@ -353,24 +353,41 @@ data. addRows([
 		}
 		
 		//If case has passed result, push case number and case number tooltip to list of included columns
-		function listFromResolution(result)
+		function listFromResolution(filters)
 		{
 			var list = [0];
 			for (var key in CaseInfo)
 			{
-				if (CaseInfo[key][2] == result)
+				for (var i = 0; i < filters.length; i++)
 				{
-					list.push(key);
-					list.push(key+'T');
+					if (CaseInfo[key][2] == filters[i])
+					{
+						list.push(key);
+						list.push(key+'T'); //also push Tooltop column
+					}
 				}
 			}
 			return list;
 		}
 		
 		//Passed a string to find the columns for
-		function getFilter(result)
+		function getFilter()
 		{
-			filterGraph(listFromResolution(result));
+			var filters = [];
+			var checkboxes = document.getElementsByName("filter");
+			
+			//Build list of selected filters from checkboxes
+			for (var i = 0; i < checkboxes.length; i++)
+			{
+				if(checkboxes[i].checked)
+				{
+					filters.push(checkboxes[i].value);
+				}
+			}
+			
+			//Don't redraw if none selected - the api wouldn't redraw anyway only show an error on top
+			if (filters.length > 0)
+				filterGraph(listFromResolution(filters));
 		}
 		
 		//Re-Draw graph with only given columns
@@ -383,9 +400,20 @@ data. addRows([
 			wrapper.draw(document.getElementById('curve_chart'));
 		}
 		
-		//Re-Draw graph with no filter
+		//Check or uncheck all checkboxes based on parameter
+		function setAll(value)
+		{
+			var checkboxes = document.getElementsByName("filter");
+			for (var i = 0; i < checkboxes.length; i++)
+			{
+				checkboxes[i].checked = value;
+			}		
+		}
+		
+		//Re-Draw graph with no filter - save on big loop selecting all
 		function showAll()
 		{
+			setAll(true)
 			view = new google.visualization.DataView(data);
 			wrapper.setView(view.toJSON());
 			
@@ -409,17 +437,22 @@ data. addRows([
     <div id="curve_chart"></div>
 	<div class="container">
 		<div id="controls">
-			<button onclick="showAll()" id="filterButton1">ALL</button>
-			<button onclick="getFilter(this.innerHTML)">Suggested Fix</button>
-			<button onclick="getFilter(this.innerHTML)">New Bug</button>
-			<button onclick="getFilter(this.innerHTML)">Known Bug</button>
-			<button onclick="getFilter(this.innerHTML)">Environment Issue</button>
-			<button onclick="getFilter(this.innerHTML)">Feature Request</button>
-			<button onclick="getFilter(this.innerHTML)">Expected</button>
-			<button onclick="getFilter(this.innerHTML)">Workaround</button>
-			<button onclick="getFilter(this.innerHTML)">Transferred</button>
-			<button onclick="getFilter(this.innerHTML)">No Response</button>
-			<button onclick="getFilter(this.innerHTML)">Unresolved</button>
+			<div id="filters">
+				<input type="checkbox" name="filter" value="Suggested Fix" onclick="return getFilter()" checked="checked">Suggested Fix
+				<input type="checkbox" name="filter" value="New Bug" onclick="return getFilter()" checked="checked">New Bug
+				<input type="checkbox" name="filter" value="Known Bug" onclick="return getFilter()" checked="checked">Known Bug
+				<input type="checkbox" name="filter" value="Environment Issue" onclick="return getFilter()" checked="checked">Environment Issue
+				<input type="checkbox" name="filter" value="Feature Request" onclick="return getFilter()" checked="checked">Feature Request
+				<input type="checkbox" name="filter" value="Expected" onclick="return getFilter()" checked="checked">Expected
+				<input type="checkbox" name="filter" value="Workaround" onclick="return getFilter()" checked="checked">Workaround
+				<input type="checkbox" name="filter" value="Transferred" onclick="return getFilter()" checked="checked">Transferred
+				<input type="checkbox" name="filter" value="No Response" onclick="return getFilter()" checked="checked">No Response
+				<input type="checkbox" name="filter" value="Unresolved" onclick="return getFilter()" checked="checked">Unresolved
+			</div>
+			<div id="buttons">
+				<button onclick="showAll()" id="filterButton1">ALL</button>
+				<button onclick="setAll(false)" id="filterButton1">None</button>
+			</div
 		</div>
 		<div id="CaseLog"></div>
 	</div>
