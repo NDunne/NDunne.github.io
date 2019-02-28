@@ -138,9 +138,6 @@ Function parseWeek
 	$cases_map = $args[0]
 	$week = $args[1]
 	$text = $args[2]
-	
-	"WEEK:"
-	$week
 
 	$s_content = $text -split "(<br>)+? *- " #Split case notes on line breaks and hyphen bullet points
 			
@@ -204,10 +201,12 @@ Function main
 	#Map [Case Number] -> [Case Object]
 	$cases_map = @{} 
 	
+	#Exit after 5 failed attempts
 	$attempts = 5
 	
 	do
 	{
+		#Prevent console error on cancel/exit
 		try
 		{
 			$cred = Get-Credential
@@ -217,17 +216,21 @@ Function main
 			"Get-Credential Cancelled"
 			return
 		}
+		
 		if ($cred -eq $null)
 		{
+			#Credentials not filled out
 			"Error getting credentials, null"
 		}
 		else
 		{
+			#Build command only if $cred is not null
 			$command = ".\pyScraper.py " + $cred.UserName + " " + $cred.GetNetworkCredential().Password
 		
+			#Runs command to execute little python api caller - requires gkeepapi python library
 			$Raw = Invoke-Expression $command
 			
-			if ($Raw -match 'Success')
+			if ($Raw -match '^Success')
 			{
 				"Login Succesful"
 				break
@@ -241,10 +244,18 @@ Function main
 				}
 				elseif ($Raw -match "NeedsBrowser")
 				{
+					#Google requires this check to prevent too much automation
 					Start-Process -FilePath "https://accounts.google.com/b/0/DisplayUnlockCaptcha"
 					pause("Press Enter once Captcha is accepted...")
+					#Once accepted it persists for a few minutes
+					$Raw = Invoke-Expression $command
+					if ($Raw -match 'Success')
+					{
+						#Login details must be incorrect to get this error, so no need to check for error
+						"Login Succesful"
+						break
+					}
 				}
-				
 			}
 		}
 		$attempts -= 1
