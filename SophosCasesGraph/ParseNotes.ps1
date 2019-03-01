@@ -20,6 +20,10 @@ class Case
 	#End state of case
 	$result
 	
+	#Hex for colour to draw as
+	#$color
+	
+	static $mostWeeks = 0
 	
 	#Create new case from first note
 	Case($num, $desc, $initCaseLog, $initWeek, $resolve)
@@ -38,6 +42,8 @@ class Case
 		$this.workLog["W$($initWeek - 1)"] = 0
 		$this.workLog["W$initWeek"] = $this.weekCount
 		
+		#$this.GetColor()
+		
 		$this.result = $resolve
 	}
 	
@@ -46,6 +52,12 @@ class Case
 	{
 		$this.caseLog = $this.caseLog + "<br><br><b>W" + $week + ":</b> " + $newCaseLog
 		$this.weekCount += 1
+		
+		if ($this.weekCount -gt [Case]::mostWeeks)
+		{
+			[Case]::mostWeeks = $this.weekCount
+		}
+		
 		$this.workLog["W$week"] = $this.weekCount
 		
 		#Prevent overwrite of result in case of update after result tag in note.
@@ -54,11 +66,25 @@ class Case
 			$this.result = $resolve;
 		}
 	}
+	
+	<#GetColor()
+	{
+		$bytes = ::UTF8.GetBytes($this.number)
+		$algorithm = ::Create('MD5')
+		$StringBuilder = New-Object System.Text.StringBuilder 
+	  
+		$algorithm.ComputeHash($bytes) | 
+		ForEach-Object { 
+			$null = $StringBuilder.Append($_.ToString("x2")) 
+		}	 
+		$this.number
+		$StringBuilder.ToString() 
+	}#>
 }
 
 #TODO: column role style can set colour, allow colour to be persisited through filter by using case number somehow (hash?)
 
-Function toHTML
+Function toWebpage
 {
 	$cases_map = $args[0]
 
@@ -72,7 +98,9 @@ Function toHTML
 	#Add a column to the data table for each case. Each case also has a tooltip column with label '[Case#]T'.
 	foreach( $k in $sortedEnum.Name)
 	{
-		$data = $data + "`ndata.addColumn({type:'number', role:'data', label:'" + $k + "'});`ndata.addColumn({type:'string', role:'tooltip', label:'" + $k + "T'});"
+		$data = $data + "`ndata.addColumn({type:'number', role:'data', label:'" + $k + "'});"
+		$data = $data + "`ndata.addColumn({type:'string', role:'tooltip', label:'" + $k + "T'});"
+		$data = $data + "`ndata.addColumn({type:'string', role:'style', label:'" + $k + "S'});"
 	}
 	
 	#i starts at 0 for cases that begin in W1
@@ -101,7 +129,8 @@ Function toHTML
 				$tooltip = "'" + $case.value.number + ": " + $case.value.description + "'"
 			}
 			#add two cells to the current row - the data then the tooltip for the current case.
-			$data = $data + "," + $val + "," + $tooltip
+			
+			$data = $data + "," + $val + "," + $tooltip + "," + "'color: #F" + $case.value.number + ";'"
 		}
 		#Close data row
 		$data = $data + "],"
@@ -123,15 +152,14 @@ Function toHTML
 	
 	#Read base HTML file
 	$pwd = Get-Location
-	$base = [IO.File]::ReadAllText("$pwd\ParseNotesBase.html") 
+	$JSbase = [IO.File]::ReadAllText("$pwd\JSbase.js") 
 
 	#Replace variables
-	$page = $base.replace('$addCaseInfo', $addCaseInfo).replace('$str',$data)
+	$JSout = $JSbase.replace('$addCaseInfo', $addCaseInfo).replace('$str',$data).replace('$mostWeeks',[Case]::mostWeeks)
 	
 	#Write Out as UTF8 to prevent powershell wide chars
-	$page | Out-File CasesGraph.html -Encoding UTF8
+	$JSout | Out-File CasesGraphJS.js -Encoding UTF8
 
-	
 	Invoke-Item CasesGraph.html #open html file with default reader (browser).
 }
 
@@ -230,7 +258,7 @@ Function main
 			
 			if ($Raw -match '^Success')
 			{
-				"Login Succesful"
+				Write-Host "Login Succesful" -ForegroundColor Green
 				break
 			}
 			if ($Raw -match "<class 'gkeepapi.exception.LoginException'>")
@@ -250,7 +278,7 @@ Function main
 					if ($Raw -match 'Success')
 					{
 						#Login details must be incorrect to get this error, so no need to check for error
-						"Login Succesful"
+						Write-Host "Login Succesful" -ForegroundColor Green
 						break
 					}
 				}
@@ -288,7 +316,7 @@ Function main
 		}
 	}
 	parseWeek $cases_map $key $buf
-	toHTML $cases_map
+	toWebpage $cases_map
 }
 
 Function old
