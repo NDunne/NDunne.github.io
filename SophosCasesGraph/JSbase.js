@@ -17,7 +17,7 @@ function drawChart()
 {		
 	data = new google.visualization.DataTable();
 	//powershell variable replaced by values
-	$str
+	$data
 	
 	//Graph options
 	var opts = {
@@ -83,7 +83,7 @@ function onSelect()
 {		
 	selection = wrapper.getChart().getSelection();			
 	
-	if (selection == null)
+	if (selection == null || selection[0] == null)
 		return;
 	if (selection[0].row == null)
 	{
@@ -106,10 +106,12 @@ function onSelect()
 		
 		document.getElementById("CaseLog").innerHTML = "<p>";
 		
+		console.log(val);
 		//If value in this row (week) is the same for another column(case) they share this point on the graph
 		//+= 2 to skip over tooltip columns
-		for (i = 1; i < limit; i+=2)
+		for (i = 1; i < limit; i+=3)
 		{
+			console.log("== " + view.getValue(row, i));
 			if (val == view.getValue(row, i))
 			{
 				caseNumber = view.getColumnLabel(i);

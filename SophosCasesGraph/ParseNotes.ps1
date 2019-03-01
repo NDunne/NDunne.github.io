@@ -21,7 +21,7 @@ class Case
 	$result
 	
 	#Hex for colour to draw as
-	#$color
+	$color
 	
 	static $mostWeeks = 0
 	
@@ -42,7 +42,7 @@ class Case
 		$this.workLog["W$($initWeek - 1)"] = 0
 		$this.workLog["W$initWeek"] = $this.weekCount
 		
-		#$this.GetColor()
+		$this.GetColor()
 		
 		$this.result = $resolve
 	}
@@ -67,19 +67,17 @@ class Case
 		}
 	}
 	
-	<#GetColor()
+	GetColor()
 	{
-		$bytes = ::UTF8.GetBytes($this.number)
-		$algorithm = ::Create('MD5')
+		$bytes = [system.Text.Encoding]::UTF8.GetBytes($this.number)
+		$algorithm = [System.Security.Cryptography.HashAlgorithm]::Create('SHA1')
 		$StringBuilder = New-Object System.Text.StringBuilder 
 	  
-		$algorithm.ComputeHash($bytes) | 
-		ForEach-Object { 
+		$algorithm.ComputeHash($bytes) | ForEach-Object { 
 			$null = $StringBuilder.Append($_.ToString("x2")) 
 		}	 
-		$this.number
-		$StringBuilder.ToString() 
-	}#>
+		$this.color = $StringBuilder.ToString().Substring(0,6) 
+	}
 }
 
 #TODO: column role style can set colour, allow colour to be persisited through filter by using case number somehow (hash?)
@@ -116,6 +114,7 @@ Function toWebpage
 		
 		foreach($case in $sortedEnum)
 		{	
+			
 			$val = $case.value.workLog["W$i"]
 			
 			if ($val -eq $null) {
@@ -130,7 +129,7 @@ Function toWebpage
 			}
 			#add two cells to the current row - the data then the tooltip for the current case.
 			
-			$data = $data + "," + $val + "," + $tooltip + "," + "'color: #F" + $case.value.number + ";'"
+			$data = $data + "," + $val + "," + $tooltip + "," + "'color: #" + $case.value.color + ";'"
 		}
 		#Close data row
 		$data = $data + "],"
@@ -145,7 +144,7 @@ Function toWebpage
 	$addCaseInfo = ""
 	foreach($case in $sortedEnum)
 	{	
-		
+		$case.value.number
 		#Create CaseInfo item, Case number maps to a list containing Description (tooltip), CaseLog String as HTML and result.
 		$addCaseInfo = $addCaseInfo + "CaseInfo['" + $case.value.number + "'] = ['" + $case.value.description + "','" + $case.value.caseLog + "','" + $case.value.result+ "']`n"
 	}
@@ -155,7 +154,7 @@ Function toWebpage
 	$JSbase = [IO.File]::ReadAllText("$pwd\JSbase.js") 
 
 	#Replace variables
-	$JSout = $JSbase.replace('$addCaseInfo', $addCaseInfo).replace('$str',$data).replace('$mostWeeks',[Case]::mostWeeks)
+	$JSout = $JSbase.replace('$addCaseInfo', $addCaseInfo).replace('$data',$data).replace('$mostWeeks',[Case]::mostWeeks)
 	
 	#Write Out as UTF8 to prevent powershell wide chars
 	$JSout | Out-File CasesGraphJS.js -Encoding UTF8
@@ -273,6 +272,7 @@ Function main
 					#Google requires this check to prevent too much automation
 					Start-Process -FilePath "https://accounts.google.com/b/0/DisplayUnlockCaptcha"
 					pause("Press Enter once Captcha is accepted...")
+					"Re-trying Login..."
 					#Once accepted it persists for a few minutes
 					$Raw = Invoke-Expression $command
 					if ($Raw -match 'Success')
