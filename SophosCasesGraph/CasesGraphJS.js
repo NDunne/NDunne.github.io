@@ -320,8 +320,7 @@ data. addRows([
 		},
 		legend: 
 		{ 
-			position: 'top',
-			maxLines: 10
+			position: 'none'
 		},
 		hAxis: 
 		{ 

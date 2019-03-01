@@ -31,8 +31,7 @@ function drawChart()
 		},
 		legend: 
 		{ 
-			position: 'top',
-			maxLines: 10
+			position: 'none'
 		},
 		hAxis: 
 		{ 
