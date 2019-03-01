@@ -130,6 +130,8 @@ Function toHTML
 	
 	#Write Out as UTF8 to prevent powershell wide chars
 	$page | Out-File CasesGraph.html -Encoding UTF8
+
+	
 	Invoke-Item CasesGraph.html #open html file with default reader (browser).
 }
 
@@ -173,10 +175,6 @@ Function parseWeek
 				#Add to existing object
 				$cases_map[$CaseNum].add($CaseLog,$week,$result)
 			}
-		<#" "
-		$cases_map[$caseNum].description
-		$cases_map[$caseNum].caseLog
-		#>
 		}
 	}
 }
