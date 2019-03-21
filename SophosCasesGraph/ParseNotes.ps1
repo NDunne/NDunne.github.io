@@ -1,5 +1,15 @@
 # https://accounts.google.com/b/0/DisplayUnlockCaptcha
 
+<#
+TODO
+- Search by: CaseID, Component, contents??
+- Tick boxes for component?
+- Favourite cases?
+- Case result be data driven rather than magic
+- Look into keep api and replace with powershell? javascript???
+- resolution bitmap and enum?
+#>
+
 class Case
 {
 	#Case number WINEP - #####
@@ -42,6 +52,7 @@ class Case
 		$this.workLog["W$($initWeek - 1)"] = 0
 		$this.workLog["W$initWeek"] = $this.weekCount
 		
+		#Set the line colour for this case here so it doesn't need to be re-calculated on every re-draw
 		$this.GetColor()
 		
 		$this.result = $resolve
@@ -67,8 +78,10 @@ class Case
 		}
 	}
 	
+	#Sha1 hash the case number and use the first 6 characters as the colour for the line
 	GetColor()
 	{
+		#I stole this from stack overflow
 		$bytes = [system.Text.Encoding]::UTF8.GetBytes($this.number)
 		$algorithm = [System.Security.Cryptography.HashAlgorithm]::Create('SHA1')
 		$StringBuilder = New-Object System.Text.StringBuilder 
@@ -79,8 +92,6 @@ class Case
 		$this.color = $StringBuilder.ToString().Substring(0,6) 
 	}
 }
-
-#TODO: column role style can set colour, allow colour to be persisited through filter by using case number somehow (hash?)
 
 Function toWebpage
 {
@@ -96,8 +107,11 @@ Function toWebpage
 	#Add a column to the data table for each case. Each case also has a tooltip column with label '[Case#]T'.
 	foreach( $k in $sortedEnum.Name)
 	{
+		#Actual Data
 		$data = $data + "`ndata.addColumn({type:'number', role:'data', label:'" + $k + "'});"
+		#Tooltip
 		$data = $data + "`ndata.addColumn({type:'string', role:'tooltip', label:'" + $k + "T'});"
+		#Line Colour
 		$data = $data + "`ndata.addColumn({type:'string', role:'style', label:'" + $k + "S'});"
 	}
 	
@@ -112,6 +126,7 @@ Function toWebpage
 		#First column is week number
 		$data = $data + "`n['$i'"
 		
+		#Cases sorted by case number. This doesn't matter now the legend is hidden but I might need it in the future.
 		foreach($case in $sortedEnum)
 		{	
 			
@@ -144,7 +159,6 @@ Function toWebpage
 	$addCaseInfo = ""
 	foreach($case in $sortedEnum)
 	{	
-		$case.value.number
 		#Create CaseInfo item, Case number maps to a list containing Description (tooltip), CaseLog String as HTML and result.
 		$addCaseInfo = $addCaseInfo + "CaseInfo['" + $case.value.number + "'] = ['" + $case.value.description + "','" + $case.value.caseLog + "','" + $case.value.result+ "']`n"
 	}
