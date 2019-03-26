@@ -88,7 +88,7 @@ function onSelect()
 	{
 		//Legend clicked
 		caseNumber = view.getColumnLabel(selection[0].column);
-		document.getElementById("CaseLog").innerHTML = "<p><b>" + caseNumber + ": " + CaseInfo[caseNumber][0] +"</b><br>" + CaseInfo[caseNumber][1] + "<br></p>";
+		document.getElementById("CaseLog").innerHTML = "<p><b>" + caseNumber + ": " + CaseInfo[caseNumber].description +"</b><br>" + CaseInfo[caseNumber].caseLog + "<br></p>";
 	}
 	else
 	{
@@ -116,7 +116,7 @@ function onSelect()
 				caseNumber = view.getColumnLabel(i);
 				try
 				{
-					document.getElementById("CaseLog").innerHTML += "<b>" + caseNumber + ": " + CaseInfo[caseNumber][0] +"</b><br>" + CaseInfo[caseNumber][1] + "<br></p>";
+					document.getElementById("CaseLog").innerHTML += "<b>" + caseNumber + ": " + CaseInfo[caseNumber].description +"</b><br>" + CaseInfo[caseNumber].caseLog + "<br></p>";
 				}
 				catch(err) {} //Sometimes tries to read from tooltip columns, not sure why
 			}
@@ -132,7 +132,7 @@ function listFromResolution(filters)
 	{
 		for (var i = 0; i < filters.length; i++)
 		{
-			if (CaseInfo[key][2] == filters[i])
+			if (CaseInfo[key].Result == filters[i])
 			{
 				list.push(key);
 				list.push(key+'T'); //also push Tooltop column

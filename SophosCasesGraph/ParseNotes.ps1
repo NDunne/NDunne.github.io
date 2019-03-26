@@ -165,7 +165,14 @@ Function toWebpage
 	foreach($case in $sortedEnum)
 	{	
 		#Create CaseInfo item, Case number maps to a list containing Description (tooltip), CaseLog String as HTML and result.
-		$addCaseInfo = $addCaseInfo + "CaseInfo['" + $case.value.number + "'] = ['" + $case.value.description + "','" + $case.value.caseLog + "','" + $case.value.tags["Result"] + "']`n"
+		$addCaseInfo = $addCaseInfo + "CaseInfo['" + $case.value.number + "'] = {description:'" + $case.value.description + "', caseLog:'" + $case.value.caseLog + "'"
+
+		foreach($tag in $case.value.tags.keys)
+		{
+			$addCaseInfo = $addCaseInfo + ", " + $tag + ":'" + $case.value.tags[$tag] + "'"
+		}
+
+		$addCaseInfo = $addCaseInfo +"}`n"
 	}
 	
 	#Read base HTML file
@@ -258,6 +265,7 @@ Function main
 		#Prevent console error on cancel/exit
 		try
 		{
+			#Get Google login details
 			$cred = Get-Credential
 		}
 		catch
@@ -289,7 +297,6 @@ Function main
 				if ($Raw -match "BadAuthentication")
 				{
 					Write-Host "Login Details Incorrect"  -ForegroundColor Red
-					
 				}
 				elseif ($Raw -match "NeedsBrowser")
 				{
@@ -315,6 +322,7 @@ Function main
 	
 	if ($attempts -eq 0)
 	{
+		#Prevent infinite fail
 		"Too many failed login attempts"
 		return
 	}
@@ -324,22 +332,29 @@ Function main
 	
 	foreach ($line in $Raw)
 	{
+		#Next week found
 		if ($line -match 'W([1-9][0-9]*):')
 		{
 			if ($key -ne "")
 			{
+				#Pass exisiting buffer containing last week's case notes 
 				parseWeek $cases_map $key $buf
 			}
 			
+			#Clear buffer
 			$buf = ""
-			$key = $matches[1]
+			$key = $matches[1] #Set key to found week string
 		}
 		else
 		{
+			#otherwise add content to buffer on a new line
 			$buf = $buf + "<br>" + $line
 		}
 	}
+	#One last call to pick up ends
 	parseWeek $cases_map $key $buf
+	
+	#Build Wep page
 	toWebpage $cases_map
 }
 
