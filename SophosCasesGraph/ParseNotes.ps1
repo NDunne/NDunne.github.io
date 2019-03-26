@@ -6,8 +6,8 @@ TODO
 - Tick boxes for component?
 - Favourite cases?
 - Case result be data driven rather than magic
+- Store map of 'Tags' and reference in ticket as ###Name:Value###
 - Look into keep api and replace with powershell? javascript???
-- resolution bitmap and enum?
 #>
 
 class Case
@@ -27,8 +27,8 @@ class Case
 	#Maps [W#] -> [#W] Week number to number of weeks worked on.
 	$workLog
 	
-	#End state of case
-	$result
+	#Maps [Tag] -> Value - Initially for Result but can be expanded for Component, Favourite etc.
+	$tags = @{}
 	
 	#Hex for colour to draw as
 	$color
@@ -36,13 +36,13 @@ class Case
 	static $mostWeeks = 0
 	
 	#Create new case from first note
-	Case($num, $desc, $initCaseLog, $initWeek, $resolve)
+	Case($num, $desc, $initCaseLog, $initWeek, [hashtable]$newTags)
 	{
 		"CONSTRUCTOR"
 		$this.number = $num
-		$num
+
 		$this.description = $desc
-		$desc
+
 		$this.caseLog = "<b>W" + $initWeek + ":</b> " + $initCaseLog
 		
 		$this.weekCount = 1
@@ -54,12 +54,17 @@ class Case
 		
 		#Set the line colour for this case here so it doesn't need to be re-calculated on every re-draw
 		$this.GetColor()
-		
-		$this.result = $resolve
+
+		#Add new tags to object
+		foreach($tag in $newTags.keys)
+		{
+			"$tag => $($newTags[$tag])"
+			$this.tags[$tag] = $newTags[$tag]
+		}
 	}
 	
 	#Append log to existing case and update worklog
-	Add($newCaseLog, $week, $resolve)
+	Add($newCaseLog, $week, $newTags)
 	{
 		$this.caseLog = $this.caseLog + "<br><br><b>W" + $week + ":</b> " + $newCaseLog
 		$this.weekCount += 1
@@ -70,11 +75,11 @@ class Case
 		}
 		
 		$this.workLog["W$week"] = $this.weekCount
-		
-		#Prevent overwrite of result in case of update after result tag in note.
-		if ($this.result -eq "Unresolved")
+
+		#Update existing tags or add new ones (PS does this automatically 
+		foreach($tag in $newTags.keys)
 		{
-			$this.result = $resolve;
+			$this.tags[$tag] = $newTags[$tag]
 		}
 	}
 	
@@ -160,7 +165,7 @@ Function toWebpage
 	foreach($case in $sortedEnum)
 	{	
 		#Create CaseInfo item, Case number maps to a list containing Description (tooltip), CaseLog String as HTML and result.
-		$addCaseInfo = $addCaseInfo + "CaseInfo['" + $case.value.number + "'] = ['" + $case.value.description + "','" + $case.value.caseLog + "','" + $case.value.result+ "']`n"
+		$addCaseInfo = $addCaseInfo + "CaseInfo['" + $case.value.number + "'] = ['" + $case.value.description + "','" + $case.value.caseLog + "','" + $case.value.tags["Result"] + "']`n"
 	}
 	
 	#Read base HTML file
@@ -197,24 +202,29 @@ Function parseWeek
 			$CaseDesc = $matches[2]
 			$CaseLog = $matches[3]
 			
-			if($CaseLog -match '###(.*?)###') #Get result tag if it exisits
-			{
-				$result = $matches[1]
-				$CaseLog = $CaseLog -replace '###(.*?)###','' #Remove tag from CaseLog
-			}
-			else
-			{
-				$result = "Unresolved"
+			$CaseTags = @{}
+			
+			while($CaseLog -match '###(.*?):(.*?)###') #Get tag if it exisits
+			{			
+				#Repeatedly find tags in case and remove until there are no more.
+				$CaseTags[$matches[1]] = $matches[2]
+				[regex]$pattern = '###.*?:.*?###'
+				$CaseLog = $pattern.replace($CaseLog, '', 1) #Remove only first instance instead of all.
 			}
 			if ($cases_map[$CaseNum] -eq $null)
 			{
 				#Create object if doesn't exist
-				$cases_map[$CaseNum] = New-Object -TypeName Case -ArgumentList $CaseNum,$CaseDesc,$CaseLog,$week,$result
+				
+				if ($CaseTags["Result"] -eq $null)
+				{
+					$CaseTags["Result"] = "Unresolved"
+				}
+				$cases_map[$CaseNum] = New-Object -TypeName Case -ArgumentList ($CaseNum, $CaseDesc, $CaseLog, $week, $CaseTags)
 			}
 			else
 			{
 				#Add to existing object
-				$cases_map[$CaseNum].add($CaseLog,$week,$result)
+				$cases_map[$CaseNum].add($CaseLog,$week,$CaseTags)
 			}
 		}
 	}
@@ -278,7 +288,7 @@ Function main
 			{
 				if ($Raw -match "BadAuthentication")
 				{
-					"Login Details Incorrect"
+					Write-Host "Login Details Incorrect"  -ForegroundColor Red
 					
 				}
 				elseif ($Raw -match "NeedsBrowser")
@@ -331,83 +341,6 @@ Function main
 	}
 	parseWeek $cases_map $key $buf
 	toWebpage $cases_map
-}
-
-Function old
-{
-	#Map [Case Number] -> [Case Object]
-	$cases_map = @{} 
-
-	#$pwd = Get-Location
-	
-	#Get files from Keep only where they are a Case log. Could have parse the file for the tag but this is quicker than opening and reading them all
-	#$files = (Get-ChildItem "$pwd\Keep\" | Where-Object {$_.Name -match "W.*"}).Name -replace "W([0-9]) ", "W0`$1 "
-	
-	#Sort to get caseLogs in chronological order. Above W[1-9] is replaced by W0[1-9] to allow sorting
-	#$files = $files | Sort-Object
-	#Get all files sorted and excluding non related files
-
-	foreach ($file in $files)
-	{	
-		
-		$file = $file -replace "W0([0-9]) ", "W`$1 " #swap back
-		
-		$URI = "file:\\\$pwd\Keep\$file"
-		$HTML = Invoke-WebRequest $URI
-		#parse as HTML
-		
-		$f = $file -match 'W([0-9]+) '
-		if ($f)
-		{
-			#Get Week number
-			$week = $matches[1]
-		}
-		
-		#Get Content tag text from html
-		$found = $HTML.RawContent -match '<div class="content">(.*?)</div>'
-		
-		if ($found)
-		{
-			$content = $matches[1]
-			$s_content = $content -split "(<br>)+? *- " #Split case notes on line breaks and hyphen bullet points
-			
-			foreach ($case in $s_content)
-			{
-				
-				if ($case -eq "<br>") { continue } #Skip delimiters
-				$f2 = $case -match '(?: - )*([0-9]+) \*(.*?)\* (.*)' #Brackets return to matches variable in case you forgot. (?: ...) groups but doesn't return.
-				#Match Case number, description in * * and contents
-				
-				if ($f2)
-				{				
-					$CaseNum = $matches[1]
-					$CaseDesc = $matches[2]
-					$CaseLog = $matches[3]
-					
-					if($CaseLog -match '###(.*?)###') #Get result tag if it exisits
-					{
-						$result = $matches[1]
-						$CaseLog = $CaseLog -replace '###(.*?)###','' #Remove tag from CaseLog
-					}
-					else
-					{
-						$result = "Unresolved"
-					}
-					if ($cases_map[$CaseNum] -eq $null)
-					{
-						#Create object if doesn't exist
-						$cases_map[$CaseNum] = New-Object -TypeName Case -ArgumentList $CaseNum,$CaseDesc,$CaseLog,$week,$result
-					}
-					else
-					{
-						#Add to existing object
-						$cases_map[$CaseNum].add($CaseLog,$week,$result)
-					}
-				}
-			}
-		}		
-	}
-	toHTML($cases_map)
 }
 
 main
