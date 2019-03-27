@@ -3,7 +3,7 @@ var CaseInfo = new Object();
 
 //powershell variable replaced by values
 CaseInfo['00000'] = {description:'Health Trails Tool', caseLog:'<b>W5:</b> Creating a C++/.NET tool to view and query JSON objects created by SophosHealth in a GUI. <br><br><b>W6:</b>  Functional now, but more to do<br>~ Groups Health Events by various categories<br>~ Sorts<br>~ View data<br><br><b>W7:</b> Added setup batch file to install C++ redistributale, and create reg keys to allow context right-click launch for sdu root and Trails folder.<br>Also updated UI to show a table of a child events when parent is clicked. More css is required tho!', Result:'Suggested Fix'};
-CaseInfo['00001'] = {description:'Case Grapher', caseLog:'<b>W32:</b> Working on powershell/javascript to parse case notes into progress graph using google charts api. Clicking on graph shows case history, and now all cases below the point clicked (this is not in the api as far as I can see). Powershell is used to take html notes files and compress cases into objects, then tabulate in javascript and draw with google charts. Output is a single html file that is easily transported and opened on any computer. <br><br><b>W33:</b> Working in Javascript to allow filtering of the graph using DataView class from Google charts API. Also commited to github for easier working. <br><br>Added button to filter and changed caseLog grouping to always pull from a view as it didn&#x27;t work when filtered before, due to reading row/column from the original dataTable when the columns don&#x27;t line up any more. Also implemented CaseLog info when clicking on the legend.<br><br><b>W34:</b> Trying to scrape data from webpage instead of manual takeout, by creating a browser instance and interacting with html elements via powershell, but its not easy as nothing has an id :/ Moving to a python 3rd party api with strong results. The format received is different so having to alter main though. It seems to be working after some fiddling to get everything in the right order, but I don&#x27;t think the description is right?<br><br>Managed to get it working with the scraper and very happy with it. Did have to add a credentials section and handling for various cases including cancel, wrong password, google captcha required and correct. Also, swapped the buttons in HTML out for checkboxes and updated the onclick functions to handle this. Currently the implementation isn&#x27;t great {O(n^2)} but meh I can&#x27;t think of a better way immediately, seeing as the filtering has to be pure javascript and can&#x27;t go back to powershell.<br><br>Its now hosted live on github so I hope I dont get in trouble for having my notes public... I also added a style column to the table for each line, and set the line colour based on the SHA1 hash of the case number, meaning it can stay constant when re-filtering (by default column number defines colour). The styling is supposed to be section specific though, so the legend has the wrong colours. Don&#x27;t think there is an easy workaround here so it&#x27;s hidden for now.<br><br>Next up: make it pretty! Tabs for cases being shown, a help section on how to read the graph now there is no Legend, maybe some CSS<br><br><b>W38:</b> Swapped the result tag for a tagging system where any word can be applied as a key:value pair. to support this the JS map now contains an object with K:V pairs rather than an array requiring context. ', Test:'Passed', Result:'Suggested Fix'};
+CaseInfo['00001'] = {description:'Case Grapher', caseLog:'<b>W32:</b> Working on powershell/javascript to parse case notes into progress graph using google charts api. Clicking on graph shows case history, and now all cases below the point clicked (this is not in the api as far as I can see). Powershell is used to take html notes files and compress cases into objects, then tabulate in javascript and draw with google charts. Output is a single html file that is easily transported and opened on any computer. <br><br><b>W33:</b> Working in Javascript to allow filtering of the graph using DataView class from Google charts API. Also commited to github for easier working. <br><br>Added button to filter and changed caseLog grouping to always pull from a view as it didn&#x27;t work when filtered before, due to reading row/column from the original dataTable when the columns don&#x27;t line up any more. Also implemented CaseLog info when clicking on the legend.<br><br><b>W34:</b> Trying to scrape data from webpage instead of manual takeout, by creating a browser instance and interacting with html elements via powershell, but its not easy as nothing has an id :/ Moving to a python 3rd party api with strong results. The format received is different so having to alter main though. It seems to be working after some fiddling to get everything in the right order, but I don&#x27;t think the description is right?<br><br>Managed to get it working with the scraper and very happy with it. Did have to add a credentials section and handling for various cases including cancel, wrong password, google captcha required and correct. Also, swapped the buttons in HTML out for checkboxes and updated the onclick functions to handle this. Currently the implementation isn&#x27;t great {O(n^2)} but meh I can&#x27;t think of a better way immediately, seeing as the filtering has to be pure javascript and can&#x27;t go back to powershell.<br><br>Its now hosted live on github so I hope I dont get in trouble for having my notes public... I also added a style column to the table for each line, and set the line colour based on the SHA1 hash of the case number, meaning it can stay constant when re-filtering (by default column number defines colour). The styling is supposed to be section specific though, so the legend has the wrong colours. Don&#x27;t think there is an easy workaround here so it&#x27;s hidden for now.<br><br>Next up: make it pretty! Tabs for cases being shown, a help section on how to read the graph now there is no Legend, maybe some CSS<br><br><b>W38:</b> Swapped the result tag for a tagging system where any word can be applied as a key:value pair. to support this the JS map now contains an object with K:V pairs rather than an array requiring context.  ', Result:'Suggested Fix', Component:'DataControl', Test:'Passed'};
 CaseInfo['12724'] = {description:'Detection of &#x27;both&#x27; location takes 5 minutes', caseLog:'<b>W21:</b> Logs suggest system is waiting for a lot of DNS queries to time out, as each adapter has multiple ip addresses, and each one is retried 3 times, taking 12 seconds each time. In code found a reg key to alter retry number, requested cx change to 1 to lower delay? ', Result:'Unresolved'};
 CaseInfo['13785'] = {description:'Only one confirmation dialogue with attaching files to email for ~3s', caseLog:'<b>W4:</b> Initially believed to be caching action and retrieving incorrect cached action, dug through *lots* of data control code to determine key. Issue appears to actually be with repeat acknowledgement suppressor, meant to be for the same action and file in a short time. Equality operator of Acknowledgement objects reference attribute SourceFilename not set in DataControlRequest objects where Check Type is File Open (which attaching to email does). <br><br>Confirmed behaviour is the same with other File Open actions. Confirmed lack of string in local values by breaking in with debugger, comparing FileOpen locals to FileCopy (which displays all acknowledgement dialogues). FileOpen has blank strings where FileCopy has the full file path. Suggested a 1 line fix based on similar operation in the caching logic. <br>Potential Workaround of setting old Ack. timeouts to 0 not configurable :/', Result:'Suggested Fix'};
 CaseInfo['13854'] = {description:'Wifi adapter device instance ID script', caseLog:'<b>W1:</b> Wrote powershell script to help Emile with this case. Retrieves instance ID from active Wifi adapter device.<br>', Result:'Transferred'};
@@ -376,7 +376,6 @@ data. addRows([
 
 function addHTML()
 {
-	console.log("AddHTML");
 	
 	var controls = document.getElementById('controls');
 	
@@ -387,8 +386,6 @@ function addHTML()
 		for (var caseProp in caseObj)
 		{
 			if (caseProp == "description" || caseProp == "caseLog") continue;
-
-			console.log(caseProp);
 			
 			var currentDiv = document.getElementById(caseProp + "Div");
 			
@@ -396,8 +393,18 @@ function addHTML()
 			{
 				currentDiv = document.createElement('Div');
 				currentDiv.id = caseProp + "Div";
+				currentDiv.className = "checkboxes";
 				currentDiv.innerHTML = "<span><b>" + caseProp + "</b></span><br>";
 				controls.appendChild(currentDiv);
+								
+				buttonsDiv = document.createElement('Div');
+				buttonsDiv.id = caseProp + "Buttons";
+				buttonsDiv.className = "buttons";
+				
+				buttonsDiv.innerHTML = "<button onclick='showAll(\"" + caseProp + "Filter\")' id=\"" + caseProp +"All\">ALL</button>"
+				buttonsDiv.innerHTML += "<button onclick='setAll(\"" + caseProp + "Filter\",false)' id=\"" + caseProp +"Clear\">NONE</button>"
+				
+				controls.appendChild(buttonsDiv);
 			}
 			
 			if (!currentDiv.contains(document.getElementById(caseObj[caseProp])))
@@ -407,7 +414,7 @@ function addHTML()
 				newCheckBox.name = caseProp + "Filter";
 				newCheckBox.id = caseObj[caseProp];
 				newCheckBox.value = caseObj[caseProp];
-				newCheckBox.onClick = "return getFilter(" + caseProp + ")";
+				newCheckBox.onclick = function() {getFilter()};
 				newCheckBox.checked="checked";
 				
 				var newLabel = document.createElement('label');
@@ -454,13 +461,10 @@ function onSelect()
 		limit = view.getNumberOfColumns();
 		
 		document.getElementById("CaseLog").innerHTML = "<p>";
-		
-		console.log(val);
 		//If value in this row (week) is the same for another column(case) they share this point on the graph
 		//+= 2 to skip over tooltip columns
 		for (i = 1; i < limit; i+=3)
 		{
-			console.log("== " + view.getValue(row, i));
 			if (val == view.getValue(row, i))
 			{
 				caseNumber = view.getColumnLabel(i);
@@ -475,42 +479,92 @@ function onSelect()
 }
 
 //If case has passed result, push case number and case number tooltip to list of included columns
-function listFromResolution(filters)
-{
+function listFromResolution(values)
+{	
 	var list = [0];
 	for (var key in CaseInfo)
 	{
-		for (var i = 0; i < filters.length; i++)
+		console.log("Case: " + key);
+		
+		var pushed = 0;
+		
+		var keys = Object.keys(values);
+		
+		for (var i = 0; i < keys.length ; i++)
 		{
-			if (CaseInfo[key].Result == filters[i])
+			var keep = 0;
+			var property = keys[i];
+			var filter = values[property];
+			
+			for (var j = 0; j < filter.length; j++)
 			{
-				list.push(key);
-				list.push(key+'T'); //also push Tooltop column
-				list.push(key+'S'); //also push Style column
+				if (CaseInfo[key][property] == filter[j])
+				{
+					console.log(property + " matched filter " + filter[j]); 
+					if (pushed == 0)
+					{
+						console.log("Adding");
+						list.push(key);
+						list.push(key+'T'); //also push Tooltop column
+						list.push(key+'S'); //also push Style column
+					
+						pushed = 1;
+					}
+					keep = 1;
+				}
 			}
+			if (pushed == 1 && keep == 0)
+			{
+				pushed = 0;
+				console.log("No match for property " + property + ", removing"); 
+				list.pop();
+				list.pop();
+				list.pop();
+			}
+			if (pushed == 0) break;
 		}
 	}
+	console.log(list);
 	return list;
 }
 
 //Passed a string to find the columns for
 function getFilter()
 {
-	var filters = [];
-	var checkboxes = document.getElementsByName("filter");
+	var values = {};
+	var checkboxDivs = document.getElementsByClassName("checkboxes");
 	
-	//Build list of selected filters from checkboxes
-	for (var i = 0; i < checkboxes.length; i++)
+	var filterCount = 0;
+	
+	console.log(checkboxDivs);
+	
+	for (var i = 0; i < checkboxDivs.length; i++)
 	{
-		if(checkboxes[i].checked)
+		var div = checkboxDivs[i];
+		var property = div.id.slice(0,-3);
+		
+		values[property] = []
+		
+		var checkboxes = div.children;
+		
+		console.log(checkboxes);
+		
+		for (var j = 0; j < checkboxes.length; j++)
 		{
-			filters.push(checkboxes[i].value);
+			if(checkboxes[j].checked)
+			{
+				values[property].push(checkboxes[j].value);
+				filterCount++;
+			}
 		}
+		
 	}
+	//Build list of selected filters from checkboxes
+	
 	
 	//Don't redraw if none selected - the api wouldn't redraw anyway only show an error on top
-	if (filters.length > 0)
-		filterGraph(listFromResolution(filters));
+	if (filterCount > 0)
+		filterGraph(listFromResolution(values));
 }
 
 //Re-Draw graph with only given columns
@@ -524,9 +578,9 @@ function filterGraph(columns)
 }
 
 //Check or uncheck all checkboxes based on parameter
-function setAll(value)
+function setAll(name,value)
 {
-	var checkboxes = document.getElementsByName("filter");
+	var checkboxes = document.getElementsByName(name);
 	for (var i = 0; i < checkboxes.length; i++)
 	{
 		checkboxes[i].checked = value;
@@ -534,12 +588,11 @@ function setAll(value)
 }
 
 //Re-Draw graph with no filter - save on big loop selecting all
-function showAll()
+function showAll(name)
 {
-	setAll(true)
-	view = new google.visualization.DataView(data);
-	wrapper.setView(view.toJSON());
+	setAll(name,true)
+	//view = new google.visualization.DataView(data);
+	//wrapper.setView(view.toJSON());
 	
-	wrapper.draw(document.getElementById('curve_chart'));
+	//wrapper.draw(document.getElementById('curve_chart'));
 }
-	
