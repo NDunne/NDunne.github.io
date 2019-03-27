@@ -109,6 +109,9 @@ Function toWebpage
 	#it contains the dataTable for the charts api
 	$data = "data.addColumn({type:'string', role:'domain', label:'Week'});"
 	
+	#null column
+	$data = $data + "`ndata.addColumn({type:'number', role:'data', label:'dummy'});"
+	
 	#The graph legend is in addition order, so sort here to ensure they are sensibly ordered.
 	$sortedEnum = $($cases_map.GetEnumerator() | sort -Property name)
 	
@@ -132,7 +135,7 @@ Function toWebpage
 	do
 	{
 		#First column is week number
-		$data = $data + "`n['$i'"
+		$data = $data + "`n['$i',null"
 		
 		#Cases sorted by case number. This doesn't matter now the legend is hidden but I might need it in the future.
 		foreach($case in $sortedEnum)

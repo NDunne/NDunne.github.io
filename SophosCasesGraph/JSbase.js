@@ -44,8 +44,8 @@ function drawChart()
 		vAxis: 
 		{ 
 			title: 'Weeks spent on Case',
-			minValue: $mostWeeks,
-			//This should come from the data
+			maxValue: $mostWeeks,
+			minValue: 0
 		},
 		tooltip:
 		{
@@ -100,7 +100,7 @@ function addHTML()
 				buttonsDiv.id = caseProp + "Buttons";
 				buttonsDiv.className = "buttons";
 				
-				buttonsDiv.innerHTML = "<button onclick='showAll(\"" + caseProp + "Filter\")' id=\"" + caseProp +"All\">ALL</button>"
+				buttonsDiv.innerHTML = "<button onclick='setAll(\"" + caseProp + "Filter\",true)' id=\"" + caseProp +"All\">ALL</button>"
 				buttonsDiv.innerHTML += "<button onclick='setAll(\"" + caseProp + "Filter\",false)' id=\"" + caseProp +"Clear\">NONE</button>"
 				
 				controls.appendChild(buttonsDiv);
@@ -258,7 +258,10 @@ function filterGraph(columns)
 	//don't draw if not enough columns
 	
 	//TODO this is not good
-	if (columns.length == 1) return;
+	if (columns.length == 1)
+	{
+		columns.push("dummy");
+	}
 	
 	view = new google.visualization.DataView(data);
 	view.setColumns(columns);
@@ -274,12 +277,7 @@ function setAll(name,value)
 	for (var i = 0; i < checkboxes.length; i++)
 	{
 		checkboxes[i].checked = value;
-	}		
-}
+	}
 
-//For all it makes sense to redraw, for none it does not.
-function showAll(name)
-{
-	setAll(name,true);
-	getFilter();
+	getFilter();	
 }
