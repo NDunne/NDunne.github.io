@@ -177,53 +177,43 @@ function onSelect()
 	}
 }
 
-//If case has passed result, push case number and case number tooltip to list of included columns
+//If case matches one of each filter, push case number and case number tooltip to list of included columns
 function listFromResolution(values)
 {	
-	var list = [0];
-	for (var key in CaseInfo)
-	{
-		console.log("Case: " + key);
-		
-		var pushed = 0;
+	var list = [0]; //0 is required to include 1st column every time
+	
+	//Iterate over all cases in CaseInfo
+	for (var caseNum in CaseInfo)
+	{	
+		//match flag
+		var push = -1;
 		
 		var keys = Object.keys(values);
 		
 		for (var i = 0; i < keys.length ; i++)
 		{
-			var keep = 0;
 			var property = keys[i];
 			var filter = values[property];
 			
 			for (var j = 0; j < filter.length; j++)
 			{
-				if (CaseInfo[key][property] == filter[j])
+				if (CaseInfo[caseNum][property] == filter[j])
 				{
-					console.log(property + " matched filter " + filter[j]); 
-					if (pushed == 0)
-					{
-						console.log("Adding");
-						list.push(key);
-						list.push(key+'T'); //also push Tooltop column
-						list.push(key+'S'); //also push Style column
-					
-						pushed = 1;
-					}
-					keep = 1;
+					console.log(caseNum + " matched " + property + ": " + filter[j])
+					push = i;
 				}
 			}
-			if (pushed == 1 && keep == 0)
-			{
-				pushed = 0;
-				console.log("No match for property " + property + ", removing"); 
-				list.pop();
-				list.pop();
-				list.pop();
-			}
-			if (pushed == 0) break;
+			
+			if (push != i) break;
+		}
+		if (push == (keys.length - 1))
+		{
+			list.push(caseNum);
+			list.push(caseNum+'T'); //also push Tooltop column
+			list.push(caseNum+'S'); //also push Style column
+			list.push(caseNum+'S'); //also push Style column
 		}
 	}
-	console.log(list);
 	return list;
 }
 
@@ -231,44 +221,45 @@ function listFromResolution(values)
 function getFilter()
 {
 	var values = {};
+	//CheckBox divs in a list
 	var checkboxDivs = document.getElementsByClassName("checkboxes");
 	
-	var filterCount = 0;
-	
-	console.log(checkboxDivs);
-	
+	//Iterate over each one
 	for (var i = 0; i < checkboxDivs.length; i++)
 	{
 		var div = checkboxDivs[i];
+		
+		//div id will be "[property]Div" so trim off "Div"
 		var property = div.id.slice(0,-3);
 		
-		values[property] = []
+		values[property] = [] //Setup map location for values to filter on
 		
 		var checkboxes = div.children;
-		
-		console.log(checkboxes);
+		//This gets all children not just the checkboxes, but it works because .checked
 		
 		for (var j = 0; j < checkboxes.length; j++)
 		{
 			if(checkboxes[j].checked)
 			{
+				//If checkbox is checked we want to filter on it, so add to the list under the property
 				values[property].push(checkboxes[j].value);
-				filterCount++;
 			}
 		}
 		
 	}
+	
 	//Build list of selected filters from checkboxes
-	
-	
-	//Don't redraw if none selected - the api wouldn't redraw anyway only show an error on top
-	if (filterCount > 0)
-		filterGraph(listFromResolution(values));
+	filterGraph(listFromResolution(values));
 }
 
 //Re-Draw graph with only given columns
 function filterGraph(columns)
 {
+	//don't draw if not enough columns
+	
+	//TODO this is not good
+	if (columns.length == 1) return;
+	
 	view = new google.visualization.DataView(data);
 	view.setColumns(columns);
 	wrapper.setView(view.toJSON());
@@ -286,12 +277,9 @@ function setAll(name,value)
 	}		
 }
 
-//Re-Draw graph with no filter - save on big loop selecting all
+//For all it makes sense to redraw, for none it does not.
 function showAll(name)
 {
-	setAll(name,true)
-	//view = new google.visualization.DataView(data);
-	//wrapper.setView(view.toJSON());
-	
-	//wrapper.draw(document.getElementById('curve_chart'));
+	setAll(name,true);
+	getFilter();
 }
