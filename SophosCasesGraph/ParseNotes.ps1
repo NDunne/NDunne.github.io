@@ -3,10 +3,13 @@
 <#
 TODO
 - Search by: CaseID, Component, contents??
+
 - Tick boxes for component?
 - Favourite cases?
+-This is done just need to add the buttons - possibly make them less magic
+
 - Case result be data driven rather than magic
-- Store map of 'Tags' and reference in ticket as ###Name:Value###
+
 - Look into keep api and replace with powershell? javascript???
 #>
 
@@ -172,7 +175,7 @@ Function toWebpage
 			$addCaseInfo = $addCaseInfo + ", " + $tag + ":'" + $case.value.tags[$tag] + "'"
 		}
 
-		$addCaseInfo = $addCaseInfo +"}`n"
+		$addCaseInfo = $addCaseInfo +"};`n"
 	}
 	
 	#Read base HTML file

@@ -1,9 +1,3 @@
-//Load google things
-google.charts.load('current', {'packages':['corechart', 'controls']});
-
-//once loaded call drawChar
-google.charts.setOnLoadCallback(drawChart);
-
 //global CaseInfo object
 var CaseInfo = new Object();
 
@@ -13,8 +7,16 @@ $addCaseInfo;
 var data;
 var view;
 
+//Load google things
+google.charts.load('current', {'packages':['corechart', 'controls']});
+
+//once loaded call drawChar
+google.charts.setOnLoadCallback(drawChart);
+
 function drawChart() 
-{		
+{	
+	addHTML()
+	
 	data = new google.visualization.DataTable();
 	//powershell variable replaced by values
 	$data
@@ -69,6 +71,53 @@ function drawChart()
 	
 	//Draw to html div with ID curve_chart
 	wrapper.draw(document.getElementById('curve_chart'));
+}
+
+function addHTML()
+{
+	console.log("AddHTML");
+	
+	var controls = document.getElementById('controls');
+	
+	for (var caseNum in CaseInfo)
+	{
+		var caseObj = CaseInfo[caseNum];
+	
+		for (var caseProp in caseObj)
+		{
+			if (caseProp == "description" || caseProp == "caseLog") continue;
+
+			console.log(caseProp);
+			
+			var currentDiv = document.getElementById(caseProp + "Div");
+			
+			if (currentDiv == null)
+			{
+				currentDiv = document.createElement('Div');
+				currentDiv.id = caseProp + "Div";
+				currentDiv.innerHTML = "<span><b>" + caseProp + "</b></span><br>";
+				controls.appendChild(currentDiv);
+			}
+			
+			if (!currentDiv.contains(document.getElementById(caseObj[caseProp])))
+			{
+				var newCheckBox = document.createElement('input');
+				newCheckBox.type = "checkbox";
+				newCheckBox.name = caseProp + "Filter";
+				newCheckBox.id = caseObj[caseProp];
+				newCheckBox.value = caseObj[caseProp];
+				newCheckBox.onClick = "return getFilter(" + caseProp + ")";
+				newCheckBox.checked="checked";
+				
+				var newLabel = document.createElement('label');
+				newLabel.for = caseObj[caseProp];
+				newLabel.innerHTML = caseObj[caseProp];
+				
+				currentDiv.appendChild(newCheckBox);
+				currentDiv.appendChild(newLabel);	
+			}	
+		}
+	}
 }
 
 //onSelect Listener can only be added once ready
