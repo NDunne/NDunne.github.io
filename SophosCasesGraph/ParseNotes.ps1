@@ -164,7 +164,7 @@ Function toWebpage
 	foreach($case in $sortedEnum)
 	{	
 		#Create CaseInfo item, Case number maps to a list containing Description (tooltip), CaseLog String as HTML and result.
-		$addCaseInfo = $addCaseInfo + "CaseInfo['" + $case.value.number + "'] = {description:'" + $case.value.description + "', caseLog:'" + $case.value.caseLog + "'"
+		$addCaseInfo = $addCaseInfo + "CaseInfo['" + $case.value.number + "'] = {description:'" + $case.value.description + "', caseLog:'" + $case.value.caseLog + "', color:'" + $case.value.color + "'"
 
 		foreach($tag in $case.value.tags.keys)
 		{

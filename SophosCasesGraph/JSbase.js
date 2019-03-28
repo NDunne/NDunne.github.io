@@ -78,6 +78,24 @@ function drawChart()
 	wrapper.draw(document.getElementById('curve_chart'));
 }
 
+function createCheckbox(parentDiv,property,value)
+{
+	var newCheckBox = document.createElement('input');
+	newCheckBox.type = "checkbox";
+	newCheckBox.name = property + "Filter";
+	newCheckBox.id = value;
+	newCheckBox.value = value;
+	newCheckBox.onclick = function() {getFilter()};
+	newCheckBox.checked="checked";
+	
+	var newLabel = document.createElement('label');
+	newLabel.for = value;
+	newLabel.innerHTML = value;
+	
+	parentDiv.insertBefore(newCheckBox,document.getElementById("Other " + property));
+	parentDiv.insertBefore(newLabel,document.getElementById("Other " + property));
+}
+
 function addHTML()
 {
 	
@@ -89,7 +107,7 @@ function addHTML()
 	
 		for (var caseProp in caseObj)
 		{
-			if (caseProp == "description" || caseProp == "caseLog") continue;
+			if (caseProp == "description" || caseProp == "caseLog" || caseProp == "color") continue;
 			
 			var currentDiv = document.getElementById(caseProp + "Div");
 			
@@ -99,6 +117,9 @@ function addHTML()
 				currentDiv.id = caseProp + "Div";
 				currentDiv.className = "checkboxes";
 				currentDiv.innerHTML = "<span><b>" + caseProp + "</b></span><br>";
+
+				createCheckbox(currentDiv,caseProp,"Other " + caseProp);
+				
 				controls.appendChild(currentDiv);
 								
 				buttonsDiv = document.createElement('Div');
@@ -113,20 +134,7 @@ function addHTML()
 			
 			if (!currentDiv.contains(document.getElementById(caseObj[caseProp])))
 			{
-				var newCheckBox = document.createElement('input');
-				newCheckBox.type = "checkbox";
-				newCheckBox.name = caseProp + "Filter";
-				newCheckBox.id = caseObj[caseProp];
-				newCheckBox.value = caseObj[caseProp];
-				newCheckBox.onclick = function() {getFilter()};
-				newCheckBox.checked="checked";
-				
-				var newLabel = document.createElement('label');
-				newLabel.for = caseObj[caseProp];
-				newLabel.innerHTML = caseObj[caseProp];
-				
-				currentDiv.appendChild(newCheckBox);
-				currentDiv.appendChild(newLabel);	
+				createCheckbox(currentDiv, caseProp, caseObj[caseProp]);
 			}	
 		}
 	}
@@ -174,7 +182,7 @@ function onSelect()
 				caseNumber = view.getColumnLabel(i);
 				try
 				{
-					document.getElementById("CaseLog").innerHTML += "<b>" + caseNumber + ": " + CaseInfo[caseNumber].description +"</b><br>" + CaseInfo[caseNumber].caseLog + "<br></p>";
+					document.getElementById("CaseLog").innerHTML += "<span style='color:" + CaseInfo[caseNumber].color + "'><b>" + caseNumber + ":</span> " + CaseInfo[caseNumber].description +"</b><br>" + CaseInfo[caseNumber].caseLog + "<br></p>";
 				}
 				catch(err) {} //Sometimes tries to read from tooltip columns, not sure why
 			}
