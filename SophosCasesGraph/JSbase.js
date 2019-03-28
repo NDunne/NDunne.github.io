@@ -1,3 +1,8 @@
+/* TODO
+
+- always add "Other" checkbox and handle as special case
+*/
+
 //global CaseInfo object
 var CaseInfo = new Object();
 
@@ -136,14 +141,14 @@ function onReady()
 //Show CaseLog in div below. 
 function onSelect()
 {		
-	selection = wrapper.getChart().getSelection();			
+	var selection = wrapper.getChart().getSelection();			
 	
 	if (selection == null || selection[0] == null)
 		return;
 	if (selection[0].row == null)
 	{
 		//Legend clicked
-		caseNumber = view.getColumnLabel(selection[0].column);
+		var caseNumber = view.getColumnLabel(selection[0].column);
 		document.getElementById("CaseLog").innerHTML = "<p><b>" + caseNumber + ": " + CaseInfo[caseNumber].description +"</b><br>" + CaseInfo[caseNumber].caseLog + "<br></p>";
 	}
 	else
@@ -151,18 +156,18 @@ function onSelect()
 		// Point Clicked. This is non-trivial as multiple cases might have a point behind the one clicked,
 		//but getSelection only returns the top one
 	
-		row = selection[0].row;
+		var row = selection[0].row;
 		
 		//This must be the view rather than the DataTable as otherwise the column will likely be wrong
-		val = view.getValue(row, selection[0].column);
+		var val = view.getValue(row, selection[0].column);
 		
 		//loop limit
-		limit = view.getNumberOfColumns();
+		var limit = view.getNumberOfColumns();
 		
 		document.getElementById("CaseLog").innerHTML = "<p>";
 		//If value in this row (week) is the same for another column(case) they share this point on the graph
 		//+= 2 to skip over tooltip columns
-		for (i = 1; i < limit; i+=3)
+		for (i = 2; i < limit; i+=3)
 		{
 			if (val == view.getValue(row, i))
 			{

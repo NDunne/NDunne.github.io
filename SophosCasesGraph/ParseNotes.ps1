@@ -2,14 +2,7 @@
 
 <#
 TODO
-- Search by: CaseID, Component, contents??
-
-- Tick boxes for component?
-- Favourite cases?
--This is done just need to add the buttons - possibly make them less magic
-
-- Case result be data driven rather than magic
-
+- Add tags to cases in keep
 - Look into keep api and replace with powershell? javascript???
 #>
 
@@ -18,7 +11,7 @@ class Case
 	#Case number WINEP - #####
 	$number
 	
-	#Short description
+	#Short descrWiption
 	$description
 	
 	#Concat all case info from notes
