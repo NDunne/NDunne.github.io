@@ -193,7 +193,7 @@ function onSelect()
 //If case matches one of each filter, push case number and case number tooltip to list of included columns
 function listFromResolution(values)
 {	
-	var list = [0]; //0 is required to include 1st column every time
+	var list = [0,1]; //Columns 0 and 1 are always included so there will always be enough to draw a graph
 	
 	//Iterate over all cases in CaseInfo
 	for (var caseNum in CaseInfo)
@@ -296,14 +296,6 @@ function getFilter()
 //Re-Draw graph with only given columns
 function filterGraph(columns)
 {
-	//don't draw if not enough columns
-	
-	//TODO this is not good
-	if (columns.length == 1)
-	{
-		columns.push("dummy");
-	}
-	
 	view = new google.visualization.DataView(data);
 	view.setColumns(columns);
 	wrapper.setView(view.toJSON());

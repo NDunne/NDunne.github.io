@@ -495,43 +495,63 @@ function onSelect()
 //If case matches one of each filter, push case number and case number tooltip to list of included columns
 function listFromResolution(values)
 {	
-	var list = [0]; //0 is required to include 1st column every time
+	var list = [0,1]; //Columns 0 and 1 are always included so there will always be enough to draw a graph
 	
 	//Iterate over all cases in CaseInfo
 	for (var caseNum in CaseInfo)
 	{	
-		//match flag
+		//match flag - make sure the case matches all active filters
 		var push = -1;
 		
+		//keys is the names of the properties (filters)
 		var keys = Object.keys(values);
 		
+		//iterate over keys
 		for (var i = 0; i < keys.length ; i++)
 		{
+			//property is the name of the filter we are checking
 			var property = keys[i];
+			
+			//filter is the values to check for - i.e. the checkboxes that have been selected
 			var filter = values[property];
 			
+			//Iterate over values to see if the case matches one
 			for (var j = 0; j < filter.length; j++)
 			{
+				//Special case for "Other" checkbox - checks for cases where the value is undefined
 				if (typeof CaseInfo[caseNum][property] === 'undefined' && filter[j].slice(0,5) == "Other")
 				{
 					console.log(caseNum + " has no property: " + property + ", matching 'Other'");
+					
+					//Update push flag to i. If it falls behind the loop then the case has missed a filter
 					push = i;
-				}	
+					
+					//No need to check the rest of the filter values after a match
+					break;
+				}
+				//If its not the "Other" checkbox then check the object property to see if it matches
 				else if (CaseInfo[caseNum][property] == filter[j])
 				{
 					console.log(caseNum + " matched property: " + property + " = " + filter[j]);
+					//Update push flag to i. If it falls behind the loop then the case has missed a filter
 					push = i;
+					
+					//No need to check the rest of the filter values after a match
+					break;
 				}
 			}
 			
 			if (push != i) 
 			{
+				//Case has gone through a whole filter of values without matching, filtered out.
 				console.log(caseNum + " did not match property:" + property);
 				break;
 			}
 		}
+		//If the push flag is updated on every iteration of the loop the case passes the filter
 		if (push == (keys.length - 1))
 		{
+			//Add to list of columns to include in the view
 			list.push(caseNum);
 			list.push(caseNum+'T'); //also push Tooltop column
 			list.push(caseNum+'S'); //also push Style column
@@ -578,14 +598,6 @@ function getFilter()
 //Re-Draw graph with only given columns
 function filterGraph(columns)
 {
-	//don't draw if not enough columns
-	
-	//TODO this is not good
-	if (columns.length == 1)
-	{
-		columns.push("dummy");
-	}
-	
 	view = new google.visualization.DataView(data);
 	view.setColumns(columns);
 	wrapper.setView(view.toJSON());
