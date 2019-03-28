@@ -512,20 +512,28 @@ function listFromResolution(values)
 			
 			for (var j = 0; j < filter.length; j++)
 			{
-				if (CaseInfo[caseNum][property] == filter[j])
+				if (typeof CaseInfo[caseNum][property] === 'undefined' && filter[j].slice(0,5) == "Other")
 				{
-					console.log(caseNum + " matched " + property + ": " + filter[j])
+					console.log(caseNum + " has no property: " + property + ", matching 'Other'");
+					push = i;
+				}	
+				else if (CaseInfo[caseNum][property] == filter[j])
+				{
+					console.log(caseNum + " matched property: " + property + " = " + filter[j]);
 					push = i;
 				}
 			}
 			
-			if (push != i) break;
+			if (push != i) 
+			{
+				console.log(caseNum + " did not match property:" + property);
+				break;
+			}
 		}
 		if (push == (keys.length - 1))
 		{
 			list.push(caseNum);
 			list.push(caseNum+'T'); //also push Tooltop column
-			list.push(caseNum+'S'); //also push Style column
 			list.push(caseNum+'S'); //also push Style column
 		}
 	}
