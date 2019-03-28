@@ -1,6 +1,6 @@
 /* TODO
 
-- always add "Other" checkbox and handle as special case
+- CSS? Bootstrap? Tabs for caselog just generally more pretty
 */
 
 //global CaseInfo object
@@ -78,12 +78,38 @@ function drawChart()
 	wrapper.draw(document.getElementById('curve_chart'));
 }
 
+//Insert a new checkbox in the correct place - Insertion sort O(n)
+function addSorted(parentDiv,inCheckbox,inLabel)
+{
+	console.log(inCheckbox);
+	var kids = parentDiv.children;
+	for (var i = 0; i < kids.length; i++)
+	{
+		//Only check checkbox childnodes
+		if (kids[i].className == "checkbox")
+		{
+			if (kids[i].id > inCheckbox.id || kids[i].id.slice(0,5) == "Other")
+			{
+				//needs to be this way round because kids updates live and the index i becomes the label
+				parentDiv.insertBefore(inLabel,kids[i]);
+				parentDiv.insertBefore(inCheckbox,kids[i]);
+				return;
+			}
+		}
+	}
+	//case for empty
+	parentDiv.appendChild(inCheckbox);
+	parentDiv.appendChild(inLabel);
+	
+}
+
 function createCheckbox(parentDiv,property,value)
 {
 	var newCheckBox = document.createElement('input');
 	newCheckBox.type = "checkbox";
 	newCheckBox.name = property + "Filter";
 	newCheckBox.id = value;
+	newCheckBox.className = "checkbox";
 	newCheckBox.value = value;
 	newCheckBox.onclick = function() {getFilter()};
 	newCheckBox.checked="checked";
@@ -92,8 +118,7 @@ function createCheckbox(parentDiv,property,value)
 	newLabel.for = value;
 	newLabel.innerHTML = value;
 	
-	parentDiv.insertBefore(newCheckBox,document.getElementById("Other " + property));
-	parentDiv.insertBefore(newLabel,document.getElementById("Other " + property));
+	addSorted(parentDiv,newCheckBox,newLabel);
 }
 
 function addHTML()
@@ -115,7 +140,7 @@ function addHTML()
 			{
 				currentDiv = document.createElement('Div');
 				currentDiv.id = caseProp + "Div";
-				currentDiv.className = "checkboxes";
+				currentDiv.className = "checkboxDiv";
 				currentDiv.innerHTML = "<span><b>" + caseProp + "</b></span><br>";
 
 				createCheckbox(currentDiv,caseProp,"Other " + caseProp);
@@ -263,7 +288,7 @@ function getFilter()
 {
 	var values = {};
 	//CheckBox divs in a list
-	var checkboxDivs = document.getElementsByClassName("checkboxes");
+	var checkboxDivs = document.getElementsByClassName("checkboxDiv");
 	
 	//Iterate over each one
 	for (var i = 0; i < checkboxDivs.length; i++)
