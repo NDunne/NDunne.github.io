@@ -26,12 +26,22 @@ function drawChart()
 	//powershell variable replaced by values
 	$data
 	
+	
+	
+	var chartwidth = $('#curve_chart').width();
+	
 	//Graph options
 	var opts = {
 		title: 'Case Worklog',
 		interpolateNulls: true,
-		height: 600,
+		width: chartwidth,
+		height: 400,
 		pointsVisible: true,
+		chartArea:
+		{
+			width: chartwidth,
+			left: 40,
+		},
 		series: 
 		{
 			'00001': { color: '#000000' }
@@ -49,7 +59,7 @@ function drawChart()
 		vAxis: 
 		{ 
 			title: 'Weeks spent on Case',
-			maxValue: $mostWeeks,
+			maxValue: 6,
 			minValue: 0
 		},
 		tooltip:
@@ -76,56 +86,74 @@ function drawChart()
 	
 	//Draw to html div with ID curve_chart
 	wrapper.draw(document.getElementById('curve_chart'));
+	$('input:checkbox').change(function() {
+		  getFilter();
+	});
 }
 
-//Insert a new checkbox in the correct place - Insertion sort O(n)
-function addSorted(parentDiv,inCheckbox,inLabel)
+//Insert a new checkbox in the correct place - Insertion sort O(n^2)
+function addSorted(parentDiv,inWrapper)
 {
-	console.log(inCheckbox);
 	var kids = parentDiv.children;
 	for (var i = 0; i < kids.length; i++)
 	{
-		//Only check checkbox childnodes
-		if (kids[i].className == "checkbox")
+		if (kids[i].id > inWrapper.id || kids[i].id.slice(0,5) == "Other")
 		{
-			if (kids[i].id > inCheckbox.id || kids[i].id.slice(0,5) == "Other")
-			{
-				//needs to be this way round because kids updates live and the index i becomes the label
-				parentDiv.insertBefore(inLabel,kids[i]);
-				parentDiv.insertBefore(inCheckbox,kids[i]);
-				return;
-			}
+			//needs to be this way round because kids updates live and the index i becomes the label
+			parentDiv.insertBefore(inWrapper,kids[i]);
+			return;
 		}
 	}
 	//case for empty
-	parentDiv.appendChild(inCheckbox);
-	parentDiv.appendChild(inLabel);
+	parentDiv.appendChild(inWrapper);
 	
 }
 
+//Create a new slider for a filter that doesn't exist yet
 function createCheckbox(parentDiv,property,value)
 {
+	var wrapper = document.createElement('label');
+	wrapper.id = value + "Wrapper";
+	
 	var newCheckBox = document.createElement('input');
 	newCheckBox.type = "checkbox";
 	newCheckBox.name = property + "Filter";
 	newCheckBox.id = value;
-	newCheckBox.className = "checkbox";
-	newCheckBox.value = value;
-	newCheckBox.onclick = function() {getFilter()};
-	newCheckBox.checked="checked";
+	newCheckBox.checked = true;
 	
-	var newLabel = document.createElement('label');
-	newLabel.for = value;
-	newLabel.innerHTML = value;
+	//Set as Bootstrap toggle type
+	$(function() 
+	{
+		$(newCheckBox).bootstrapToggle(
+		{
+			on:value,
+			off:value,
+			onstyle:"success",
+			offstyle:'danger',
+			width: '130px',
+			height: '60px',
+			
+		});
+		
+		//Register on change listener
+		$(newCheckBox).change(function() {
+			getFilter();
+		});
+	});
 	
-	addSorted(parentDiv,newCheckBox,newLabel);
+	wrapper.appendChild(newCheckBox);
+		
+	//Ensure alphabetical order	
+	addSorted(parentDiv,wrapper);
 }
 
+//This has to be JQuery-y otherwise it breaks any existing sliders
 function createCollapse(property)
 {
-	var parent = document.getElementById('controls');
+	var parent = $('#controls');
 	
-	parent.innerHTML += "\
+	//Some bootstrap wizardry
+	parent.append("\
 <div class=\"card\">\
     <div class=\"card-header\" id=" + property + "Header>\
         <button class=\"btn btn-secondary btn-block\" type=\"button\" data-toggle=\"collapse\" data-target=\"#" + property + "Collapse\" aria-expanded=\"true\" aria-controls=\"" + property + "Collapse\">\
@@ -133,36 +161,56 @@ function createCollapse(property)
         </button>\
     </div>\
     <div id=\"" + property + "Collapse\" class=\"collapse\">\
-        <div class=\"card-body\" id=\"" + property + "CollapseBody\">\
+        <div class=\"card-body\">\
+			<div class=\"btn-group-toggle\" id=\"" + property + "CollapseBody\">\
+			</div>\
         </div>\
     </div>\
- </div>";
+ </div>");
 }	
 
+//Generate the HTML from the data provided - filter collapses are generated dynamically
 function addHTML()
 {
-	
 	var controls = document.getElementById('controls');
 	
+	//Iterate Cases
 	for (var caseNum in CaseInfo)
 	{
 		var caseObj = CaseInfo[caseNum];
 	
 		for (var caseProp in caseObj)
 		{
+			//Required fields do not need filters
 			if (caseProp == "description" || caseProp == "caseLog" || caseProp == "color") continue;
 			
+			//Find existing div if it exists
 			var currentDiv = document.getElementById(caseProp + "CollapseBody");
 			
+			//If not create a new one
 			if (currentDiv == null)
 			{
 				createCollapse(caseProp);
+				//Re-assign variable
 				currentDiv = document.getElementById(caseProp + "CollapseBody");
+
+				//All catagories must have "Other" checkbox to match undefined
+				createCheckbox(currentDiv, caseProp, "Other");	
+			}
+			else if(document.getElementById(caseProp + "Buttons") == null)
+			{
+				//Buttons are only created if there is more than 1 option
+				buttonsDiv = document.createElement('Div');
+				buttonsDiv.id = caseProp + "Buttons";
+				buttonsDiv.className = "buttons";
 				
-				createCheckbox(currentDiv, caseProp, "Other");
+				buttonsDiv.innerHTML = "<button onclick='setAll(\"" + caseProp + "Filter\",true)' id=\"" + caseProp +"All\" class=\"btn btn-success\">ALL</button>"
+				buttonsDiv.innerHTML += "<button onclick='setAll(\"" + caseProp + "Filter\",false)' id=\"" + caseProp +"Clear\" class=\"btn btn-danger\">NONE</button>"
 				
+				currentDiv.appendChild(buttonsDiv);
 			}
 			
+			//Check if the filter has been created already, and if not create a checkbox
 			if (!currentDiv.contains(document.getElementById(caseObj[caseProp])))
 			{
 				createCheckbox(currentDiv, caseProp, caseObj[caseProp]);
@@ -250,7 +298,7 @@ function listFromResolution(values)
 				//Special case for "Other" checkbox - checks for cases where the value is undefined
 				if (typeof CaseInfo[caseNum][property] === 'undefined' && filter[j].slice(0,5) == "Other")
 				{
-					console.log(caseNum + " has no property: " + property + ", matching 'Other'");
+					//console.log(caseNum + " has no property: " + property + ", matching 'Other'");
 					
 					//Update push flag to i. If it falls behind the loop then the case has missed a filter
 					push = i;
@@ -261,7 +309,8 @@ function listFromResolution(values)
 				//If its not the "Other" checkbox then check the object property to see if it matches
 				else if (CaseInfo[caseNum][property] == filter[j])
 				{
-					console.log(caseNum + " matched property: " + property + " = " + filter[j]);
+					//console.log(caseNum + " matched property: " + property + " = " + filter[j]);
+					
 					//Update push flag to i. If it falls behind the loop then the case has missed a filter
 					push = i;
 					
@@ -273,7 +322,7 @@ function listFromResolution(values)
 			if (push != i) 
 			{
 				//Case has gone through a whole filter of values without matching, filtered out.
-				console.log(caseNum + " did not match property:" + property);
+				//console.log(caseNum + " did not match property:" + property);
 				break;
 			}
 		}
@@ -291,37 +340,32 @@ function listFromResolution(values)
 
 //Passed a string to find the columns for
 function getFilter()
-{
-	var values = {};
-	//CheckBox divs in a list
-	var checkboxDivs = document.getElementsByClassName("checkboxDiv");
+{	
+	//All checkboxes
+	var checkboxes = $(":checkbox");
 	
-	//Iterate over each one
-	for (var i = 0; i < checkboxDivs.length; i++)
+	var values = {};
+	
+	checkboxes.each( function() 
 	{
-		var div = checkboxDivs[i];
-		
-		//div id will be "[property]Div" so trim off "Div"
-		var property = div.id.slice(0,-3);
-		
-		values[property] = [] //Setup map location for values to filter on
-		
-		var checkboxes = div.children;
-		//This gets all children not just the checkboxes, but it works because .checked
-		
-		for (var j = 0; j < checkboxes.length; j++)
+		if(this.checked)
 		{
-			if(checkboxes[j].checked)
+			//Slice off [property]Filter
+			var property = this.name.slice(0,-6);
+			
+			//Create new property
+			if(values[property] == null)
 			{
-				//If checkbox is checked we want to filter on it, so add to the list under the property
-				values[property].push(checkboxes[j].value);
+				//console.log("new property " + property);
+				values[property] = [];
 			}
+			values[property].push(this.id);
 		}
-		
-	}
+	});
 	
 	//Build list of selected filters from checkboxes
 	filterGraph(listFromResolution(values));
+	
 }
 
 //Re-Draw graph with only given columns
@@ -337,11 +381,14 @@ function filterGraph(columns)
 //Check or uncheck all checkboxes based on parameter
 function setAll(name,value)
 {
-	var checkboxes = document.getElementsByName(name);
-	for (var i = 0; i < checkboxes.length; i++)
+	//JQuery get all inputs by name
+	var checkboxes = $("input[name='" + name + "']");
+
+	checkboxes.each(function() 
 	{
-		checkboxes[i].checked = value;
-	}
+		this.checked = value;
+		$(this).bootstrapToggle(value ? 'on' : 'off');
+	});
 
 	getFilter();	
 }

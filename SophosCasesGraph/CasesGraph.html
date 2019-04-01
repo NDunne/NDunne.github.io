@@ -6,26 +6,52 @@
 	
 	<!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-	
+	<link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
 	
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 	
 	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+	<script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
 	
 	<script src="CasesGraphJS.js"></script>
+	
+	<style>
+	
+	.btn {
+		line-height: 1.2;
+		padding-right: 0.75 !important
+	}
+	.toggle-off.btn {
+		padding-left: 0.75rem
+	}
+	.toggle-on.btn {
+		padding-right: 0.75rem
+	}
+	label {
+		padding:10px
+	}
+	</style>
   </head>
   <body>
-    <div class="card-body" id="curve_chart"></div>
-	<div class="container-fluid">
-		<div class="card text-center" style="width:40rem">
-			<div class="card-body">
-				<h5 class="card-title">Filters</h2>
-				<div class ="card" id="controls"></div>
+	<div class="card">
+		<div class="card-body" id="curve_chart">
+			<div class="d-flex align-items-center">
+				<strong>Loading Graph...</strong>
+				<div class="spinner-border ml-auto" role="status" aria-hidden="true"></div>
 			</div>
 		</div>
-		<div id="CaseLog"></div>
+	</div>
+	
+	<div class="card text-center">
+		<div class="card-body">
+			<h5 class="card-title">Filters</h2>
+			<div id="controls"></div>
+		</div>
+	</div>
+	<div class="card text-center">
+		<div class="card-body" id="CaseLog"></div>
 	</div>
   </body>
 </html>
