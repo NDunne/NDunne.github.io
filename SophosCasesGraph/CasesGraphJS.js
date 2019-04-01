@@ -66,8 +66,8 @@ CaseInfo['17922'] = {description:'SD card reader explorer hang', caseLog:'<b>W32
 CaseInfo['17965'] = {description:'Missing Exchange auto-exclusions', caseLog:'<b>W31:</b> detects exchange 2010 correctly but only 1 mailbox db out of 9 is auto excluded. Inspected lua this comes from and this info is from Get-MailboxDatabase ps command. Static debugging suggests the following operations do not account for this being a list of paths rather than a single path. <br>Set up a Domain Controller VM with Exchange server 2010 and confirmed the bug occurs with 2 mailboxes, then created a C executable to run a lua file (on Github). I wrote lua to run a powershell command to get Exchange config then interpret it in the same way as the Sophos code, but simplifying some parameters etc. and see the issue is as expected. Subsequent values overwrite the previous ones as they write to the same key. Modified the code to append to a list and handle the list correctly later on, then tested and submitted a CSRV ticket.  <br><br><b>W35:</b> New case 18417 looks to be the same, just confirming then will link. ', color:'35710e', Result:'Suggested Fix', Component:'Auto-Exclusions'};
 CaseInfo['18352'] = {description:'Peripheral Control interfering with FSLogic', caseLog:'<b>W34:</b> 3rd party (FSLogic) says that Sophos is preventing them from mounting a virtual hard disk from a remote location, as part of login to &quot;profile container&quot;. Can see sharing violation on the VHD file, but device control doesn&#x27;t seem involved and SavService is still setting up. Attempting to setup repro.<br><br>Think the repro is set up although it doesn&#x27;t seem to affect anything (?) only errors in the log, but they are the same errors.<br><br><b>W35:</b> Setting up SEC endpoint (for the first time) to test with SEC Peripheral control. Had to disable the endpoint firewall to allow communication, and Peripheral control is active now. No errors in FSLogix logs when using alert only. Used PSexec to take a remote PML of the login covering an error. Reproduced without On Access to compare, but still hard to see Sophos involvement. Also, am able to mount VHD from same remote location using DiskPart.<br><br>Issue does not occur with alert only, or blocking device types other than &quot;removable storage&quot;. Also asserted that the sharing violations early on are not relevant as they also occur in working case. Seems the issue happens during System interactions with the file - the 3rd party do have drivers, some of which sit lower than ours. Eliminated two SavOnAccess reads that return File Lock Conflict by disabling functionality. Between create and attach everything in the procmon succeeds then the file is deleted.<br><br>Might try to create an .exe that creates and mounts a remote vhd.<br><br><b>W36:</b> Thought I could use apimon to identify windows api calls, but can&#x27;t seem to run remotely. Instead, created c++ .exe using apis I could find, and reproduce the issue with the attach api call -  confirming that no drivers etc. are required. However, I changed something and now it won&#x27;t reproduce =( . Managed to see the repro once on day 2, unsure what conditions caused it.<br><br>So, the error message can be obtained with SAV-Service and dcservice stopped, and SavOnAccess unloaded, but not with sophos uninstalled. In this case it always fails twice then succeeds, even when using the disk management gui. Comparing the pmls can see that after the attach there are system queries that lack the partmgr and CLASSPNP drivers in the stack for failing attempts and have them for succeeding attempts. Why?<br>Confirmed with a clean install that VHD can be attached without device control, and once enabled the 3rd attach succeeds.<br><br>Reading about SCSI upper filter as the working run creates the key with upper filter set to partmgr whereas the failing ones report name not found. Not found the connection yet, but failing attempts also use DrvInst.exe to install drivers so we can insert out sdccoinstaller dll. Removing the reference to out dll causes it to still fail, so the presence of DrvInst would seem to be the issue? How do we cause this and why does this mean the attach fails.<br><br>Managed to find out how to break a working registry to reproduce the issue on demand. SCSI Enum key has instance sub keys, and if they have a partmgr parameter it will succeed if the device is assigned that instance id. Deleting all of these subkeys allows up to 3 to be created wrong.<br><br>BREAKTHROUGH might be a Microsoft issue. The DrvInst process is triggered by the existence of the guid in the CoDeviceInstallers key, which we create for sdccoinstaller.dll. Creating this key (empty) without Sophos installed causes the same issue. If existing broken instance keys exists, they are fixed by removing this value, so no need to delete broken instanceid keys as system. Without the coinstaller devC does work, but some devices might not be blocked until next restart, recommended the cxcontact MS and don&#x27;t block removable storage devices, or delete the key if necessary.<br>', color:'38587c', Result:'Unresolved', Component:'Device Control'};
 CaseInfo['18403'] = {description:'On Access slows file copying', caseLog:'<b>W38:</b> Another slow copy case, this time lots and lots of different files and types copying locally. Customer has been unable to narrow down a particular file or location, and the extra time is equal to the time to right click scan the files. Seems to be copyDetect being broken by SED again, but because it is local enabling local checksumming doesn&#x27;t help because the source file is not scanned to generate a checksum, only the target. As a test asked them to swap the drivers but definitely don&#x27;t leave it like that, as that would confirm SED&#x27;s interference.', color:'45218e', Result:'Unresolved'};
-CaseInfo['18760'] = {description:'File save takes excessively longer when SED is loaded', caseLog:'<b>W37:</b> Looks a bunch like oplocks to me - oplockBreakWait is 35s and read by SED hangs 35s before a system action relating to acknowledging smb2 lease oplock. Requested cx reduce the breakWait time and see if save time corresponds. <br><br><b>W38:</b> It wasn&#x27;t oplocks :/ Can see SED driver is trying to read the file and waiting 35s to be able to do it so it just seems so likely to me that it is... maybe the config needs to be on the endpoint not the server?', color:'889f31', Result:'Unresolved', Component:'Endpoint Defense'};
-CaseInfo['18795'] = {description:'DLP events not going back to Central', caseLog:'<b>W37:</b> The crux of this case was destination only checks again - copy without using explorer cannot be checked, so is blocked by default without a notification, as it isn&#x27;t certain that the file contained sensitive data. GES was thrown off by lots of health events in the Error folder, as the customer seems to have deleted the trails folder, and that is where they are moved to if the transfer from Incoming to Trail fails. I used my own HealthGUI tool for this case :)  <br><br><b>W38:</b> Turns out the checks that are important were not destination only, GES just decided to pull one out when summarising instead of the one that matches the PML... So the cx is dragging a file onto the USB and no notification goes to central. I thought I was reproducing this, but turns out the date and time on my VM was incorrect so they had expired. Asked for MCS Trails and MCSClient debug logging.', color:'f10999', Result:'Unresolved', Component:'Data Control'};
+CaseInfo['18760'] = {description:'File save takes excessively longer when SED is loaded', caseLog:'<b>W37:</b> Looks a bunch like oplocks to me - oplockBreakWait is 35s and read by SED hangs 35s before a system action relating to acknowledging smb2 lease oplock. Requested cx reduce the breakWait time and see if save time corresponds. <br><br><b>W38:</b> The command didn&#x27;t help :/ Can see SED driver is trying to read the file and waiting 35s to be able to do it so it just seems so likely to me that it is... maybe the config needs to be on the endpoint not the server? Requested PML and Wireshark from client.', color:'889f31', Result:'Unresolved', Component:'Endpoint Defense'};
+CaseInfo['18795'] = {description:'DLP events not going back to Central', caseLog:'<b>W37:</b> The crux of this case was destination only checks again - copy without using explorer cannot be checked, so is blocked by default without a notification, as it isn&#x27;t certain that the file contained sensitive data. GES was thrown off by lots of health events in the Error folder, as the customer seems to have deleted the trails folder, and that is where they are moved to if the transfer from Incoming to Trail fails. I used my own HealthGUI tool for this case :)  <br><br><b>W38:</b> I thought the checks that are important were not destination only, and GES just decided to pull one out when summarising instead of the one that matches the PML... So the cx is dragging a file onto the USB and no notification goes to central. I thought I was reproducing this, but turns out the date and time on my VM was incorrect so they had expired. Customer provided trails but no MCS event is created. MCS does work as a device control notification is sent, but when the data control event occurs MCS does nothing. Trying to acertain why no event is received but not exactly sure what the trigger is.<br><br>Turns out, the events are destination only, and DO allow events don&#x27;t contain the &quot;without explorer string&quot; but I should have realised from the fact there is no rule. No central is correct but the copy is definitely with explorer so why DO? Turns out the customer has Secure Boot enabled which prevents detours from loading, and forces all checks to be DO. There is already a KBA for this incompatibility. ', color:'f10999', Result:'Expected', Component:'Data Control'};
 CaseInfo['18823'] = {description:'USB Fails to be re-enabled', caseLog:'<b>W37:</b> Debug DeviceControl.txt just reports &quot;device should not be disabled&quot; but doesn&#x27;t attempt to enable. Before debug the initial attempt to re-enable shows error -5, which is internal and defined in DevConResult.cpp as Error_Internal. This isn&#x27;t very descriptive, but narrows down to a function in the DevConProxy - Which is supposed to simply launch the devCon process with the correct parameters. <br>In the initial email the Cx mentions the device is visible but not functional, which suggests it is not disabled, as then it would disappear. Can they enable with sdcDevCon.exe manually?', color:'33ca1f', Result:'Unresolved'};
 ;
 
@@ -423,6 +423,24 @@ function createCheckbox(parentDiv,property,value)
 	addSorted(parentDiv,newCheckBox,newLabel);
 }
 
+function createCollapse(property)
+{
+	var parent = document.getElementById('controls');
+	
+	parent.innerHTML += "\
+<div class=\"card\">\
+    <div class=\"card-header\" id=" + property + "Header>\
+        <button class=\"btn btn-secondary btn-block\" type=\"button\" data-toggle=\"collapse\" data-target=\"#" + property + "Collapse\" aria-expanded=\"true\" aria-controls=\"" + property + "Collapse\">\
+            " + property + "\
+        </button>\
+    </div>\
+    <div id=\"" + property + "Collapse\" class=\"collapse\">\
+        <div class=\"card-body\" id=\"" + property + "CollapseBody\">\
+        </div>\
+    </div>\
+ </div>";
+}	
+
 function addHTML()
 {
 	
@@ -436,27 +454,15 @@ function addHTML()
 		{
 			if (caseProp == "description" || caseProp == "caseLog" || caseProp == "color") continue;
 			
-			var currentDiv = document.getElementById(caseProp + "Div");
+			var currentDiv = document.getElementById(caseProp + "CollapseBody");
 			
 			if (currentDiv == null)
 			{
-				currentDiv = document.createElement('Div');
-				currentDiv.id = caseProp + "Div";
-				currentDiv.className = "checkboxDiv";
-				currentDiv.innerHTML = "<span><b>" + caseProp + "</b></span><br>";
-
-				createCheckbox(currentDiv,caseProp,"Other " + caseProp);
+				createCollapse(caseProp);
+				currentDiv = document.getElementById(caseProp + "CollapseBody");
 				
-				controls.appendChild(currentDiv);
-								
-				buttonsDiv = document.createElement('Div');
-				buttonsDiv.id = caseProp + "Buttons";
-				buttonsDiv.className = "buttons";
+				createCheckbox(currentDiv, caseProp, "Other");
 				
-				buttonsDiv.innerHTML = "<button onclick='setAll(\"" + caseProp + "Filter\",true)' id=\"" + caseProp +"All\">ALL</button>"
-				buttonsDiv.innerHTML += "<button onclick='setAll(\"" + caseProp + "Filter\",false)' id=\"" + caseProp +"Clear\">NONE</button>"
-				
-				controls.appendChild(buttonsDiv);
 			}
 			
 			if (!currentDiv.contains(document.getElementById(caseObj[caseProp])))

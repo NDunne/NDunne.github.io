@@ -121,6 +121,24 @@ function createCheckbox(parentDiv,property,value)
 	addSorted(parentDiv,newCheckBox,newLabel);
 }
 
+function createCollapse(property)
+{
+	var parent = document.getElementById('controls');
+	
+	parent.innerHTML += "\
+<div class=\"card\">\
+    <div class=\"card-header\" id=" + property + "Header>\
+        <button class=\"btn btn-secondary btn-block\" type=\"button\" data-toggle=\"collapse\" data-target=\"#" + property + "Collapse\" aria-expanded=\"true\" aria-controls=\"" + property + "Collapse\">\
+            " + property + "\
+        </button>\
+    </div>\
+    <div id=\"" + property + "Collapse\" class=\"collapse\">\
+        <div class=\"card-body\" id=\"" + property + "CollapseBody\">\
+        </div>\
+    </div>\
+ </div>";
+}	
+
 function addHTML()
 {
 	
@@ -134,27 +152,15 @@ function addHTML()
 		{
 			if (caseProp == "description" || caseProp == "caseLog" || caseProp == "color") continue;
 			
-			var currentDiv = document.getElementById(caseProp + "Div");
+			var currentDiv = document.getElementById(caseProp + "CollapseBody");
 			
 			if (currentDiv == null)
 			{
-				currentDiv = document.createElement('Div');
-				currentDiv.id = caseProp + "Div";
-				currentDiv.className = "checkboxDiv";
-				currentDiv.innerHTML = "<span><b>" + caseProp + "</b></span><br>";
-
-				createCheckbox(currentDiv,caseProp,"Other " + caseProp);
+				createCollapse(caseProp);
+				currentDiv = document.getElementById(caseProp + "CollapseBody");
 				
-				controls.appendChild(currentDiv);
-								
-				buttonsDiv = document.createElement('Div');
-				buttonsDiv.id = caseProp + "Buttons";
-				buttonsDiv.className = "buttons";
+				createCheckbox(currentDiv, caseProp, "Other");
 				
-				buttonsDiv.innerHTML = "<button onclick='setAll(\"" + caseProp + "Filter\",true)' id=\"" + caseProp +"All\">ALL</button>"
-				buttonsDiv.innerHTML += "<button onclick='setAll(\"" + caseProp + "Filter\",false)' id=\"" + caseProp +"Clear\">NONE</button>"
-				
-				controls.appendChild(buttonsDiv);
 			}
 			
 			if (!currentDiv.contains(document.getElementById(caseObj[caseProp])))
