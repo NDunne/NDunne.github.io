@@ -26,8 +26,6 @@ function drawChart()
 	//powershell variable replaced by values
 	$data
 	
-	
-	
 	var chartwidth = $('#curve_chart').width();
 	
 	//Graph options
@@ -86,9 +84,6 @@ function drawChart()
 	
 	//Draw to html div with ID curve_chart
 	wrapper.draw(document.getElementById('curve_chart'));
-	$('input:checkbox').change(function() {
-		  getFilter();
-	});
 }
 
 //Insert a new checkbox in the correct place - Insertion sort O(n^2)
@@ -114,6 +109,7 @@ function createCheckbox(parentDiv,property,value)
 {
 	var wrapper = document.createElement('label');
 	wrapper.id = value + "Wrapper";
+	wrapper.className = "wrapper";
 	
 	var newCheckBox = document.createElement('input');
 	newCheckBox.type = "checkbox";
@@ -133,11 +129,6 @@ function createCheckbox(parentDiv,property,value)
 			width: '130px',
 			height: '60px',
 			
-		});
-		
-		//Register on change listener
-		$(newCheckBox).change(function() {
-			getFilter();
 		});
 	});
 	
@@ -341,6 +332,7 @@ function listFromResolution(values)
 //Passed a string to find the columns for
 function getFilter()
 {	
+	console.log("GetFilter");
 	//All checkboxes
 	var checkboxes = $(":checkbox");
 	
@@ -352,6 +344,8 @@ function getFilter()
 		{
 			//Slice off [property]Filter
 			var property = this.name.slice(0,-6);
+			
+			console.log(property + ": " + this.id);
 			
 			//Create new property
 			if(values[property] == null)
@@ -389,6 +383,4 @@ function setAll(name,value)
 		this.checked = value;
 		$(this).bootstrapToggle(value ? 'on' : 'off');
 	});
-
-	getFilter();	
 }
