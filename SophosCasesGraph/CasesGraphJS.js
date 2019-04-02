@@ -435,17 +435,19 @@ function createCheckbox(parentDiv,property,value)
 		
 		$(newCheckBox).change(function( event ) 
 		{
-			//console.log('Set: ' + $(this).prop('checked') + " " + event.timeStamp);
-			//console.log(event.timeStamp + " " + $('#curve_chart').data('lastsort'));
-			if(event.timeStamp > $('#curve_chart').data('lastsort') + 100)
+			//Default 0 - prevents lots of filters all at once from multi buttons
+			if(event.timeStamp > $('#curve_chart').data('lastfilter') + 100)
 			{
-				console.log("Set " + this.id + ': ' + $(this).prop('checked') + " " + event.timeStamp);
+				//Disable the checkbox if filter is taken so user cannot double click
 				$(newCheckBox).bootstrapToggle('disable');
-				//console.log("Sufficient Delay");
+				
+				//Generate new DataView
 				getFilter(event.timeStamp);
 				
-				$('#curve_chart').data('lastsort',(new Date).getTime());
+				//Set lastfilter to time *after* getFilter has run.
+				$('#curve_chart').data('lastfilter',(new Date).getTime());
 				
+				//Delay 101ms before re-enabling button. 
 				setTimeout(function() {$(newCheckBox).bootstrapToggle('enable'); },101);;
 			}
 			else
@@ -702,14 +704,18 @@ function setAll(name,value)
 	//JQuery get all inputs by name
 	var checkboxes = $("input[name='" + name + "']");
 
-	checkboxes.each(function() 
+		checkboxes.each(function() 
 	{
+		//Triggers event on slider that is actually switching
 		if ($(this).prop('checked') != value)
-		{
-			$(this).bootstrapToggle('enable');
+		{			
+			//this is required apparently, would have thought it follows the CB value
 			$(this).bootstrapToggle('toggle')
+			
+			//Set CB to checked and trigger event for filtering
 			$(this).prop('checked', value).change();
 		}
+		//Bonus - don't sort if all clicked and nothing changes.
 	});
 }
 
