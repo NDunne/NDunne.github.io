@@ -130,6 +130,27 @@ function createCheckbox(parentDiv,property,value)
 			height: '60px',
 			
 		});
+		
+		$(newCheckBox).change(function( event ) 
+		{
+			//console.log('Set: ' + $(this).prop('checked') + " " + event.timeStamp);
+			//console.log(event.timeStamp + " " + $('#curve_chart').data('lastsort'));
+			if(event.timeStamp > $('#curve_chart').data('lastsort') + 100)
+			{
+				console.log("Set " + this.id + ': ' + $(this).prop('checked') + " " + event.timeStamp);
+				$(newCheckBox).bootstrapToggle('disable');
+				//console.log("Sufficient Delay");
+				getFilter(event.timeStamp);
+				
+				$('#curve_chart').data('lastsort',(new Date).getTime());
+				
+				setTimeout(function() {$(newCheckBox).bootstrapToggle('enable'); },101);;
+			}
+			else
+			{
+				//console.log("too soon");
+			}
+		})
 	});
 	
 	wrapper.appendChild(newCheckBox);
@@ -330,9 +351,9 @@ function listFromResolution(values)
 }
 
 //Passed a string to find the columns for
-function getFilter()
+function getFilter(timestamp)
 {	
-	console.log("GetFilter");
+	console.log("+GetFilter: " + (new Date).getTime());
 	//All checkboxes
 	var checkboxes = $(":checkbox");
 	
@@ -345,7 +366,7 @@ function getFilter()
 			//Slice off [property]Filter
 			var property = this.name.slice(0,-6);
 			
-			console.log(property + ": " + this.id);
+			//console.log(property + ": " + this.id);
 			
 			//Create new property
 			if(values[property] == null)
@@ -360,6 +381,7 @@ function getFilter()
 	//Build list of selected filters from checkboxes
 	filterGraph(listFromResolution(values));
 	
+	console.log("-GetFilter: " + (new Date).getTime());
 }
 
 //Re-Draw graph with only given columns
@@ -380,7 +402,11 @@ function setAll(name,value)
 
 	checkboxes.each(function() 
 	{
-		this.checked = value;
-		$(this).bootstrapToggle(value ? 'on' : 'off');
+		if ($(this).prop('checked') != value)
+		{
+			$(this).bootstrapToggle('enable');
+			$(this).bootstrapToggle('toggle')
+			$(this).prop('checked', value).change();
+		}
 	});
 }
