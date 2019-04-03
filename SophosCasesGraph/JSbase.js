@@ -5,6 +5,7 @@
 
 //global CaseInfo object
 var CaseInfo = new Object();
+var massFlag = 0;
 
 //powershell variable replaced by values
 $addCaseInfo;
@@ -132,21 +133,11 @@ function createCheckbox(parentDiv,property,value)
 		});
 		
 		$(newCheckBox).change(function( event ) 
-		{
-			//Default 0 - prevents lots of filters all at once from multi buttons
-			if(event.timeStamp > $('#curve_chart').data('lastfilter') + 100)
+		{			
+			if (massFlag == 0)
 			{
-				//Disable the checkbox if filter is taken so user cannot double click
-				$(newCheckBox).bootstrapToggle('disable');
-				
 				//Generate new DataView
-				getFilter(event.timeStamp);
-				
-				//Set lastfilter to time *after* getFilter has run.
-				$('#curve_chart').data('lastfilter',(new Date).getTime());
-				
-				//Delay 101ms after filtering before re-enabling button. 
-				setTimeout(function() {$(newCheckBox).bootstrapToggle('enable'); },101);;
+				getFilter();
 			}
 		})
 	});
@@ -308,7 +299,7 @@ function listFromResolution(values)
 				//Special case for "Other" checkbox - checks for cases where the value is undefined
 				if (typeof CaseInfo[caseNum][property] === 'undefined' && filter[j].slice(0,5) == "Other")
 				{
-					console.log(caseNum + " has no property: " + property + ", matching 'Other'");
+					//console.log(caseNum + " has no property: " + property + ", matching 'Other'");
 					
 					//Update push flag to i. If it falls behind the loop then the case has missed a filter
 					push = i;
@@ -319,7 +310,7 @@ function listFromResolution(values)
 				//If its not the "Other" checkbox then check the object property to see if it matches
 				else if (CaseInfo[caseNum][property] == filter[j])
 				{
-					console.log(caseNum + " matched property: " + property + " = " + filter[j]);
+					//console.log(caseNum + " matched property: " + property + " = " + filter[j]);
 					
 					//Update push flag to i. If it falls behind the loop then the case has missed a filter
 					push = i;
@@ -332,7 +323,7 @@ function listFromResolution(values)
 			if (push != i) 
 			{
 				//Case has gone through a whole filter of values without matching, filtered out.
-				console.log(caseNum + " did not match property:" + property);
+				//console.log(caseNum + " did not match property:" + property);
 				break;
 			}
 		}
@@ -345,11 +336,12 @@ function listFromResolution(values)
 			list.push(caseNum+'S'); //also push Style column
 		}
 	}
+	//console.log(list);
 	return list;
 }
 
 //Passed a string to find the columns for
-function getFilter(timestamp)
+function getFilter()
 {	
 	console.log("+GetFilter: " + (new Date).getTime());
 	//All checkboxes
@@ -359,22 +351,24 @@ function getFilter(timestamp)
 	
 	checkboxes.each( function() 
 	{
+		//Slice off [property]Filter
+		var property = this.name.slice(0,-6);
+		
+		//Create new property
+		if(values[property] == null)
+		{
+			//console.log("new property " + property);
+			values[property] = [];
+		}
+		
 		if(this.checked)
 		{
-			//Slice off [property]Filter
-			var property = this.name.slice(0,-6);
-			
 			//console.log(property + ": " + this.id);
-			
-			//Create new property
-			if(values[property] == null)
-			{
-				//console.log("new property " + property);
-				values[property] = [];
-			}
 			values[property].push(this.id);
 		}
 	});
+	
+	console.log(values);
 	
 	//Build list of selected filters from checkboxes
 	filterGraph(listFromResolution(values));
@@ -398,17 +392,23 @@ function setAll(name,value)
 	//JQuery get all inputs by name
 	var checkboxes = $("input[name='" + name + "']");
 
-		checkboxes.each(function() 
+	massFlag = 1;
+	
+	checkboxes.each(function() 
 	{
 		//Triggers event on slider that is actually switching
 		if ($(this).prop('checked') != value)
 		{			
-			//this is required apparently, would have thought it follows the CB value
-			$(this).bootstrapToggle('toggle')
 			
 			//Set CB to checked and trigger event for filtering
 			$(this).prop('checked', value).change();
+			
 		}
 		//Bonus - don't sort if all clicked and nothing changes.
 	});
+	
+	getFilter();
+	
+	massFlag = 0;
 }
+
