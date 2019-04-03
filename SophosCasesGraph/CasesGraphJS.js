@@ -650,6 +650,10 @@ function listFromResolution(values)
 function getFilter()
 {	
 	console.log("+GetFilter: " + (new Date).getTime());
+	
+	//Clear CaseLog
+	document.getElementById("CaseLog").innerHTML = "";
+	
 	//All checkboxes
 	var checkboxes = $(":checkbox");
 	
