@@ -1,10 +1,11 @@
 ﻿/* TODO
-
+- "other" filter is broken/opposite
 - CSS? Bootstrap? Tabs for caselog just generally more pretty
 */
 
 //global CaseInfo object
 var CaseInfo = new Object();
+var massFlag = 0;
 
 //powershell variable replaced by values
 CaseInfo['00000'] = {description:'Health Trails Tool', caseLog:'<b>W5:</b> Creating a C++/.NET tool to view and query JSON objects created by SophosHealth in a GUI. <br><br><b>W6:</b>  Functional now, but more to do<br>~ Groups Health Events by various categories<br>~ Sorts<br>~ View data<br><br><b>W7:</b> Added setup batch file to install C++ redistributale, and create reg keys to allow context right-click launch for sdu root and Trails folder.<br>Also updated UI to show a table of a child events when parent is clicked. More css is required tho!<br>', color:'693410', Result:'Suggested Fix'};
@@ -434,25 +435,11 @@ function createCheckbox(parentDiv,property,value)
 		});
 		
 		$(newCheckBox).change(function( event ) 
-		{
-			//Default 0 - prevents lots of filters all at once from multi buttons
-			if(event.timeStamp > $('#curve_chart').data('lastfilter') + 100)
+		{			
+			if (massFlag == 0)
 			{
-				//Disable the checkbox if filter is taken so user cannot double click
-				$(newCheckBox).bootstrapToggle('disable');
-				
 				//Generate new DataView
-				getFilter(event.timeStamp);
-				
-				//Set lastfilter to time *after* getFilter has run.
-				$('#curve_chart').data('lastfilter',(new Date).getTime());
-				
-				//Delay 101ms before re-enabling button. 
-				setTimeout(function() {$(newCheckBox).bootstrapToggle('enable'); },101);;
-			}
-			else
-			{
-				//console.log("too soon");
+				getFilter();
 			}
 		})
 	});
@@ -651,11 +638,12 @@ function listFromResolution(values)
 			list.push(caseNum+'S'); //also push Style column
 		}
 	}
+	//console.log(list);
 	return list;
 }
 
 //Passed a string to find the columns for
-function getFilter(timestamp)
+function getFilter()
 {	
 	console.log("+GetFilter: " + (new Date).getTime());
 	//All checkboxes
@@ -682,6 +670,8 @@ function getFilter(timestamp)
 		}
 	});
 	
+	console.log(values);
+	
 	//Build list of selected filters from checkboxes
 	filterGraph(listFromResolution(values));
 	
@@ -704,18 +694,23 @@ function setAll(name,value)
 	//JQuery get all inputs by name
 	var checkboxes = $("input[name='" + name + "']");
 
-		checkboxes.each(function() 
+	massFlag = 1;
+	
+	checkboxes.each(function() 
 	{
 		//Triggers event on slider that is actually switching
 		if ($(this).prop('checked') != value)
 		{			
-			//this is required apparently, would have thought it follows the CB value
-			$(this).bootstrapToggle('toggle')
 			
 			//Set CB to checked and trigger event for filtering
 			$(this).prop('checked', value).change();
+			
 		}
 		//Bonus - don't sort if all clicked and nothing changes.
 	});
+	
+	getFilter();
+	
+	massFlag = 0;
 }
 

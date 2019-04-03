@@ -1,5 +1,5 @@
 /* TODO
-
+- "other" filter is broken/opposite
 - CSS? Bootstrap? Tabs for caselog just generally more pretty
 */
 
@@ -308,7 +308,7 @@ function listFromResolution(values)
 				//Special case for "Other" checkbox - checks for cases where the value is undefined
 				if (typeof CaseInfo[caseNum][property] === 'undefined' && filter[j].slice(0,5) == "Other")
 				{
-					//console.log(caseNum + " has no property: " + property + ", matching 'Other'");
+					console.log(caseNum + " has no property: " + property + ", matching 'Other'");
 					
 					//Update push flag to i. If it falls behind the loop then the case has missed a filter
 					push = i;
@@ -319,7 +319,7 @@ function listFromResolution(values)
 				//If its not the "Other" checkbox then check the object property to see if it matches
 				else if (CaseInfo[caseNum][property] == filter[j])
 				{
-					//console.log(caseNum + " matched property: " + property + " = " + filter[j]);
+					console.log(caseNum + " matched property: " + property + " = " + filter[j]);
 					
 					//Update push flag to i. If it falls behind the loop then the case has missed a filter
 					push = i;
@@ -332,7 +332,7 @@ function listFromResolution(values)
 			if (push != i) 
 			{
 				//Case has gone through a whole filter of values without matching, filtered out.
-				//console.log(caseNum + " did not match property:" + property);
+				console.log(caseNum + " did not match property:" + property);
 				break;
 			}
 		}
