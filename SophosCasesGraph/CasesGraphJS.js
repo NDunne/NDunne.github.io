@@ -532,10 +532,39 @@ function onReady()
 	google.visualization.events.addListener(wrapper, 'select', onSelect);
 }
 
+function clearTabs()
+{
+	//Remove existing caseLogs
+	$('#caseTabs').empty();
+	$('#caseTabsContent').empty();
+}
+
+//Create new tab for a case
+function newTab(color,number,description,caseLog,first)
+{
+	//Clickable tab added to list
+	$('#caseTabs').append("<li class=\"nav-item\"><a class=\"nav-link" + (first ? " active" : "") + "\" id=\"tab_" + number + "\" data-toggle=\"tab\" href=\"#content_" + number + "\" role=\"tab\" aria-controls=\"content_" + number + "\" aria-selected=\"" + first + "\" style='color:#" + color + "'><b>" + number + "</a></li>");
+	
+	//Content div added and hidden if not first
+	$('#caseTabsContent').append("<div class=\"tab-pane fade" +  (first ? " show active" : "") + "\" id=\"content_" + number + "\" role=\"tabpanel\" aria-labelledby=\"tab_" + number + "\"><div class=\"card\"><div class=\"card-header\"><h5>" + description + "</h5></div><div class=\"card-body\">" + caseLog + "</div></div>");
+	
+	//on click show tab
+	$('#caseTabs a').on('click', function (e) 
+	{		
+		//prevent default click action
+		e.preventDefault();
+		
+		$(this).tab('show');
+	});
+}
+
 //Show CaseLog in div below. 
 function onSelect()
 {		
+	clearTabs();
 	var selection = wrapper.getChart().getSelection();			
+	
+	console.log(selection);
 	
 	if (selection == null || selection[0] == null)
 		return;
@@ -558,7 +587,9 @@ function onSelect()
 		//loop limit
 		var limit = view.getNumberOfColumns();
 		
-		document.getElementById("CaseLog").innerHTML = "<p>";
+		var first = true;
+		
+		//document.getElementById("CaseLog").innerHTML = "<p>";
 		//If value in this row (week) is the same for another column(case) they share this point on the graph
 		//+= 2 to skip over tooltip columns
 		for (i = 2; i < limit; i+=3)
@@ -566,11 +597,13 @@ function onSelect()
 			if (val == view.getValue(row, i))
 			{
 				caseNumber = view.getColumnLabel(i);
-				try
-				{
-					document.getElementById("CaseLog").innerHTML += "<span style='color:" + CaseInfo[caseNumber].color + "'><b>" + caseNumber + ":</span> " + CaseInfo[caseNumber].description +"</b><br>" + CaseInfo[caseNumber].caseLog + "<br></p>";
-				}
-				catch(err) {} //Sometimes tries to read from tooltip columns, not sure why
+				//try
+				//{
+					//document.getElementById("CaseLog").innerHTML += "<span style='color:" + CaseInfo[caseNumber].color + "'><b>" + caseNumber + ":</span> " + CaseInfo[caseNumber].description +"</b><br>" + CaseInfo[caseNumber].caseLog + "<br></p>";
+					newTab(CaseInfo[caseNumber].color, caseNumber, CaseInfo[caseNumber].description, CaseInfo[caseNumber].caseLog, first);
+					first = false
+				//}
+				//catch(err) {} //Sometimes tries to read from tooltip columns, not sure why
 			}
 		}
 	}
@@ -652,7 +685,7 @@ function getFilter()
 	console.log("+GetFilter: " + (new Date).getTime());
 	
 	//Clear CaseLog
-	document.getElementById("CaseLog").innerHTML = "";
+	clearTabs();
 	
 	//All checkboxes
 	var checkboxes = $(":checkbox");
@@ -721,5 +754,3 @@ function setAll(name,value)
 	
 	massFlag = 0;
 }
-
-
