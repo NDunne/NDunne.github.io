@@ -370,7 +370,11 @@ data. addRows([
 		tooltip:
 		{
 			isHtml: true,
-		}
+		},
+		animation:{
+			//duration: 1000,
+			//startup: true
+		},
 	};
 	
 	//Define chart type with wrapper
@@ -683,6 +687,8 @@ function listFromResolution(values)
 function getFilter()
 {	
 	console.log("+GetFilter: " + (new Date).getTime());
+	
+	document.getElementById('curve_chart').innerhtml = "<div class=\"d-flex align-items-center\"><strong>Loading Graph...</strong><div class=\"spinner-border ml-auto\" role=\"status\" aria-hidden=\"true\"></div></div>";
 	
 	//Clear CaseLog
 	clearTabs();

@@ -1,6 +1,6 @@
 /* TODO
-- "other" filter is broken/opposite
 - CSS? Bootstrap? Tabs for caselog just generally more pretty
+- animate button?
 */
 
 //global CaseInfo object

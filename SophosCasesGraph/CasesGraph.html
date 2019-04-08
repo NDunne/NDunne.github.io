@@ -15,7 +15,9 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 	<script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
 	
-	<script src="CasesGraphJS.js"></script>
+	<!-- <script src="chartsApiTesting.js"></script> -->
+	<script src="CasesGraphJS_Anim.js"></script>
+	<!-- <script src="CasesGraphJS.js"></script> -->
 	
 	<style>
 	label {
@@ -25,11 +27,15 @@
   </head>
   <body>
 	<div class="card sticky-top">
-		<div class="card-body" id="curve_chart" data-lastfilter=0>
+		<div class="card-body" id="curve_chart">
 			<div class="d-flex align-items-center">
 				<strong>Loading Graph...</strong>
 				<div class="spinner-border ml-auto" role="status" aria-hidden="true"></div>
 			</div>
+		</div>
+		<div>
+			<input type="button" id = "b1">b1</input>
+			<input type="button" id = "b2">b2</input>
 		</div>
 	</div>
 	
