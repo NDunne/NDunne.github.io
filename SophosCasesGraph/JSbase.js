@@ -64,7 +64,12 @@ function drawChart()
 		tooltip:
 		{
 			isHtml: true,
-		}
+		},
+		crosshair: 
+		{ 
+			trigger: 'selection',
+			orientation: 'vertical'
+		},
 	};
 	
 	//Define chart type with wrapper
