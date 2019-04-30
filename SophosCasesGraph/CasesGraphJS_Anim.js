@@ -83,6 +83,9 @@ function loadCallback()
 {	
 	//addHTML()
 	
+	window.onload = drawChart();
+	window.onresize = drawChart();
+	
 	var testCases = {};
 	
 	testCases['00002'] = {work:[0,1,2,null,null],tooltip:'testcase1',color:'33ca1f'};

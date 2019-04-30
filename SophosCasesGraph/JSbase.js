@@ -418,12 +418,18 @@ function getFilter()
 	console.log("-GetFilter: " + (new Date).getTime());
 }
 
+//Filter graph on resize as well
+window.onresize = getFilter;
+
 //Re-Draw graph with only given columns
 function filterGraph(columns)
 {
 	view = new google.visualization.DataView(data);
 	view.setColumns(columns);
 	wrapper.setView(view.toJSON());
+	
+	//Re-read screen width to auto resize graph
+	wrapper.setOption('width',$('#curve_chart').width());
 	
 	wrapper.draw(document.getElementById('curve_chart'));
 }
