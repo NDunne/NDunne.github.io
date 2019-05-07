@@ -504,6 +504,8 @@ function createCollapse(property)
  </div>");
 }	
 
+PIECONTROLS
+
 //Generate the HTML from the data provided - filter collapses are generated dynamically
 function addHTML()
 {
