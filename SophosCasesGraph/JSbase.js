@@ -27,7 +27,7 @@ function drawChart()
 	//powershell variable replaced by values
 	$data
 	
-		var chartwidth = $('#curve_chart').width();
+	var chartwidth = $('#curve_chart').width();
 	
 	//Graph options
 	var opts = {
@@ -162,45 +162,96 @@ function createCollapse(property)
         </button>\
     </div>\
     <div id=\"" + property + "Collapse\" class=\"collapse\">\
-        <div class=\"card-body\">\
-			<div class=\"btn-group-toggle\" id=\"" + property + "CollapseBody\">\
-			</div>\
+        <div class=\"card-body\" id=\"" + property + "CollapseBody\">\
+			<div id=\"" + property + "chart\"</div>\
         </div>\
     </div>\
  </div>");
-}	
+}
+
+//wrapper for incrementing a row by column 0 value
+function incrementCount(data, property)
+{
+	console.log("+incrementCount");
+	
+	var limit = data.getNumberOfRows();
+	for (var i = 0; i < limit; i++)
+	{
+		if (data.getValue(i,0) == property)
+		{
+			var t = data.getValue(i,1);
+			data.setValue(i,1,t+1);
+			return data;
+		}
+	}
+	
+	return data;
+	console.log("-incrementCount");
+}
+
+function getOtherCount(data)
+{
+	console.log("+getOtherCount");
+	
+	var limit = data.getNumberOfRows();
+	var total = 0;
+	
+	
+	for (var i = 0; i < limit; i++)
+	{
+		total += data.getValue(i,1);
+	}
+	
+	var otherCount = Object.keys(CaseInfo).length - total;
+	
+	console.log("Other: " + otherCount);
+	
+	data.setValue(0,1,otherCount);
+	
+	console.log("-getOtherCount");
+	
+	return data;
+}
 
 //Generate the HTML from the data provided - filter collapses are generated dynamically
 function addHTML()
 {
 	var controls = document.getElementById('controls');
 	
+	var pieData = {};
+	
 	//Iterate Cases
 	for (var caseNum in CaseInfo)
 	{
 		var caseObj = CaseInfo[caseNum];
 	
+		//Iterate properties of current case
 		for (var caseProp in caseObj)
 		{
-			//Required fields do not need filters
+			//Required fields do not need filters, skip them
 			if (caseProp == "description" || caseProp == "caseLog" || caseProp == "color") continue;
 			
 			//Find existing div if it exists
 			var currentDiv = document.getElementById(caseProp + "CollapseBody");
+			//Can be null
 			
-			//If not create a new one
-			if (currentDiv == null)
+			if (pieData[caseProp] == null)
 			{
+				//Create Data Table if doesn't exist
+				
+				console.log("Created Data table for " + caseProp);
+				pieData[caseProp] = new google.visualization.DataTable();
+				pieData[caseProp].addColumn('string', caseProp);
+				pieData[caseProp].addColumn('number', "cases");
+		
+				
 				createCollapse(caseProp);
 				//Re-assign variable
 				currentDiv = document.getElementById(caseProp + "CollapseBody");
 
 				//All catagories must have "Other" checkbox to match undefined
-				createCheckbox(currentDiv, caseProp, "Other");	
-			}
-			else if(document.getElementById(caseProp + "Buttons") == null)
-			{
-				//Buttons are only created if there is more than 1 option
+				pieData[caseProp].addRow(["Other",0]);	
+				
 				buttonsDiv = document.createElement('Div');
 				buttonsDiv.id = caseProp + "Buttons";
 				buttonsDiv.className = "buttons";
@@ -212,11 +263,32 @@ function addHTML()
 			}
 			
 			//Check if the filter has been created already, and if not create a checkbox
-			if (!currentDiv.contains(document.getElementById(caseObj[caseProp])))
+			if (!pieData[caseProp].getDistinctValues(0).includes(caseProp))
 			{
-				createCheckbox(currentDiv, caseProp, caseObj[caseProp]);
-			}	
+				console.log("Created Row for: " + caseObj[caseProp]);
+				pieData[caseProp].addRow([caseObj[caseProp],0]);
+			}
+			
+			pieData[caseProp] = incrementCount(pieData[caseProp], caseObj[caseProp]);				
 		}
+	}
+	
+	for (var pc in pieData)
+	{
+		pieData[pc] = getOtherCount(pieData[pc]);
+	
+		var opts = {
+			height:300,
+			width:500,
+			title:pc,
+			legend:
+			{
+				position:'left'
+			}
+		}	
+	
+		var chart = new google.visualization.PieChart(document.getElementById(pc + "chart"));
+		chart.draw(pieData[pc], opts);
 	}
 }
 

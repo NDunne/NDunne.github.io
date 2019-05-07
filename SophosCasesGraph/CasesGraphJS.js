@@ -361,7 +361,7 @@ data. addRows([
 ['50',null,null,'','color: #693410;',null,'','color: #9d97a5;',null,'','color: #c6a3d2;',null,'','color: #3b1503;',null,'','color: #3e115a;',null,'','color: #9884ac;',null,'','color: #94bd71;',null,'','color: #4f12d0;',null,'','color: #3cb106;',null,'','color: #77b9f7;',null,'','color: #666d71;',null,'','color: #89e74f;',null,'','color: #0e0c92;',null,'','color: #5646f6;',null,'','color: #994f32;',null,'','color: #c1d6e0;',null,'','color: #c9f526;',null,'','color: #c67f45;',null,'','color: #62b47f;',null,'','color: #97d5d8;',null,'','color: #b7b4ac;',null,'','color: #91af3a;',null,'','color: #31a963;',null,'','color: #7069b6;',null,'','color: #2a8965;',null,'','color: #14b022;',null,'','color: #c10338;',null,'','color: #b513c4;',null,'','color: #a67085;',null,'','color: #2f545f;',null,'','color: #c2f8b0;',null,'','color: #525d6b;',null,'','color: #c8089c;',null,'','color: #dba9c1;',null,'','color: #1ce49e;',null,'','color: #a280e1;',null,'','color: #3d3503;',null,'','color: #ca0860;',null,'','color: #69c88e;',null,'','color: #392201;',null,'','color: #e00dfb;',null,'','color: #d9cb0b;',null,'','color: #1b4eb7;',null,'','color: #12c4fd;',null,'','color: #0caa2f;',null,'','color: #e44bff;',null,'','color: #709489;',null,'','color: #f6efec;',null,'','color: #61561c;',null,'','color: #d66749;',null,'','color: #788d24;',null,'','color: #7753c4;',null,'','color: #a4d0c9;',null,'','color: #ea64d6;',null,'','color: #de518d;',null,'','color: #b93d1c;',null,'','color: #e92411;',null,'','color: #35710e;',null,'','color: #38587c;',null,'','color: #45218e;',null,'','color: #889f31;',null,'','color: #f10999;',null,'','color: #33ca1f;',null,'','color: #39e046;',null,'','color: #044f99;',null,'','color: #439dad;',null,'','color: #08a686;',null,'','color: #2eb5fe;',null,'','color: #dd0f08;',null,'','color: #b76b5f;'],
 ['51',null,null,'','color: #693410;',null,'','color: #9d97a5;',null,'','color: #c6a3d2;',null,'','color: #3b1503;',null,'','color: #3e115a;',null,'','color: #9884ac;',null,'','color: #94bd71;',null,'','color: #4f12d0;',null,'','color: #3cb106;',null,'','color: #77b9f7;',null,'','color: #666d71;',null,'','color: #89e74f;',null,'','color: #0e0c92;',null,'','color: #5646f6;',null,'','color: #994f32;',null,'','color: #c1d6e0;',null,'','color: #c9f526;',null,'','color: #c67f45;',null,'','color: #62b47f;',null,'','color: #97d5d8;',null,'','color: #b7b4ac;',null,'','color: #91af3a;',null,'','color: #31a963;',null,'','color: #7069b6;',null,'','color: #2a8965;',null,'','color: #14b022;',null,'','color: #c10338;',null,'','color: #b513c4;',null,'','color: #a67085;',null,'','color: #2f545f;',null,'','color: #c2f8b0;',null,'','color: #525d6b;',null,'','color: #c8089c;',null,'','color: #dba9c1;',null,'','color: #1ce49e;',null,'','color: #a280e1;',null,'','color: #3d3503;',null,'','color: #ca0860;',null,'','color: #69c88e;',null,'','color: #392201;',null,'','color: #e00dfb;',null,'','color: #d9cb0b;',null,'','color: #1b4eb7;',null,'','color: #12c4fd;',null,'','color: #0caa2f;',null,'','color: #e44bff;',null,'','color: #709489;',null,'','color: #f6efec;',null,'','color: #61561c;',null,'','color: #d66749;',null,'','color: #788d24;',null,'','color: #7753c4;',null,'','color: #a4d0c9;',null,'','color: #ea64d6;',null,'','color: #de518d;',null,'','color: #b93d1c;',null,'','color: #e92411;',null,'','color: #35710e;',null,'','color: #38587c;',null,'','color: #45218e;',null,'','color: #889f31;',null,'','color: #f10999;',null,'','color: #33ca1f;',null,'','color: #39e046;',null,'','color: #044f99;',null,'','color: #439dad;',null,'','color: #08a686;',null,'','color: #2eb5fe;',null,'','color: #dd0f08;',null,'','color: #b76b5f;'],]);
 	
-		var chartwidth = $('#curve_chart').width();
+	var chartwidth = $('#curve_chart').width();
 	
 	//Graph options
 	var opts = {
@@ -496,47 +496,96 @@ function createCollapse(property)
         </button>\
     </div>\
     <div id=\"" + property + "Collapse\" class=\"collapse\">\
-        <div class=\"card-body\">\
-			<div class=\"btn-group-toggle\" id=\"" + property + "CollapseBody\">\
-			</div>\
+        <div class=\"card-body\" id=\"" + property + "CollapseBody\">\
+			<div id=\"" + property + "chart\"</div>\
         </div>\
     </div>\
  </div>");
-}	
+}
 
-PIECONTROLS
+//wrapper for incrementing a row by column 0 value
+function incrementCount(data, property)
+{
+	console.log("+incrementCount");
+	
+	var limit = data.getNumberOfRows();
+	for (var i = 0; i < limit; i++)
+	{
+		if (data.getValue(i,0) == property)
+		{
+			var t = data.getValue(i,1);
+			data.setValue(i,1,t+1);
+			return data;
+		}
+	}
+	
+	return data;
+	console.log("-incrementCount");
+}
+
+function getOtherCount(data)
+{
+	console.log("+getOtherCount");
+	
+	var limit = data.getNumberOfRows();
+	var total = 0;
+	
+	
+	for (var i = 0; i < limit; i++)
+	{
+		total += data.getValue(i,1);
+	}
+	
+	var otherCount = Object.keys(CaseInfo).length - total;
+	
+	console.log("Other: " + otherCount);
+	
+	data.setValue(0,1,otherCount);
+	
+	console.log("-getOtherCount");
+	
+	return data;
+}
 
 //Generate the HTML from the data provided - filter collapses are generated dynamically
 function addHTML()
 {
 	var controls = document.getElementById('controls');
 	
+	var pieData = {};
+	
 	//Iterate Cases
 	for (var caseNum in CaseInfo)
 	{
 		var caseObj = CaseInfo[caseNum];
 	
+		//Iterate properties of current case
 		for (var caseProp in caseObj)
 		{
-			//Required fields do not need filters
+			//Required fields do not need filters, skip them
 			if (caseProp == "description" || caseProp == "caseLog" || caseProp == "color") continue;
 			
 			//Find existing div if it exists
 			var currentDiv = document.getElementById(caseProp + "CollapseBody");
+			//Can be null
 			
-			//If not create a new one
-			if (currentDiv == null)
+			if (pieData[caseProp] == null)
 			{
+				//Create Data Table if doesn't exist
+				
+				console.log("Created Data table for " + caseProp);
+				pieData[caseProp] = new google.visualization.DataTable();
+				pieData[caseProp].addColumn('string', caseProp);
+				pieData[caseProp].addColumn('number', "cases");
+		
+				
 				createCollapse(caseProp);
 				//Re-assign variable
 				currentDiv = document.getElementById(caseProp + "CollapseBody");
 
 				//All catagories must have "Other" checkbox to match undefined
-				createCheckbox(currentDiv, caseProp, "Other");	
-			}
-			else if(document.getElementById(caseProp + "Buttons") == null)
-			{
-				//Buttons are only created if there is more than 1 option
+				pieData[caseProp].addRow(["Other",0]);	
+				
 				buttonsDiv = document.createElement('Div');
 				buttonsDiv.id = caseProp + "Buttons";
 				buttonsDiv.className = "buttons";
@@ -548,11 +597,32 @@ function addHTML()
 			}
 			
 			//Check if the filter has been created already, and if not create a checkbox
-			if (!currentDiv.contains(document.getElementById(caseObj[caseProp])))
+			if (!pieData[caseProp].getDistinctValues(0).includes(caseProp))
 			{
-				createCheckbox(currentDiv, caseProp, caseObj[caseProp]);
-			}	
+				console.log("Created Row for: " + caseObj[caseProp]);
+				pieData[caseProp].addRow([caseObj[caseProp],0]);
+			}
+			
+			pieData[caseProp] = incrementCount(pieData[caseProp], caseObj[caseProp]);				
 		}
+	}
+	
+	for (var pc in pieData)
+	{
+		pieData[pc] = getOtherCount(pieData[pc]);
+	
+		var opts = {
+			height:300,
+			width:500,
+			title:pc,
+			legend:
+			{
+				position:'left'
+			}
+		}	
+	
+		var chart = new google.visualization.PieChart(document.getElementById(pc + "chart"));
+		chart.draw(pieData[pc], opts);
 	}
 }
 
