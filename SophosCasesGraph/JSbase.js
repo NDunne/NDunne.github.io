@@ -27,7 +27,7 @@ function drawChart()
 	//powershell variable replaced by values
 	$data
 	
-	var chartwidth = $('#curve_chart').width();
+		var chartwidth = $('#curve_chart').width();
 	
 	//Graph options
 	var opts = {
@@ -58,7 +58,7 @@ function drawChart()
 		vAxis: 
 		{ 
 			title: 'Weeks spent on Case',
-			maxValue: 6,
+			maxValue: 8,
 			minValue: 0
 		},
 		tooltip:
@@ -84,12 +84,7 @@ function drawChart()
 	//Once ready event is fired the onReady function is called
 	google.visualization.events.addListener(wrapper, 'ready', onReady);
 	
-	//Chart must always have a view for CaseLog functionality when filtered
-	view = new google.visualization.DataView(data);
-	wrapper.setView(view.toJSON());
-	
-	//Draw to html div with ID curve_chart
-	wrapper.draw(document.getElementById('curve_chart'));
+	getFilter();
 }
 
 //Insert a new checkbox in the correct place - Insertion sort O(n^2)
@@ -427,6 +422,8 @@ function filterGraph(columns)
 	view = new google.visualization.DataView(data);
 	view.setColumns(columns);
 	wrapper.setView(view.toJSON());
+	
+	$("#caseTotal").html("<h4> " + (view.getNumberOfColumns() - 2) / 3 + " Cases</h>");
 	
 	//Re-read screen width to auto resize graph
 	wrapper.setOption('width',$('#curve_chart').width());

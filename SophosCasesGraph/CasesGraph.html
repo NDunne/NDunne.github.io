@@ -20,8 +20,18 @@
 	<script src="CasesGraphJS.js"></script>
 	
 	<style>
+	html
+	{
+		overflow-y: scroll;
+	}
 	label {
-		padding:5px
+		padding:5px;
+	}
+	#caseTotal
+	{
+		position: absolute;
+		top: 50px;
+		right: 20px;
 	}
 	</style>
   </head>
@@ -33,6 +43,7 @@
 				<div class="spinner-border ml-auto" role="status" aria-hidden="true"></div>
 			</div>
 		</div>
+		<div id="caseTotal" class="float-right"></div>
 		<!-- <div> -->
 			<!-- <input type="button" id = "b1">b1</input> -->
 			<!-- <input type="button" id = "b2">b2</input> -->
