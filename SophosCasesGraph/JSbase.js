@@ -82,7 +82,7 @@ function drawChart()
 	});
 	
 	//Once ready event is fired the onReady function is called
-	google.visualization.events.addListener(wrapper, 'ready', onReady);
+	google.visualization.events.addListener(wrapper, 'ready', onLineReady);
 	
 	getFilter();
 }
@@ -161,7 +161,7 @@ function createCollapse(property)
             " + property + "\
         </button>\
     </div>\
-    <div id=\"" + property + "Collapse\" class=\"collapse\">\
+    <div id=\"" + property + "Collapse\" class=\"collapse show\">\
         <div class=\"card-body\" id=\"" + property + "CollapseBody\">\
 			<div id=\"" + property + "chart\"</div>\
         </div>\
@@ -172,7 +172,7 @@ function createCollapse(property)
 //wrapper for incrementing a row by column 0 value
 function incrementCount(data, property)
 {
-	console.log("+incrementCount");
+	//console.log("+incrementCount");
 	
 	var limit = data.getNumberOfRows();
 	for (var i = 0; i < limit; i++)
@@ -185,8 +185,8 @@ function incrementCount(data, property)
 		}
 	}
 	
+	//console.log("-incrementCount");
 	return data;
-	console.log("-incrementCount");
 }
 
 function getOtherCount(data)
@@ -239,7 +239,7 @@ function addHTML()
 			{
 				//Create Data Table if doesn't exist
 				
-				console.log("Created Data table for " + caseProp);
+				//console.log("Created Data table for " + caseProp);
 				pieData[caseProp] = new google.visualization.DataTable();
 				pieData[caseProp].addColumn('string', caseProp);
 				pieData[caseProp].addColumn('number', "cases");
@@ -265,7 +265,7 @@ function addHTML()
 			//Check if the filter has been created already, and if not create a checkbox
 			if (!pieData[caseProp].getDistinctValues(0).includes(caseProp))
 			{
-				console.log("Created Row for: " + caseObj[caseProp]);
+				//console.log("Created Row for: " + caseObj[caseProp]);
 				pieData[caseProp].addRow([caseObj[caseProp],0]);
 			}
 			
@@ -273,29 +273,105 @@ function addHTML()
 		}
 	}
 	
+	drawPieCharts(pieData);
+}
+
+function drawPieCharts(pieData)
+{
+	pieChartWrappers = {};
+	
 	for (var pc in pieData)
 	{
 		pieData[pc] = getOtherCount(pieData[pc]);
-	
+		
 		var opts = {
 			height:300,
 			width:500,
-			title:pc,
+			title: pc,
 			legend:
 			{
 				position:'left'
-			}
-		}	
+			},
+			slices: {}
+		}
 	
-		var chart = new google.visualization.PieChart(document.getElementById(pc + "chart"));
-		chart.draw(pieData[pc], opts);
+		pieChartWrappers[pc] = new google.visualization.ChartWrapper({
+			chartType: 'PieChart',
+			dataTable: pieData[pc],
+			options: opts,
+			containerId: pc + "chart"
+		});
+		
+		google.visualization.events.addListener(pieChartWrappers[pc], 'ready', onPieReady(pc));
+		
+		function onPieReady(pc) 
+		{
+			console.log("ready event: " + pc);
+			
+			$('#google-visualization-errors-all-1').hide();
+			
+			google.visualization.events.addListener(pieChartWrappers[pc], 'error', onPieError);
+			google.visualization.events.addListener(pieChartWrappers[pc], 'select', onPieSelect);
+		}
+		
+		function onPieError(googleError) 
+		{
+			google.visualization.errors.removeError(googleError.id);
+			console.log("Google Error: " + googleError.message);
+		}
+		
+		function onPieSelect()
+		{
+			for (var pc in pieChartWrappers)
+			{
+				var selected = pieChartWrappers[pc].getChart().getSelection();
+				//empty check
+				if (Object.keys(selected).length > 0)
+				{
+					var opts = pieChartWrappers[pc].getOptions();
+					
+					console.log(pc + " : " + JSON.stringify(selected));
+					console.log(pc + " : " + JSON.stringify(opts));
+					
+					var slice = selected[0]["row"];
+					
+					
+					try 
+					{
+						if (opts.slices[slice]["offset"] == 0.25)
+						{
+							opts.slices[slice]["offset"] = 0;
+						}
+						else
+						{
+							opts.slices[slice]["offset"] = 0.25;
+						}
+					}
+					catch(error)
+					{
+						opts.slices[slice] = { "offset": 0.25 };
+					}
+					
+					pieChartWrappers[pc].setOptions(opts);
+					
+					pieChartWrappers[pc].draw();
+					
+					
+					//Clear selection to act like radio buttons
+					pieChartWrappers[pc].getChart().setSelection([]);
+				}
+				
+			}
+		}
+		
+		pieChartWrappers[pc].draw();
 	}
 }
 
 //onSelect Listener can only be added once ready
-function onReady()
+function onLineReady()
 {
-	google.visualization.events.addListener(wrapper, 'select', onSelect);
+	google.visualization.events.addListener(wrapper, 'select', onLineSelect);
 }
 
 function clearTabs()
@@ -325,7 +401,7 @@ function newTab(color,number,description,caseLog,first)
 }
 
 //Show CaseLog in div below. 
-function onSelect()
+function onLineSelect()
 {		
 	clearTabs();
 	var selection = wrapper.getChart().getSelection();			

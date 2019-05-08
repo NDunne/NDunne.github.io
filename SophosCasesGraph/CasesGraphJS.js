@@ -9,7 +9,7 @@ var massFlag = 0;
 
 //powershell variable replaced by values
 CaseInfo['00000'] = {description:'Health Trails Tool', caseLog:'<b>W5:</b> Creating a C++/.NET tool to view and query JSON objects created by SophosHealth in a GUI. <br><br><b>W6:</b>  Functional now, but more to do<br>~ Groups Health Events by various categories<br>~ Sorts<br>~ View data<br><br><b>W7:</b> Added setup batch file to install C++ redistributale, and create reg keys to allow context right-click launch for sdu root and Trails folder.<br>Also updated UI to show a table of a child events when parent is clicked. More css is required tho!<br>', color:'693410', Result:'Suggested Fix'};
-CaseInfo['00001'] = {description:'Case Grapher', caseLog:'<b>W32:</b> Working on powershell/javascript to parse case notes into progress graph using google charts api. Clicking on graph shows case history, and now all cases below the point clicked (this is not in the api as far as I can see). Powershell is used to take html notes files and compress cases into objects, then tabulate in javascript and draw with google charts. Output is a single html file that is easily transported and opened on any computer. <br><br><b>W33:</b> Working in Javascript to allow filtering of the graph using DataView class from Google charts API. Also commited to github for easier working. <br><br>Added button to filter and changed caseLog grouping to always pull from a view as it didn&#x27;t work when filtered before, due to reading row/column from the original dataTable when the columns don&#x27;t line up any more. Also implemented CaseLog info when clicking on the legend.<br><br><b>W34:</b> Trying to scrape data from webpage instead of manual takeout, by creating a browser instance and interacting with html elements via powershell, but its not easy as nothing has an id :/ Moving to a python 3rd party api with strong results. The format received is different so having to alter main though. It seems to be working after some fiddling to get everything in the right order, but I don&#x27;t think the description is right?<br><br>Managed to get it working with the scraper and very happy with it. Did have to add a credentials section and handling for various cases including cancel, wrong password, google captcha required and correct. Also, swapped the buttons in HTML out for checkboxes and updated the onclick functions to handle this. Currently the implementation isn&#x27;t great {O(n^2)} but meh I can&#x27;t think of a better way immediately, seeing as the filtering has to be pure javascript and can&#x27;t go back to powershell.<br><br>Its now hosted live on github so I hope I dont get in trouble for having my notes public... I also added a style column to the table for each line, and set the line colour based on the SHA1 hash of the case number, meaning it can stay constant when re-filtering (by default column number defines colour). The styling is supposed to be section specific though, so the legend has the wrong colours. Don&#x27;t think there is an easy workaround here so it&#x27;s hidden for now.<br><br>Next up: make it pretty! Tabs for cases being shown, a help section on how to read the graph now there is no Legend, maybe some CSS<br><br><b>W38:</b> Swapped the result tag for a tagging system where any word can be applied as a key:value pair. to support this the JS map now contains an object with K:V pairs rather than an array requiring context. This means that any new word used as a key in a case note will generate a new row of checkboxes (based on the order they are found), and can be filtered using it. New values for that tag are also data driven rather than pre-defined. Also allowed the graph to draw empty when there are no matches, and re-wrote the filtering system to be less stupid. Should probably add an &quot;other&quot; checkbox by default as now if a case does not have a value for a checkbox it is gone as soon as you filter.<br><br><b>W39:</b> using more bootstrap for the filters, struggling to not have it sort the graph 18 times (performance noticable) when clicking all buttons as each slider receives a change event. Also component - other is broken somehow.<br>Fixed the performance issue by having the onChange listener check a global flag to see if it was changed by a mass button, and not call the filter if it was. The mass buttons then call the filter separately so it is always called once. I also added tabs for the caselog, which took a while as I didn&#x27;t know html ids cannot start with a number.<br><br>Spent quite a while trying to animate entry and exit of cases, but the animation doesn&#x27;t work very well, and the customer colour is only applied after, so I&#x27;m not sure if it&#x27;s worth pursuing.', color:'9d97a5', Result:'Suggested Fix'};
+CaseInfo['00001'] = {description:'Case Grapher', caseLog:'<b>W32:</b> Working on powershell/javascript to parse case notes into progress graph using google charts api. Clicking on graph shows case history, and now all cases below the point clicked (this is not in the api as far as I can see). Powershell is used to take html notes files and compress cases into objects, then tabulate in javascript and draw with google charts. Output is a single html file that is easily transported and opened on any computer. <br><br><b>W33:</b> Working in Javascript to allow filtering of the graph using DataView class from Google charts API. Also commited to github for easier working. <br><br>Added button to filter and changed caseLog grouping to always pull from a view as it didn&#x27;t work when filtered before, due to reading row/column from the original dataTable when the columns don&#x27;t line up any more. Also implemented CaseLog info when clicking on the legend.<br><br><b>W34:</b> Trying to scrape data from webpage instead of manual takeout, by creating a browser instance and interacting with html elements via powershell, but its not easy as nothing has an id :/ Moving to a python 3rd party api with strong results. The format received is different so having to alter main though. It seems to be working after some fiddling to get everything in the right order, but I don&#x27;t think the description is right?<br><br>Managed to get it working with the scraper and very happy with it. Did have to add a credentials section and handling for various cases including cancel, wrong password, google captcha required and correct. Also, swapped the buttons in HTML out for checkboxes and updated the onclick functions to handle this. Currently the implementation isn&#x27;t great {O(n^2)} but meh I can&#x27;t think of a better way immediately, seeing as the filtering has to be pure javascript and can&#x27;t go back to powershell.<br><br>Its now hosted live on github so I hope I dont get in trouble for having my notes public... I also added a style column to the table for each line, and set the line colour based on the SHA1 hash of the case number, meaning it can stay constant when re-filtering (by default column number defines colour). The styling is supposed to be section specific though, so the legend has the wrong colours. Don&#x27;t think there is an easy workaround here so it&#x27;s hidden for now.<br><br>Next up: make it pretty! Tabs for cases being shown, a help section on how to read the graph now there is no Legend, maybe some CSS<br><br><b>W38:</b> Swapped the result tag for a tagging system where any word can be applied as a key:value pair. to support this the JS map now contains an object with K:V pairs rather than an array requiring context. This means that any new word used as a key in a case note will generate a new row of checkboxes (based on the order they are found), and can be filtered using it. New values for that tag are also data driven rather than pre-defined. Also allowed the graph to draw empty when there are no matches, and re-wrote the filtering system to be less stupid. Should probably add an &quot;other&quot; checkbox by default as now if a case does not have a value for a checkbox it is gone as soon as you filter.<br><br><b>W39:</b> using more bootstrap for the filters, struggling to not have it sort the graph 18 times (performance noticable) when clicking all buttons as each slider receives a change event. Also component - other is broken somehow.<br>Fixed the performance issue by having the onChange listener check a global flag to see if it was changed by a mass button, and not call the filter if it was. The mass buttons then call the filter separately so it is always called once. I also added tabs for the caselog, which took a while as I didn&#x27;t know html ids cannot start with a number.<br><br>Spent quite a while trying to animate entry and exit of cases, but the animation doesn&#x27;t work very well, and the customer colour is only applied after, so I&#x27;m not sure if it&#x27;s worth pursuing.<br><br><b>W44:</b> had an idea to replace the buttons with pie charts. So far pie charts get drawn, but need to get onclick sorting working, and hopefully can blow out segments that are not in the filter.', color:'9d97a5', Result:'Suggested Fix'};
 CaseInfo['12724'] = {description:'Detection of &#x27;both&#x27; location takes 5 minutes', caseLog:'<b>W21:</b> Logs suggest system is waiting for a lot of DNS queries to time out, as each adapter has multiple ip addresses, and each one is retried 3 times, taking 12 seconds each time. In code found a reg key to alter retry number, requested cx change to 1 to lower delay? ', color:'c6a3d2', Result:'Expected'};
 CaseInfo['13785'] = {description:'Only one confirmation dialogue with attaching files to email for ~3s', caseLog:'<b>W4:</b> Initially believed to be caching action and retrieving incorrect cached action, dug through *lots* of data control code to determine key. Issue appears to actually be with repeat acknowledgement suppressor, meant to be for the same action and file in a short time. Equality operator of Acknowledgement objects reference attribute SourceFilename not set in DataControlRequest objects where Check Type is File Open (which attaching to email does). <br><br>Confirmed behaviour is the same with other File Open actions. Confirmed lack of string in local values by breaking in with debugger, comparing FileOpen locals to FileCopy (which displays all acknowledgement dialogues). FileOpen has blank strings where FileCopy has the full file path. Suggested a 1 line fix based on similar operation in the caching logic.  <br>Potential Workaround of setting old Ack. timeouts to 0 not configurable :/', color:'3b1503', Result:'Suggested Fix', Component:'Data Control'};
 CaseInfo['13854'] = {description:'Wifi adapter device instance ID script', caseLog:'<b>W1:</b> Wrote powershell script to help Emile with this case. Retrieves instance ID from active Wifi adapter device.<br>', color:'3e115a', Result:'Transferred'};
@@ -352,7 +352,7 @@ data. addRows([
 ['41',null,null,'','color: #693410;',null,'','color: #9d97a5;',null,'','color: #c6a3d2;',null,'','color: #3b1503;',null,'','color: #3e115a;',null,'','color: #9884ac;',null,'','color: #94bd71;',null,'','color: #4f12d0;',null,'','color: #3cb106;',null,'','color: #77b9f7;',null,'','color: #666d71;',null,'','color: #89e74f;',null,'','color: #0e0c92;',null,'','color: #5646f6;',null,'','color: #994f32;',null,'','color: #c1d6e0;',null,'','color: #c9f526;',null,'','color: #c67f45;',null,'','color: #62b47f;',null,'','color: #97d5d8;',null,'','color: #b7b4ac;',null,'','color: #91af3a;',null,'','color: #31a963;',null,'','color: #7069b6;',null,'','color: #2a8965;',null,'','color: #14b022;',null,'','color: #c10338;',null,'','color: #b513c4;',null,'','color: #a67085;',null,'','color: #2f545f;',null,'','color: #c2f8b0;',6,'16765: Options not re-enabled after override','color: #525d6b;',null,'','color: #c8089c;',null,'','color: #dba9c1;',null,'','color: #1ce49e;',null,'','color: #a280e1;',null,'','color: #3d3503;',null,'','color: #ca0860;',7,'16988: Delay saving Office docs to NAS','color: #69c88e;',null,'','color: #392201;',null,'','color: #e00dfb;',null,'','color: #d9cb0b;',null,'','color: #1b4eb7;',null,'','color: #12c4fd;',null,'','color: #0caa2f;',null,'','color: #e44bff;',null,'','color: #709489;',null,'','color: #f6efec;',null,'','color: #61561c;',null,'','color: #d66749;',null,'','color: #788d24;',null,'','color: #7753c4;',null,'','color: #a4d0c9;',null,'','color: #ea64d6;',null,'','color: #de518d;',null,'','color: #b93d1c;',null,'','color: #e92411;',null,'','color: #35710e;',null,'','color: #38587c;',2,'18403: On Access slows file copying','color: #45218e;',null,'','color: #889f31;',null,'','color: #f10999;',null,'','color: #33ca1f;',null,'','color: #39e046;',null,'','color: #044f99;',3,'19087: Chrome cache DLP block','color: #439dad;',1,'19220: Windows Update Boot hang','color: #08a686;',1,'19312: Delay saving to SMB share with ESET','color: #2eb5fe;',null,'','color: #dd0f08;',null,'','color: #b76b5f;'],
 ['42',null,null,'','color: #693410;',null,'','color: #9d97a5;',null,'','color: #c6a3d2;',null,'','color: #3b1503;',null,'','color: #3e115a;',null,'','color: #9884ac;',null,'','color: #94bd71;',null,'','color: #4f12d0;',null,'','color: #3cb106;',null,'','color: #77b9f7;',null,'','color: #666d71;',null,'','color: #89e74f;',null,'','color: #0e0c92;',null,'','color: #5646f6;',null,'','color: #994f32;',null,'','color: #c1d6e0;',null,'','color: #c9f526;',null,'','color: #c67f45;',null,'','color: #62b47f;',null,'','color: #97d5d8;',null,'','color: #b7b4ac;',null,'','color: #91af3a;',null,'','color: #31a963;',null,'','color: #7069b6;',null,'','color: #2a8965;',null,'','color: #14b022;',null,'','color: #c10338;',null,'','color: #b513c4;',null,'','color: #a67085;',null,'','color: #2f545f;',null,'','color: #c2f8b0;',7,'16765: Options not re-enabled after override','color: #525d6b;',null,'','color: #c8089c;',null,'','color: #dba9c1;',null,'','color: #1ce49e;',null,'','color: #a280e1;',null,'','color: #3d3503;',null,'','color: #ca0860;',null,'','color: #69c88e;',null,'','color: #392201;',null,'','color: #e00dfb;',null,'','color: #d9cb0b;',null,'','color: #1b4eb7;',null,'','color: #12c4fd;',null,'','color: #0caa2f;',null,'','color: #e44bff;',null,'','color: #709489;',null,'','color: #f6efec;',null,'','color: #61561c;',null,'','color: #d66749;',null,'','color: #788d24;',null,'','color: #7753c4;',null,'','color: #a4d0c9;',null,'','color: #ea64d6;',0,'17878: Increased time to install mobile software','color: #de518d;',null,'','color: #b93d1c;',null,'','color: #e92411;',null,'','color: #35710e;',null,'','color: #38587c;',3,'18403: On Access slows file copying','color: #45218e;',null,'','color: #889f31;',null,'','color: #f10999;',2,'18823: USB Fails to be re-enabled','color: #33ca1f;',2,'18829: FSLogix VHDX containers are blocked','color: #39e046;',3,'19000: SNTP failed install','color: #044f99;',null,'','color: #439dad;',null,'','color: #08a686;',null,'','color: #2eb5fe;',0,'19363: SED causing 1min OneDrive sync','color: #dd0f08;',0,'19398: Filter Driver unloaded on boot','color: #b76b5f;'],
 ['43',null,null,'','color: #693410;',null,'','color: #9d97a5;',null,'','color: #c6a3d2;',null,'','color: #3b1503;',null,'','color: #3e115a;',null,'','color: #9884ac;',null,'','color: #94bd71;',null,'','color: #4f12d0;',null,'','color: #3cb106;',null,'','color: #77b9f7;',null,'','color: #666d71;',null,'','color: #89e74f;',null,'','color: #0e0c92;',null,'','color: #5646f6;',null,'','color: #994f32;',null,'','color: #c1d6e0;',null,'','color: #c9f526;',null,'','color: #c67f45;',null,'','color: #62b47f;',null,'','color: #97d5d8;',null,'','color: #b7b4ac;',null,'','color: #91af3a;',null,'','color: #31a963;',null,'','color: #7069b6;',null,'','color: #2a8965;',null,'','color: #14b022;',null,'','color: #c10338;',null,'','color: #b513c4;',null,'','color: #a67085;',null,'','color: #2f545f;',null,'','color: #c2f8b0;',8,'16765: Options not re-enabled after override','color: #525d6b;',null,'','color: #c8089c;',null,'','color: #dba9c1;',null,'','color: #1ce49e;',null,'','color: #a280e1;',null,'','color: #3d3503;',null,'','color: #ca0860;',null,'','color: #69c88e;',null,'','color: #392201;',null,'','color: #e00dfb;',null,'','color: #d9cb0b;',null,'','color: #1b4eb7;',null,'','color: #12c4fd;',null,'','color: #0caa2f;',null,'','color: #e44bff;',null,'','color: #709489;',null,'','color: #f6efec;',null,'','color: #61561c;',null,'','color: #d66749;',null,'','color: #788d24;',null,'','color: #7753c4;',null,'','color: #a4d0c9;',null,'','color: #ea64d6;',1,'17878: Increased time to install mobile software','color: #de518d;',null,'','color: #b93d1c;',null,'','color: #e92411;',null,'','color: #35710e;',null,'','color: #38587c;',null,'','color: #45218e;',null,'','color: #889f31;',null,'','color: #f10999;',null,'','color: #33ca1f;',null,'','color: #39e046;',4,'19000: SNTP failed install','color: #044f99;',4,'19087: Chrome cache DLP block','color: #439dad;',null,'','color: #08a686;',null,'','color: #2eb5fe;',1,'19363: SED causing 1min OneDrive sync','color: #dd0f08;',1,'19398: Filter Driver unloaded on boot','color: #b76b5f;'],
-['44',null,null,'','color: #693410;',null,'','color: #9d97a5;',null,'','color: #c6a3d2;',null,'','color: #3b1503;',null,'','color: #3e115a;',null,'','color: #9884ac;',null,'','color: #94bd71;',null,'','color: #4f12d0;',null,'','color: #3cb106;',null,'','color: #77b9f7;',null,'','color: #666d71;',null,'','color: #89e74f;',null,'','color: #0e0c92;',null,'','color: #5646f6;',null,'','color: #994f32;',null,'','color: #c1d6e0;',null,'','color: #c9f526;',null,'','color: #c67f45;',null,'','color: #62b47f;',null,'','color: #97d5d8;',null,'','color: #b7b4ac;',null,'','color: #91af3a;',null,'','color: #31a963;',null,'','color: #7069b6;',null,'','color: #2a8965;',null,'','color: #14b022;',null,'','color: #c10338;',null,'','color: #b513c4;',null,'','color: #a67085;',null,'','color: #2f545f;',null,'','color: #c2f8b0;',null,'','color: #525d6b;',null,'','color: #c8089c;',null,'','color: #dba9c1;',null,'','color: #1ce49e;',null,'','color: #a280e1;',null,'','color: #3d3503;',null,'','color: #ca0860;',null,'','color: #69c88e;',null,'','color: #392201;',null,'','color: #e00dfb;',null,'','color: #d9cb0b;',null,'','color: #1b4eb7;',null,'','color: #12c4fd;',null,'','color: #0caa2f;',null,'','color: #e44bff;',null,'','color: #709489;',null,'','color: #f6efec;',null,'','color: #61561c;',null,'','color: #d66749;',null,'','color: #788d24;',null,'','color: #7753c4;',null,'','color: #a4d0c9;',null,'','color: #ea64d6;',null,'','color: #de518d;',null,'','color: #b93d1c;',null,'','color: #e92411;',null,'','color: #35710e;',null,'','color: #38587c;',null,'','color: #45218e;',4,'18760: File save takes excessively longer when SED is loaded','color: #889f31;',null,'','color: #f10999;',null,'','color: #33ca1f;',null,'','color: #39e046;',null,'','color: #044f99;',null,'','color: #439dad;',null,'','color: #08a686;',null,'','color: #2eb5fe;',2,'19363: SED causing 1min OneDrive sync','color: #dd0f08;',null,'','color: #b76b5f;'],
+['44',null,null,'','color: #693410;',6,'00001: Case Grapher','color: #9d97a5;',null,'','color: #c6a3d2;',null,'','color: #3b1503;',null,'','color: #3e115a;',null,'','color: #9884ac;',null,'','color: #94bd71;',null,'','color: #4f12d0;',null,'','color: #3cb106;',null,'','color: #77b9f7;',null,'','color: #666d71;',null,'','color: #89e74f;',null,'','color: #0e0c92;',null,'','color: #5646f6;',null,'','color: #994f32;',null,'','color: #c1d6e0;',null,'','color: #c9f526;',null,'','color: #c67f45;',null,'','color: #62b47f;',null,'','color: #97d5d8;',null,'','color: #b7b4ac;',null,'','color: #91af3a;',null,'','color: #31a963;',null,'','color: #7069b6;',null,'','color: #2a8965;',null,'','color: #14b022;',null,'','color: #c10338;',null,'','color: #b513c4;',null,'','color: #a67085;',null,'','color: #2f545f;',null,'','color: #c2f8b0;',null,'','color: #525d6b;',null,'','color: #c8089c;',null,'','color: #dba9c1;',null,'','color: #1ce49e;',null,'','color: #a280e1;',null,'','color: #3d3503;',null,'','color: #ca0860;',null,'','color: #69c88e;',null,'','color: #392201;',null,'','color: #e00dfb;',null,'','color: #d9cb0b;',null,'','color: #1b4eb7;',null,'','color: #12c4fd;',null,'','color: #0caa2f;',null,'','color: #e44bff;',null,'','color: #709489;',null,'','color: #f6efec;',null,'','color: #61561c;',null,'','color: #d66749;',null,'','color: #788d24;',null,'','color: #7753c4;',null,'','color: #a4d0c9;',null,'','color: #ea64d6;',null,'','color: #de518d;',null,'','color: #b93d1c;',null,'','color: #e92411;',null,'','color: #35710e;',null,'','color: #38587c;',null,'','color: #45218e;',4,'18760: File save takes excessively longer when SED is loaded','color: #889f31;',null,'','color: #f10999;',null,'','color: #33ca1f;',null,'','color: #39e046;',null,'','color: #044f99;',null,'','color: #439dad;',null,'','color: #08a686;',null,'','color: #2eb5fe;',2,'19363: SED causing 1min OneDrive sync','color: #dd0f08;',null,'','color: #b76b5f;'],
 ['45',null,null,'','color: #693410;',null,'','color: #9d97a5;',null,'','color: #c6a3d2;',null,'','color: #3b1503;',null,'','color: #3e115a;',null,'','color: #9884ac;',null,'','color: #94bd71;',null,'','color: #4f12d0;',null,'','color: #3cb106;',null,'','color: #77b9f7;',null,'','color: #666d71;',null,'','color: #89e74f;',null,'','color: #0e0c92;',null,'','color: #5646f6;',null,'','color: #994f32;',null,'','color: #c1d6e0;',null,'','color: #c9f526;',null,'','color: #c67f45;',null,'','color: #62b47f;',null,'','color: #97d5d8;',null,'','color: #b7b4ac;',null,'','color: #91af3a;',null,'','color: #31a963;',null,'','color: #7069b6;',null,'','color: #2a8965;',null,'','color: #14b022;',null,'','color: #c10338;',null,'','color: #b513c4;',null,'','color: #a67085;',null,'','color: #2f545f;',null,'','color: #c2f8b0;',null,'','color: #525d6b;',null,'','color: #c8089c;',null,'','color: #dba9c1;',null,'','color: #1ce49e;',null,'','color: #a280e1;',null,'','color: #3d3503;',null,'','color: #ca0860;',null,'','color: #69c88e;',null,'','color: #392201;',null,'','color: #e00dfb;',null,'','color: #d9cb0b;',null,'','color: #1b4eb7;',null,'','color: #12c4fd;',null,'','color: #0caa2f;',null,'','color: #e44bff;',null,'','color: #709489;',null,'','color: #f6efec;',null,'','color: #61561c;',null,'','color: #d66749;',null,'','color: #788d24;',null,'','color: #7753c4;',null,'','color: #a4d0c9;',null,'','color: #ea64d6;',null,'','color: #de518d;',null,'','color: #b93d1c;',null,'','color: #e92411;',null,'','color: #35710e;',null,'','color: #38587c;',null,'','color: #45218e;',null,'','color: #889f31;',null,'','color: #f10999;',null,'','color: #33ca1f;',null,'','color: #39e046;',null,'','color: #044f99;',null,'','color: #439dad;',null,'','color: #08a686;',null,'','color: #2eb5fe;',null,'','color: #dd0f08;',null,'','color: #b76b5f;'],
 ['46',null,null,'','color: #693410;',null,'','color: #9d97a5;',null,'','color: #c6a3d2;',null,'','color: #3b1503;',null,'','color: #3e115a;',null,'','color: #9884ac;',null,'','color: #94bd71;',null,'','color: #4f12d0;',null,'','color: #3cb106;',null,'','color: #77b9f7;',null,'','color: #666d71;',null,'','color: #89e74f;',null,'','color: #0e0c92;',null,'','color: #5646f6;',null,'','color: #994f32;',null,'','color: #c1d6e0;',null,'','color: #c9f526;',null,'','color: #c67f45;',null,'','color: #62b47f;',null,'','color: #97d5d8;',null,'','color: #b7b4ac;',null,'','color: #91af3a;',null,'','color: #31a963;',null,'','color: #7069b6;',null,'','color: #2a8965;',null,'','color: #14b022;',null,'','color: #c10338;',null,'','color: #b513c4;',null,'','color: #a67085;',null,'','color: #2f545f;',null,'','color: #c2f8b0;',null,'','color: #525d6b;',null,'','color: #c8089c;',null,'','color: #dba9c1;',null,'','color: #1ce49e;',null,'','color: #a280e1;',null,'','color: #3d3503;',null,'','color: #ca0860;',null,'','color: #69c88e;',null,'','color: #392201;',null,'','color: #e00dfb;',null,'','color: #d9cb0b;',null,'','color: #1b4eb7;',null,'','color: #12c4fd;',null,'','color: #0caa2f;',null,'','color: #e44bff;',null,'','color: #709489;',null,'','color: #f6efec;',null,'','color: #61561c;',null,'','color: #d66749;',null,'','color: #788d24;',null,'','color: #7753c4;',null,'','color: #a4d0c9;',null,'','color: #ea64d6;',null,'','color: #de518d;',null,'','color: #b93d1c;',null,'','color: #e92411;',null,'','color: #35710e;',null,'','color: #38587c;',null,'','color: #45218e;',null,'','color: #889f31;',null,'','color: #f10999;',null,'','color: #33ca1f;',null,'','color: #39e046;',null,'','color: #044f99;',null,'','color: #439dad;',null,'','color: #08a686;',null,'','color: #2eb5fe;',null,'','color: #dd0f08;',null,'','color: #b76b5f;'],
 ['47',null,null,'','color: #693410;',null,'','color: #9d97a5;',null,'','color: #c6a3d2;',null,'','color: #3b1503;',null,'','color: #3e115a;',null,'','color: #9884ac;',null,'','color: #94bd71;',null,'','color: #4f12d0;',null,'','color: #3cb106;',null,'','color: #77b9f7;',null,'','color: #666d71;',null,'','color: #89e74f;',null,'','color: #0e0c92;',null,'','color: #5646f6;',null,'','color: #994f32;',null,'','color: #c1d6e0;',null,'','color: #c9f526;',null,'','color: #c67f45;',null,'','color: #62b47f;',null,'','color: #97d5d8;',null,'','color: #b7b4ac;',null,'','color: #91af3a;',null,'','color: #31a963;',null,'','color: #7069b6;',null,'','color: #2a8965;',null,'','color: #14b022;',null,'','color: #c10338;',null,'','color: #b513c4;',null,'','color: #a67085;',null,'','color: #2f545f;',null,'','color: #c2f8b0;',null,'','color: #525d6b;',null,'','color: #c8089c;',null,'','color: #dba9c1;',null,'','color: #1ce49e;',null,'','color: #a280e1;',null,'','color: #3d3503;',null,'','color: #ca0860;',null,'','color: #69c88e;',null,'','color: #392201;',null,'','color: #e00dfb;',null,'','color: #d9cb0b;',null,'','color: #1b4eb7;',null,'','color: #12c4fd;',null,'','color: #0caa2f;',null,'','color: #e44bff;',null,'','color: #709489;',null,'','color: #f6efec;',null,'','color: #61561c;',null,'','color: #d66749;',null,'','color: #788d24;',null,'','color: #7753c4;',null,'','color: #a4d0c9;',null,'','color: #ea64d6;',null,'','color: #de518d;',null,'','color: #b93d1c;',null,'','color: #e92411;',null,'','color: #35710e;',null,'','color: #38587c;',null,'','color: #45218e;',null,'','color: #889f31;',null,'','color: #f10999;',null,'','color: #33ca1f;',null,'','color: #39e046;',null,'','color: #044f99;',null,'','color: #439dad;',null,'','color: #08a686;',null,'','color: #2eb5fe;',null,'','color: #dd0f08;',null,'','color: #b76b5f;'],
@@ -416,7 +416,7 @@ data. addRows([
 	});
 	
 	//Once ready event is fired the onReady function is called
-	google.visualization.events.addListener(wrapper, 'ready', onReady);
+	google.visualization.events.addListener(wrapper, 'ready', onLineReady);
 	
 	getFilter();
 }
@@ -495,7 +495,7 @@ function createCollapse(property)
             " + property + "\
         </button>\
     </div>\
-    <div id=\"" + property + "Collapse\" class=\"collapse\">\
+    <div id=\"" + property + "Collapse\" class=\"collapse show\">\
         <div class=\"card-body\" id=\"" + property + "CollapseBody\">\
 			<div id=\"" + property + "chart\"</div>\
         </div>\
@@ -506,7 +506,7 @@ function createCollapse(property)
 //wrapper for incrementing a row by column 0 value
 function incrementCount(data, property)
 {
-	console.log("+incrementCount");
+	//console.log("+incrementCount");
 	
 	var limit = data.getNumberOfRows();
 	for (var i = 0; i < limit; i++)
@@ -519,8 +519,8 @@ function incrementCount(data, property)
 		}
 	}
 	
+	//console.log("-incrementCount");
 	return data;
-	console.log("-incrementCount");
 }
 
 function getOtherCount(data)
@@ -573,7 +573,7 @@ function addHTML()
 			{
 				//Create Data Table if doesn't exist
 				
-				console.log("Created Data table for " + caseProp);
+				//console.log("Created Data table for " + caseProp);
 				pieData[caseProp] = new google.visualization.DataTable();
 				pieData[caseProp].addColumn('string', caseProp);
 				pieData[caseProp].addColumn('number', "cases");
@@ -599,7 +599,7 @@ function addHTML()
 			//Check if the filter has been created already, and if not create a checkbox
 			if (!pieData[caseProp].getDistinctValues(0).includes(caseProp))
 			{
-				console.log("Created Row for: " + caseObj[caseProp]);
+				//console.log("Created Row for: " + caseObj[caseProp]);
 				pieData[caseProp].addRow([caseObj[caseProp],0]);
 			}
 			
@@ -607,29 +607,105 @@ function addHTML()
 		}
 	}
 	
+	drawPieCharts(pieData);
+}
+
+function drawPieCharts(pieData)
+{
+	pieChartWrappers = {};
+	
 	for (var pc in pieData)
 	{
 		pieData[pc] = getOtherCount(pieData[pc]);
-	
+		
 		var opts = {
 			height:300,
 			width:500,
-			title:pc,
+			title: pc,
 			legend:
 			{
 				position:'left'
-			}
-		}	
+			},
+			slices: {}
+		}
 	
-		var chart = new google.visualization.PieChart(document.getElementById(pc + "chart"));
-		chart.draw(pieData[pc], opts);
+		pieChartWrappers[pc] = new google.visualization.ChartWrapper({
+			chartType: 'PieChart',
+			dataTable: pieData[pc],
+			options: opts,
+			containerId: pc + "chart"
+		});
+		
+		google.visualization.events.addListener(pieChartWrappers[pc], 'ready', onPieReady(pc));
+		
+		function onPieReady(pc) 
+		{
+			console.log("ready event: " + pc);
+			
+			$('#google-visualization-errors-all-1').hide();
+			
+			google.visualization.events.addListener(pieChartWrappers[pc], 'error', onPieError);
+			google.visualization.events.addListener(pieChartWrappers[pc], 'select', onPieSelect);
+		}
+		
+		function onPieError(googleError) 
+		{
+			google.visualization.errors.removeError(googleError.id);
+			console.log("Google Error: " + googleError.message);
+		}
+		
+		function onPieSelect()
+		{
+			for (var pc in pieChartWrappers)
+			{
+				var selected = pieChartWrappers[pc].getChart().getSelection();
+				//empty check
+				if (Object.keys(selected).length > 0)
+				{
+					var opts = pieChartWrappers[pc].getOptions();
+					
+					console.log(pc + " : " + JSON.stringify(selected));
+					console.log(pc + " : " + JSON.stringify(opts));
+					
+					var slice = selected[0]["row"];
+					
+					
+					try 
+					{
+						if (opts.slices[slice]["offset"] == 0.25)
+						{
+							opts.slices[slice]["offset"] = 0;
+						}
+						else
+						{
+							opts.slices[slice]["offset"] = 0.25;
+						}
+					}
+					catch(error)
+					{
+						opts.slices[slice] = { "offset": 0.25 };
+					}
+					
+					pieChartWrappers[pc].setOptions(opts);
+					
+					pieChartWrappers[pc].draw();
+					
+					
+					//Clear selection to act like radio buttons
+					pieChartWrappers[pc].getChart().setSelection([]);
+				}
+				
+			}
+		}
+		
+		pieChartWrappers[pc].draw();
 	}
 }
 
 //onSelect Listener can only be added once ready
-function onReady()
+function onLineReady()
 {
-	google.visualization.events.addListener(wrapper, 'select', onSelect);
+	google.visualization.events.addListener(wrapper, 'select', onLineSelect);
 }
 
 function clearTabs()
@@ -659,7 +735,7 @@ function newTab(color,number,description,caseLog,first)
 }
 
 //Show CaseLog in div below. 
-function onSelect()
+function onLineSelect()
 {		
 	clearTabs();
 	var selection = wrapper.getChart().getSelection();			
@@ -862,4 +938,3 @@ function setAll(name,value)
 	
 	massFlag = 0;
 }
-
