@@ -7,13 +7,13 @@
 var CaseInfo = new Object();
 var massFlag = 0;
 
+const PIE_CHART_OFFSET = 0.4;
+
 //powershell variable replaced by values
 $addCaseInfo;
 
 var data;
 var view;
-
-const PIE_CHART_OFFSET = 0.25;
 
 //Load google things
 google.charts.load('current', {'packages':['corechart', 'controls']});
@@ -264,17 +264,19 @@ function addHTML()
 				currentDiv.appendChild(buttonsDiv);
 			}
 			
-			//Check if the filter has been created already, and if not create a checkbox
-			if (!pieData[caseProp].getDistinctValues(0).includes(caseProp))
+			//Check if the filter has been created already, and if not create a row			
+			if (!pieData[caseProp].getDistinctValues(0).includes(caseObj[caseProp]))
 			{
-				//console.log("Created Row for: " + caseObj[caseProp]);
+				console.log("Created Row for: " + caseObj[caseProp]);
 				pieData[caseProp].addRow([caseObj[caseProp],0]);
 			}
 			
+			//increment the count value
 			pieData[caseProp] = incrementCount(pieData[caseProp], caseObj[caseProp]);				
 		}
 	}
 	
+	//Seperated for ease of reading
 	drawPieCharts(pieData);
 }
 
@@ -282,10 +284,13 @@ function drawPieCharts(pieData)
 {
 	pieChartWrappers = {};
 	
+	//pc is a filter
 	for (var pc in pieData)
 	{
+		//other count is total - sum of other filter counts
 		pieData[pc] = getOtherCount(pieData[pc]);
 		
+		//chart options
 		var opts = {
 			height:300,
 			width:500,
@@ -310,18 +315,19 @@ function drawPieCharts(pieData)
 		{
 			console.log("ready event: " + pc);
 			
-			$('#google-visualization-errors-all-1').hide();
-			
+			//there is a strange error related to passing onReady a parameter I believe, moved it to the console rather than the ui.
 			google.visualization.events.addListener(pieChartWrappers[pc], 'error', onPieError);
 			google.visualization.events.addListener(pieChartWrappers[pc], 'select', onPieSelect);
 		}
 		
+		//Moves Google errors to the console rather than the ui
 		function onPieError(googleError) 
 		{
 			google.visualization.errors.removeError(googleError.id);
 			console.log("Google Error: " + googleError.message);
 		}
 		
+		//PieChart onclick - same for all pies as all need to be parsed by the filter
 		function onPieSelect()
 		{
 			for (var pc in pieChartWrappers)
@@ -330,14 +336,15 @@ function drawPieCharts(pieData)
 				//empty check
 				if (Object.keys(selected).length > 0)
 				{
+					//options object for currently selected pie
 					var opts = pieChartWrappers[pc].getOptions();
 					
-					console.log(pc + " : " + JSON.stringify(selected));
-					console.log(pc + " : " + JSON.stringify(opts));
+					//console.log(pc + " : " + JSON.stringify(selected));
+					//console.log(pc + " : " + JSON.stringify(opts));
 					
 					var slice = selected[0]["row"];
 					
-					
+					//option might not exist yet
 					try 
 					{
 						if (opts.slices[slice]["offset"] == PIE_CHART_OFFSET)
@@ -354,18 +361,23 @@ function drawPieCharts(pieData)
 						opts.slices[slice] = { "offset": PIE_CHART_OFFSET };
 					}
 					
+					//Set new options
 					pieChartWrappers[pc].setOptions(opts);
 					
+					//Draw new pie with exploded sectors
 					pieChartWrappers[pc].draw();
 					
 					
 					//Clear selection to act like radio buttons
 					pieChartWrappers[pc].getChart().setSelection([]);
+					
+					//Filter main graph
+					getFilter();
 				}
-				
 			}
 		}
 		
+		//Initial draw is all the way down here
 		pieChartWrappers[pc].draw();
 	}
 }
@@ -523,7 +535,7 @@ function listFromResolution(values)
 	return list;
 }
 
-//Passed a string to find the columns for
+//Get the values to search each tag for and filter the graph on them
 function getFilter()
 {	
 	console.log("+GetFilter: " + (new Date).getTime());
@@ -531,29 +543,29 @@ function getFilter()
 	//Clear CaseLog
 	clearTabs();
 	
-	//All checkboxes
-	var checkboxes = $(":checkbox");
-	
 	var values = {};
 	
-	checkboxes.each( function() 
+	for (var pc in pieChartWrappers)
 	{
-		//Slice off [property]Filter
-		var property = this.name.slice(0,-6);
+		console.log("Filtering " + pc);
+		values[pc] = [];
+		var offsets = pieChartWrappers[pc].getOption('slices');
 		
-		//Create new property
-		if(values[property] == null)
-		{
-			//console.log("new property " + property);
-			values[property] = [];
-		}
+		console.log(offsets);
 		
-		if(this.checked)
+		var pcDataTable = pieChartWrappers[pc].getDataTable();
+		
+		console.log(pcDataTable);
+		
+		for (var i = 0; i < pcDataTable.getNumberOfRows(); i++)
 		{
-			//console.log(property + ": " + this.id);
-			values[property].push(this.id);
+			if (offsets[i] != undefined && offsets[i].offset == PIE_CHART_OFFSET)
+			{			
+				continue;
+			}
+			values[pc].push(pieChartWrappers[pc].getDataTable().getValue(i,0));
 		}
-	});
+	}
 	
 	console.log(values);
 	
