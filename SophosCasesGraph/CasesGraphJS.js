@@ -2,6 +2,11 @@
 - Clean and Comment
 */
 
+/*
+	Logging enabled?
+	//LOG console.log
+*/
+
 //global CaseInfo object
 var CaseInfo = new Object();
 var massFlag = 0;
@@ -11,7 +16,7 @@ const PIE_CHART_OFFSET = 0.4;
 
 //powershell variable replaced by values
 CaseInfo['00000'] = {description:'Health Trails Tool', caseLog:'<b>W5:</b> Creating a C++/.NET tool to view and query JSON objects created by SophosHealth in a GUI. <br><br><b>W6:</b>  Functional now, but more to do<br>~ Groups Health Events by various categories<br>~ Sorts<br>~ View data<br><br><b>W7:</b> Added setup batch file to install C++ redistributale, and create reg keys to allow context right-click launch for sdu root and Trails folder.<br>Also updated UI to show a table of a child events when parent is clicked. More css is required tho!<br>', color:'693410', Result:'Suggested Fix'};
-CaseInfo['00001'] = {description:'Case Grapher', caseLog:'<b>W32:</b> Working on powershell/javascript to parse case notes into progress graph using google charts api. Clicking on graph shows case history, and now all cases below the point clicked (this is not in the api as far as I can see). Powershell is used to take html notes files and compress cases into objects, then tabulate in javascript and draw with google charts. Output is a single html file that is easily transported and opened on any computer. <br><br><b>W33:</b> Working in Javascript to allow filtering of the graph using DataView class from Google charts API. Also commited to github for easier working. <br><br>Added button to filter and changed caseLog grouping to always pull from a view as it didn&#x27;t work when filtered before, due to reading row/column from the original dataTable when the columns don&#x27;t line up any more. Also implemented CaseLog info when clicking on the legend.<br><br><b>W34:</b> Trying to scrape data from webpage instead of manual takeout, by creating a browser instance and interacting with html elements via powershell, but its not easy as nothing has an id :/ Moving to a python 3rd party api with strong results. The format received is different so having to alter main though. It seems to be working after some fiddling to get everything in the right order, but I don&#x27;t think the description is right?<br><br>Managed to get it working with the scraper and very happy with it. Did have to add a credentials section and handling for various cases including cancel, wrong password, google captcha required and correct. Also, swapped the buttons in HTML out for checkboxes and updated the onclick functions to handle this. Currently the implementation isn&#x27;t great {O(n^2)} but meh I can&#x27;t think of a better way immediately, seeing as the filtering has to be pure javascript and can&#x27;t go back to powershell.<br><br>Its now hosted live on github so I hope I dont get in trouble for having my notes public... I also added a style column to the table for each line, and set the line colour based on the SHA1 hash of the case number, meaning it can stay constant when re-filtering (by default column number defines colour). The styling is supposed to be section specific though, so the legend has the wrong colours. Don&#x27;t think there is an easy workaround here so it&#x27;s hidden for now.<br><br>Next up: make it pretty! Tabs for cases being shown, a help section on how to read the graph now there is no Legend, maybe some CSS<br><br><b>W38:</b> Swapped the result tag for a tagging system where any word can be applied as a key:value pair. to support this the JS map now contains an object with K:V pairs rather than an array requiring context. This means that any new word used as a key in a case note will generate a new row of checkboxes (based on the order they are found), and can be filtered using it. New values for that tag are also data driven rather than pre-defined. Also allowed the graph to draw empty when there are no matches, and re-wrote the filtering system to be less stupid. Should probably add an &quot;other&quot; checkbox by default as now if a case does not have a value for a checkbox it is gone as soon as you filter.<br><br><b>W39:</b> using more bootstrap for the filters, struggling to not have it sort the graph 18 times (performance noticable) when clicking all buttons as each slider receives a change event. Also component - other is broken somehow.<br>Fixed the performance issue by having the onChange listener check a global flag to see if it was changed by a mass button, and not call the filter if it was. The mass buttons then call the filter separately so it is always called once. I also added tabs for the caselog, which took a while as I didn&#x27;t know html ids cannot start with a number.<br><br>Spent quite a while trying to animate entry and exit of cases, but the animation doesn&#x27;t work very well, and the customer colour is only applied after, so I&#x27;m not sure if it&#x27;s worth pursuing.<br><br><b>W44:</b> had an idea to replace the buttons with pie charts. So far pie charts get drawn, but need to get onclick sorting working, and hopefully can blow out segments that are not in the filter.<br><br>And it works! On click the segment is either offset and the category filtered out or moved back and re-included. Really happy with the result. You can also click the legend and have the same effect. Some code needs to be cleaned out and commented, then formatting and styling to be done.', color:'9d97a5', Result:'Suggested Fix'};
+CaseInfo['00001'] = {description:'Case Grapher', caseLog:'<b>W32:</b> Working on powershell/javascript to parse case notes into progress graph using google charts api. Clicking on graph shows case history, and now all cases below the point clicked (this is not in the api as far as I can see). Powershell is used to take html notes files and compress cases into objects, then tabulate in javascript and draw with google charts. Output is a single html file that is easily transported and opened on any computer. <br><br><b>W33:</b> Working in Javascript to allow filtering of the graph using DataView class from Google charts API. Also commited to github for easier working. <br><br>Added button to filter and changed caseLog grouping to always pull from a view as it didn&#x27;t work when filtered before, due to reading row/column from the original dataTable when the columns don&#x27;t line up any more. Also implemented CaseLog info when clicking on the legend.<br><br><b>W34:</b> Trying to scrape data from webpage instead of manual takeout, by creating a browser instance and interacting with html elements via powershell, but its not easy as nothing has an id :/ Moving to a python 3rd party api with strong results. The format received is different so having to alter main though. It seems to be working after some fiddling to get everything in the right order, but I don&#x27;t think the description is right?<br><br>Managed to get it working with the scraper and very happy with it. Did have to add a credentials section and handling for various cases including cancel, wrong password, google captcha required and correct. Also, swapped the buttons in HTML out for checkboxes and updated the onclick functions to handle this. Currently the implementation isn&#x27;t great {O(n^2)} but meh I can&#x27;t think of a better way immediately, seeing as the filtering has to be pure javascript and can&#x27;t go back to powershell.<br><br>Its now hosted live on github so I hope I dont get in trouble for having my notes public... I also added a style column to the table for each line, and set the line colour based on the SHA1 hash of the case number, meaning it can stay constant when re-filtering (by default column number defines colour). The styling is supposed to be section specific though, so the legend has the wrong colours. Don&#x27;t think there is an easy workaround here so it&#x27;s hidden for now.<br><br>Next up: make it pretty! Tabs for cases being shown, a help section on how to read the graph now there is no Legend, maybe some CSS<br><br><b>W38:</b> Swapped the result tag for a tagging system where any word can be applied as a key:value pair. to support this the JS map now contains an object with K:V pairs rather than an array requiring context. This means that any new word used as a key in a case note will generate a new row of checkboxes (based on the order they are found), and can be filtered using it. New values for that tag are also data driven rather than pre-defined. Also allowed the graph to draw empty when there are no matches, and re-wrote the filtering system to be less stupid. Should probably add an &quot;other&quot; checkbox by default as now if a case does not have a value for a checkbox it is gone as soon as you filter.<br><br><b>W39:</b> using more bootstrap for the filters, struggling to not have it sort the graph 18 times (performance noticable) when clicking all buttons as each slider receives a change event. Also component - other is broken somehow.<br>Fixed the performance issue by having the onChange listener check a global flag to see if it was changed by a mass button, and not call the filter if it was. The mass buttons then call the filter separately so it is always called once. I also added tabs for the caselog, which took a while as I didn&#x27;t know html ids cannot start with a number.<br><br>Spent quite a while trying to animate entry and exit of cases, but the animation doesn&#x27;t work very well, and the customer colour is only applied after, so I&#x27;m not sure if it&#x27;s worth pursuing.<br><br><b>W44:</b> had an idea to replace the buttons with pie charts. So far pie charts get drawn, but need to get onclick sorting working, and hopefully can blow out segments that are not in the filter.<br><br>And it works! On click the segment is either offset and the category filtered out or moved back and re-included. Really happy with the result. You can also click the legend and have the same effect. Some code needs to be cleaned out and commented, then formatting and styling to be done. Also put all logging under a //LOG tag for easy enable/disable', color:'9d97a5', Result:'Suggested Fix'};
 CaseInfo['12724'] = {description:'Detection of &#x27;both&#x27; location takes 5 minutes', caseLog:'<b>W21:</b> Logs suggest system is waiting for a lot of DNS queries to time out, as each adapter has multiple ip addresses, and each one is retried 3 times, taking 12 seconds each time. In code found a reg key to alter retry number, requested cx change to 1 to lower delay? ', color:'c6a3d2', Result:'Expected'};
 CaseInfo['13785'] = {description:'Only one confirmation dialogue with attaching files to email for ~3s', caseLog:'<b>W4:</b> Initially believed to be caching action and retrieving incorrect cached action, dug through *lots* of data control code to determine key. Issue appears to actually be with repeat acknowledgement suppressor, meant to be for the same action and file in a short time. Equality operator of Acknowledgement objects reference attribute SourceFilename not set in DataControlRequest objects where Check Type is File Open (which attaching to email does). <br><br>Confirmed behaviour is the same with other File Open actions. Confirmed lack of string in local values by breaking in with debugger, comparing FileOpen locals to FileCopy (which displays all acknowledgement dialogues). FileOpen has blank strings where FileCopy has the full file path. Suggested a 1 line fix based on similar operation in the caching logic.  <br>Potential Workaround of setting old Ack. timeouts to 0 not configurable :/', color:'3b1503', Result:'Suggested Fix', Component:'Data Control'};
 CaseInfo['13854'] = {description:'Wifi adapter device instance ID script', caseLog:'<b>W1:</b> Wrote powershell script to help Emile with this case. Retrieves instance ID from active Wifi adapter device.<br>', color:'3e115a', Result:'Transferred'};
@@ -47,7 +52,7 @@ CaseInfo['16842'] = {description:'PPT saving slowly Win10 v. Win7', caseLog:'<b>
 CaseInfo['16852'] = {description:'Some DLP events not reported', caseLog:'<b>W20:</b> Initial analysis was Destination Only scans were not being reported, as all events in &quot;broken&quot; computer were DO, however cx reports they are aware of this limitation, and performing the same test (copy file from desktop to USB with explorer) is reported differently on different machines. Logs do not support this, so requested more with verbose SAV and PML. ', color:'1ce49e', Result:'Unresolved', Component:'Data Control'};
 CaseInfo['16857'] = {description:'ESH UC not showing status correctly', caseLog:'<b>W20:</b> Exists old ticket where UC logs rotate so last status can&#x27;t be found, but this has been fixed and status is now in xml file. Cx&#x27;s xml is present and correct, and even if it wasn&#x27;t there ESH would fall back to logs which contain a success event as most recent. Error case seems to be that file exists but ESH can&#x27;t retrieve the data from it for some reason? Requested PML/fresh sdu of ESH refresh.<br><br><b>W21:</b> Logs obtained, status still good in current.xml file and in logs, but PML shows access denied. Seems UpdateCache and MessageRelay folders don&#x27;t have User group read permission when installed, so assume the cx is running ESH on a non-admin account? There already exists a KBA stating that ESH must be run as admin. Issue resolved by correcting permissions on UpdateCache/MessageRelay folders.  ', color:'a280e1', Result:'Environment Issue', Component:'Endpoint Self-Help'};
 CaseInfo['16859'] = {description:'Install fails S1 with proxy', caseLog:'<b>W26:</b> same setup on other machines doesn&#x27;t fail. On this one, proxy is system on others it isn&#x27;t. Setup scenario and doesn&#x27;t inherently fail. Will try to recreate situation with powershell.<br><br><b>W27:</b> built exe to replicate WinHTTP process just for fun. Used Message Analyser on the etl trace from netsh instead of perfmon, logging is pretty detailed. The WinHttp section of a working log is the same, however normally the WebIO api is used next and it is absent from the cx&#x27;s log. WinHttp is is statically linked to WebIO. MUI is related to translation, so installed on DE machine to see which are used. Only &quot;winnlsres.dll&quot;. Removing all permissions on this file gives same errors as for cx.<br><br><b>W32:</b> Cx provided PML of install, target machine is actually a 2012RS2 server which requires C:\Windows\SysWOW64\en-US\KERNELBASE.dll.mui and is not found on CX server. Taking ownership and renaming this file causes the same error as Customer, and running sfc \scannow copies backup from C:\Windows\System32\en-US and resolves. Proxy confirmed not related.  ', color:'3d3503', Result:'Environment Issue', Component:'Installer'};
-CaseInfo['16879'] = {description:'SSP StandAlone Install fail', caseLog:'<b>W20:</b> installer cannot read existing registry key, access denied. Same for user trying to delete as admin. PML doesn&#x27;t seem to capture issue, but does show other AV &#x27;bytefence&#x27; running, requested to try without and gather PML. ', color:'ca0860', Result:'Unresolved', Component:'Installer'};
+CaseInfo['16879'] = {description:'SSP StandAlone Install fail', caseLog:'<b>W20:</b> installer cannot read existing registry key, access denied. Same for user trying to delete as admin. PML doesn&#x27;t seem to capture issue, but does show other AV &#x27;bytefence&#x27; running, requested to try without and gather PML. <br><br><b>W30:</b> ', color:'ca0860', Result:'No Response', Component:'Installer'};
 CaseInfo['16988'] = {description:'Delay saving Office docs to NAS', caseLog:'<b>W21:</b> Initally suspected oplocks like previous case, but SMB traffic is not SMB2, so not supported. PML and Wireshark don&#x27;t line up, but suspicious of apparent 40s hang on close file, and found similar looking hang in wireshark, waiting for AndX Request response. Cx originally said 10-60s delay, so requested Wireshark &amp; PML of delay and not-delayed replication.<br><br><b>W32:</b> Temporary file close is held up by file size query for copy detection, almost certainly a timeout as 40s is very consistent. Same operation later on Book1.xlsx does not hang. New Wireshark still doesn&#x27;t line up with the procmon, but attempting analysis anyway. Cx says the issue only occurs for this NAS not for any remote share, and protocol is SMB1 might be significant? Repro is unlikely. Registry key from 17886 that disables copy detection check might be useful to them tho. <br><br><b>W35:</b> Finally have matching Wireshark and PML. They confirm suspicions but its unclear what is expected as I&#x27;m not that familar with SMB, and standard fileshares now use SMB2. Set up a W2003 server as a fileshare, so it uses SMB and enabled NTLM on the client, but still no delay, unsure why transfer is re-authenticating and why it is timing out (?).<br><br>Found this:<br>Servers checks if the response is properly computed by contacting the domain controller.<br>And I believe the NAS is not in a domain, so maybe this is what times out? It seems this DC communications happens between NTLMSSP_AUTH and response rather than NTLMSSP_NEGOTIATE and NTLMSSP_CHALLENGE, but worth looking at traffic that is not smb.<br><br><b>W36:</b> Managed to enable NTMLSSP on both client and fileserver, trying to join 2003 server to domain so that the authentication can work.Something called Samba is potentially also involved but this needs more looking at.<br><br><b>W37:</b> Enabling NTLMSSP on 2003 shows that we are causing NTLM to reauthenticate somehow, but it doesn&#x27;t take 40s to respond with a challenge. Two paths here: Why does it re-authenticate at all, and why does it take 40s. Seeing as I can reproduce the authentication I will pursue this primarily. Not actually &quot;Re-authenticating&quot; but authenticating a new virtual circuit. Seems to be triggered by the rename action, and can reproduce with rename in powershell. No delay still though.<br><br><b>W38:</b> Disabling onWrite removes the new virtual circuit which seems to cause the delay for the customer.<br><br><b>W41:</b> Did a RA with the Cx. Firstly observed that the 40s delay also occurs when negotiating the first virtual circuit, browsing to the folder with explorer. The cx then disabled SavService, and browsed to the folder again, which was delayed again, then saved a file instantly (as expected) because no second Virtual Circuit was negotiated. <br><br>I suggested my observations to the customer, that there is a delay with negotiating with the NAS box, and we are simply triggering it, so the delay could also be alleviated if they could investigate where the delay comes from,  and I would continue to investigate the source of the second VC, but they insisted that because there is no delay in *saving a file* without Sophos, there is no issue. They refused to look into the issue on their end.', color:'69c88e', Result:'Unresolved'};
 CaseInfo['16995'] = {description:'Safestore config', caseLog:'<b>W21:</b> Cx wanted to change safestore limit so files over 50mb are not deleted. Functionality exists in API but not available for cx, clean to add reg keys and allow this config.  ', color:'392201', Result:'Feature Request', Component:'Safestore'};
 CaseInfo['17157'] = {description:'DLP working for admin but not user', caseLog:'<b>W22:</b> from PML the user account has folder redirection enabled, so the file is actually being transferred from a remote share. The cx has remote files disabled for on-access in Threat-Protection policy, which when tested also applies to DLP, so copying straight from remote share to browser does not flag if local only is selected.  ', color:'e00dfb', Result:'Environment Issue', Component:'Data Control'};
@@ -342,7 +347,7 @@ data. addRows([
 ['27',null,null,'','color: #693410;',null,'','color: #9d97a5;',null,'','color: #c6a3d2;',null,'','color: #3b1503;',null,'','color: #3e115a;',null,'','color: #9884ac;',null,'','color: #94bd71;',null,'','color: #4f12d0;',null,'','color: #3cb106;',null,'','color: #77b9f7;',null,'','color: #666d71;',null,'','color: #89e74f;',null,'','color: #0e0c92;',null,'','color: #5646f6;',null,'','color: #994f32;',null,'','color: #c1d6e0;',null,'','color: #c9f526;',null,'','color: #c67f45;',null,'','color: #62b47f;',null,'','color: #97d5d8;',null,'','color: #b7b4ac;',null,'','color: #91af3a;',null,'','color: #31a963;',null,'','color: #7069b6;',null,'','color: #2a8965;',null,'','color: #14b022;',null,'','color: #c10338;',null,'','color: #b513c4;',null,'','color: #a67085;',5,'16666: Tesco unable to print','color: #2f545f;',null,'','color: #c2f8b0;',null,'','color: #525d6b;',null,'','color: #c8089c;',null,'','color: #dba9c1;',null,'','color: #1ce49e;',null,'','color: #a280e1;',2,'16859: Install fails S1 with proxy','color: #3d3503;',null,'','color: #ca0860;',null,'','color: #69c88e;',null,'','color: #392201;',null,'','color: #e00dfb;',null,'','color: #d9cb0b;',null,'','color: #1b4eb7;',null,'','color: #12c4fd;',2,'17319: Unitrends USB hang','color: #0caa2f;',2,'17344: Memory leak non-paged pool server 2012','color: #e44bff;',null,'','color: #709489;',2,'17382: Install with Kaseya fails 401','color: #f6efec;',null,'','color: #61561c;',0,'17584: PTP Devices not allowed by exclusion','color: #d66749;',0,'17595: failed standalone install','color: #788d24;',0,'17610: Chrome Crash with SLD','color: #7753c4;',null,'','color: #a4d0c9;',null,'','color: #ea64d6;',null,'','color: #de518d;',null,'','color: #b93d1c;',null,'','color: #e92411;',null,'','color: #35710e;',null,'','color: #38587c;',null,'','color: #45218e;',null,'','color: #889f31;',null,'','color: #f10999;',null,'','color: #33ca1f;',null,'','color: #39e046;',null,'','color: #044f99;',null,'','color: #439dad;',null,'','color: #08a686;',null,'','color: #2eb5fe;',null,'','color: #dd0f08;',null,'','color: #b76b5f;'],
 ['28',null,null,'','color: #693410;',null,'','color: #9d97a5;',null,'','color: #c6a3d2;',null,'','color: #3b1503;',null,'','color: #3e115a;',null,'','color: #9884ac;',null,'','color: #94bd71;',null,'','color: #4f12d0;',null,'','color: #3cb106;',null,'','color: #77b9f7;',null,'','color: #666d71;',null,'','color: #89e74f;',null,'','color: #0e0c92;',null,'','color: #5646f6;',null,'','color: #994f32;',null,'','color: #c1d6e0;',null,'','color: #c9f526;',null,'','color: #c67f45;',null,'','color: #62b47f;',null,'','color: #97d5d8;',0,'16251: Slow first boot non-persistent VDIs','color: #b7b4ac;',null,'','color: #91af3a;',null,'','color: #31a963;',null,'','color: #7069b6;',null,'','color: #2a8965;',null,'','color: #14b022;',null,'','color: #c10338;',2,'16624: 2GB+ upload fails on sendthisfile.com','color: #b513c4;',null,'','color: #a67085;',null,'','color: #2f545f;',null,'','color: #c2f8b0;',null,'','color: #525d6b;',null,'','color: #c8089c;',null,'','color: #dba9c1;',null,'','color: #1ce49e;',null,'','color: #a280e1;',null,'','color: #3d3503;',null,'','color: #ca0860;',null,'','color: #69c88e;',null,'','color: #392201;',null,'','color: #e00dfb;',null,'','color: #d9cb0b;',null,'','color: #1b4eb7;',null,'','color: #12c4fd;',3,'17319: Unitrends USB hang','color: #0caa2f;',3,'17344: Memory leak non-paged pool server 2012','color: #e44bff;',null,'','color: #709489;',3,'17382: Install with Kaseya fails 401','color: #f6efec;',0,'17557: Powerpoint hang when opening/saving','color: #61561c;',1,'17584: PTP Devices not allowed by exclusion','color: #d66749;',1,'17595: failed standalone install','color: #788d24;',1,'17610: Chrome Crash with SLD','color: #7753c4;',0,'17706: Hips blocking VMware profiles','color: #a4d0c9;',null,'','color: #ea64d6;',null,'','color: #de518d;',null,'','color: #b93d1c;',null,'','color: #e92411;',null,'','color: #35710e;',null,'','color: #38587c;',null,'','color: #45218e;',null,'','color: #889f31;',null,'','color: #f10999;',null,'','color: #33ca1f;',null,'','color: #39e046;',null,'','color: #044f99;',null,'','color: #439dad;',null,'','color: #08a686;',null,'','color: #2eb5fe;',null,'','color: #dd0f08;',null,'','color: #b76b5f;'],
 ['29',null,null,'','color: #693410;',null,'','color: #9d97a5;',null,'','color: #c6a3d2;',null,'','color: #3b1503;',null,'','color: #3e115a;',null,'','color: #9884ac;',null,'','color: #94bd71;',null,'','color: #4f12d0;',null,'','color: #3cb106;',null,'','color: #77b9f7;',null,'','color: #666d71;',null,'','color: #89e74f;',null,'','color: #0e0c92;',null,'','color: #5646f6;',null,'','color: #994f32;',null,'','color: #c1d6e0;',null,'','color: #c9f526;',null,'','color: #c67f45;',null,'','color: #62b47f;',null,'','color: #97d5d8;',1,'16251: Slow first boot non-persistent VDIs','color: #b7b4ac;',null,'','color: #91af3a;',null,'','color: #31a963;',null,'','color: #7069b6;',null,'','color: #2a8965;',null,'','color: #14b022;',null,'','color: #c10338;',null,'','color: #b513c4;',null,'','color: #a67085;',null,'','color: #2f545f;',null,'','color: #c2f8b0;',null,'','color: #525d6b;',null,'','color: #c8089c;',null,'','color: #dba9c1;',null,'','color: #1ce49e;',null,'','color: #a280e1;',null,'','color: #3d3503;',null,'','color: #ca0860;',null,'','color: #69c88e;',null,'','color: #392201;',null,'','color: #e00dfb;',null,'','color: #d9cb0b;',null,'','color: #1b4eb7;',null,'','color: #12c4fd;',null,'','color: #0caa2f;',4,'17344: Memory leak non-paged pool server 2012','color: #e44bff;',null,'','color: #709489;',null,'','color: #f6efec;',1,'17557: Powerpoint hang when opening/saving','color: #61561c;',2,'17584: PTP Devices not allowed by exclusion','color: #d66749;',2,'17595: failed standalone install','color: #788d24;',2,'17610: Chrome Crash with SLD','color: #7753c4;',1,'17706: Hips blocking VMware profiles','color: #a4d0c9;',0,'17783: Mem leak opening and closing file','color: #ea64d6;',null,'','color: #de518d;',null,'','color: #b93d1c;',null,'','color: #e92411;',null,'','color: #35710e;',null,'','color: #38587c;',null,'','color: #45218e;',null,'','color: #889f31;',null,'','color: #f10999;',null,'','color: #33ca1f;',null,'','color: #39e046;',null,'','color: #044f99;',null,'','color: #439dad;',null,'','color: #08a686;',null,'','color: #2eb5fe;',null,'','color: #dd0f08;',null,'','color: #b76b5f;'],
-['30',null,null,'','color: #693410;',null,'','color: #9d97a5;',null,'','color: #c6a3d2;',null,'','color: #3b1503;',null,'','color: #3e115a;',null,'','color: #9884ac;',null,'','color: #94bd71;',null,'','color: #4f12d0;',null,'','color: #3cb106;',null,'','color: #77b9f7;',null,'','color: #666d71;',null,'','color: #89e74f;',null,'','color: #0e0c92;',null,'','color: #5646f6;',null,'','color: #994f32;',null,'','color: #c1d6e0;',null,'','color: #c9f526;',null,'','color: #c67f45;',null,'','color: #62b47f;',null,'','color: #97d5d8;',null,'','color: #b7b4ac;',null,'','color: #91af3a;',null,'','color: #31a963;',null,'','color: #7069b6;',null,'','color: #2a8965;',null,'','color: #14b022;',null,'','color: #c10338;',null,'','color: #b513c4;',null,'','color: #a67085;',null,'','color: #2f545f;',null,'','color: #c2f8b0;',null,'','color: #525d6b;',null,'','color: #c8089c;',null,'','color: #dba9c1;',null,'','color: #1ce49e;',null,'','color: #a280e1;',null,'','color: #3d3503;',null,'','color: #ca0860;',null,'','color: #69c88e;',null,'','color: #392201;',null,'','color: #e00dfb;',null,'','color: #d9cb0b;',3,'17279: 3rd Party SW unresponsive with sophos','color: #1b4eb7;',null,'','color: #12c4fd;',null,'','color: #0caa2f;',5,'17344: Memory leak non-paged pool server 2012','color: #e44bff;',null,'','color: #709489;',null,'','color: #f6efec;',null,'','color: #61561c;',null,'','color: #d66749;',null,'','color: #788d24;',3,'17610: Chrome Crash with SLD','color: #7753c4;',null,'','color: #a4d0c9;',1,'17783: Mem leak opening and closing file','color: #ea64d6;',null,'','color: #de518d;',0,'17886: Slow DLL copy','color: #b93d1c;',null,'','color: #e92411;',0,'17965: Missing Exchange auto-exclusions','color: #35710e;',null,'','color: #38587c;',null,'','color: #45218e;',null,'','color: #889f31;',null,'','color: #f10999;',null,'','color: #33ca1f;',null,'','color: #39e046;',null,'','color: #044f99;',null,'','color: #439dad;',null,'','color: #08a686;',null,'','color: #2eb5fe;',null,'','color: #dd0f08;',null,'','color: #b76b5f;'],
+['30',null,null,'','color: #693410;',null,'','color: #9d97a5;',null,'','color: #c6a3d2;',null,'','color: #3b1503;',null,'','color: #3e115a;',null,'','color: #9884ac;',null,'','color: #94bd71;',null,'','color: #4f12d0;',null,'','color: #3cb106;',null,'','color: #77b9f7;',null,'','color: #666d71;',null,'','color: #89e74f;',null,'','color: #0e0c92;',null,'','color: #5646f6;',null,'','color: #994f32;',null,'','color: #c1d6e0;',null,'','color: #c9f526;',null,'','color: #c67f45;',null,'','color: #62b47f;',null,'','color: #97d5d8;',null,'','color: #b7b4ac;',null,'','color: #91af3a;',null,'','color: #31a963;',null,'','color: #7069b6;',null,'','color: #2a8965;',null,'','color: #14b022;',null,'','color: #c10338;',null,'','color: #b513c4;',null,'','color: #a67085;',null,'','color: #2f545f;',null,'','color: #c2f8b0;',null,'','color: #525d6b;',null,'','color: #c8089c;',null,'','color: #dba9c1;',null,'','color: #1ce49e;',null,'','color: #a280e1;',null,'','color: #3d3503;',2,'16879: SSP StandAlone Install fail','color: #ca0860;',null,'','color: #69c88e;',null,'','color: #392201;',null,'','color: #e00dfb;',null,'','color: #d9cb0b;',3,'17279: 3rd Party SW unresponsive with sophos','color: #1b4eb7;',null,'','color: #12c4fd;',null,'','color: #0caa2f;',5,'17344: Memory leak non-paged pool server 2012','color: #e44bff;',null,'','color: #709489;',null,'','color: #f6efec;',null,'','color: #61561c;',null,'','color: #d66749;',null,'','color: #788d24;',3,'17610: Chrome Crash with SLD','color: #7753c4;',null,'','color: #a4d0c9;',1,'17783: Mem leak opening and closing file','color: #ea64d6;',null,'','color: #de518d;',0,'17886: Slow DLL copy','color: #b93d1c;',null,'','color: #e92411;',0,'17965: Missing Exchange auto-exclusions','color: #35710e;',null,'','color: #38587c;',null,'','color: #45218e;',null,'','color: #889f31;',null,'','color: #f10999;',null,'','color: #33ca1f;',null,'','color: #39e046;',null,'','color: #044f99;',null,'','color: #439dad;',null,'','color: #08a686;',null,'','color: #2eb5fe;',null,'','color: #dd0f08;',null,'','color: #b76b5f;'],
 ['31',null,null,'','color: #693410;',0,'00001: Case Grapher','color: #9d97a5;',null,'','color: #c6a3d2;',null,'','color: #3b1503;',null,'','color: #3e115a;',null,'','color: #9884ac;',null,'','color: #94bd71;',null,'','color: #4f12d0;',null,'','color: #3cb106;',null,'','color: #77b9f7;',null,'','color: #666d71;',null,'','color: #89e74f;',null,'','color: #0e0c92;',null,'','color: #5646f6;',null,'','color: #994f32;',null,'','color: #c1d6e0;',null,'','color: #c9f526;',null,'','color: #c67f45;',null,'','color: #62b47f;',null,'','color: #97d5d8;',null,'','color: #b7b4ac;',2,'16337: Slow xls file folder copy to server','color: #91af3a;',null,'','color: #31a963;',null,'','color: #7069b6;',null,'','color: #2a8965;',null,'','color: #14b022;',null,'','color: #c10338;',null,'','color: #b513c4;',null,'','color: #a67085;',null,'','color: #2f545f;',null,'','color: #c2f8b0;',null,'','color: #525d6b;',null,'','color: #c8089c;',null,'','color: #dba9c1;',null,'','color: #1ce49e;',null,'','color: #a280e1;',null,'','color: #3d3503;',null,'','color: #ca0860;',null,'','color: #69c88e;',null,'','color: #392201;',null,'','color: #e00dfb;',null,'','color: #d9cb0b;',null,'','color: #1b4eb7;',null,'','color: #12c4fd;',4,'17319: Unitrends USB hang','color: #0caa2f;',null,'','color: #e44bff;',null,'','color: #709489;',null,'','color: #f6efec;',null,'','color: #61561c;',null,'','color: #d66749;',null,'','color: #788d24;',null,'','color: #7753c4;',null,'','color: #a4d0c9;',null,'','color: #ea64d6;',null,'','color: #de518d;',1,'17886: Slow DLL copy','color: #b93d1c;',0,'17922: SD card reader explorer hang','color: #e92411;',1,'17965: Missing Exchange auto-exclusions','color: #35710e;',null,'','color: #38587c;',null,'','color: #45218e;',null,'','color: #889f31;',null,'','color: #f10999;',null,'','color: #33ca1f;',null,'','color: #39e046;',null,'','color: #044f99;',null,'','color: #439dad;',null,'','color: #08a686;',null,'','color: #2eb5fe;',null,'','color: #dd0f08;',null,'','color: #b76b5f;'],
 ['32',null,null,'','color: #693410;',1,'00001: Case Grapher','color: #9d97a5;',null,'','color: #c6a3d2;',null,'','color: #3b1503;',null,'','color: #3e115a;',null,'','color: #9884ac;',null,'','color: #94bd71;',null,'','color: #4f12d0;',null,'','color: #3cb106;',null,'','color: #77b9f7;',null,'','color: #666d71;',null,'','color: #89e74f;',null,'','color: #0e0c92;',null,'','color: #5646f6;',null,'','color: #994f32;',null,'','color: #c1d6e0;',null,'','color: #c9f526;',null,'','color: #c67f45;',null,'','color: #62b47f;',null,'','color: #97d5d8;',null,'','color: #b7b4ac;',null,'','color: #91af3a;',null,'','color: #31a963;',null,'','color: #7069b6;',null,'','color: #2a8965;',null,'','color: #14b022;',null,'','color: #c10338;',null,'','color: #b513c4;',null,'','color: #a67085;',null,'','color: #2f545f;',null,'','color: #c2f8b0;',null,'','color: #525d6b;',null,'','color: #c8089c;',null,'','color: #dba9c1;',null,'','color: #1ce49e;',null,'','color: #a280e1;',3,'16859: Install fails S1 with proxy','color: #3d3503;',null,'','color: #ca0860;',2,'16988: Delay saving Office docs to NAS','color: #69c88e;',null,'','color: #392201;',null,'','color: #e00dfb;',null,'','color: #d9cb0b;',null,'','color: #1b4eb7;',null,'','color: #12c4fd;',null,'','color: #0caa2f;',null,'','color: #e44bff;',null,'','color: #709489;',null,'','color: #f6efec;',null,'','color: #61561c;',null,'','color: #d66749;',null,'','color: #788d24;',null,'','color: #7753c4;',null,'','color: #a4d0c9;',null,'','color: #ea64d6;',null,'','color: #de518d;',2,'17886: Slow DLL copy','color: #b93d1c;',1,'17922: SD card reader explorer hang','color: #e92411;',null,'','color: #35710e;',null,'','color: #38587c;',null,'','color: #45218e;',null,'','color: #889f31;',null,'','color: #f10999;',null,'','color: #33ca1f;',null,'','color: #39e046;',null,'','color: #044f99;',null,'','color: #439dad;',null,'','color: #08a686;',null,'','color: #2eb5fe;',null,'','color: #dd0f08;',null,'','color: #b76b5f;'],
 ['33',null,null,'','color: #693410;',2,'00001: Case Grapher','color: #9d97a5;',null,'','color: #c6a3d2;',null,'','color: #3b1503;',null,'','color: #3e115a;',null,'','color: #9884ac;',null,'','color: #94bd71;',null,'','color: #4f12d0;',null,'','color: #3cb106;',null,'','color: #77b9f7;',null,'','color: #666d71;',null,'','color: #89e74f;',null,'','color: #0e0c92;',null,'','color: #5646f6;',null,'','color: #994f32;',null,'','color: #c1d6e0;',null,'','color: #c9f526;',null,'','color: #c67f45;',null,'','color: #62b47f;',null,'','color: #97d5d8;',null,'','color: #b7b4ac;',null,'','color: #91af3a;',null,'','color: #31a963;',null,'','color: #7069b6;',null,'','color: #2a8965;',null,'','color: #14b022;',null,'','color: #c10338;',null,'','color: #b513c4;',null,'','color: #a67085;',null,'','color: #2f545f;',null,'','color: #c2f8b0;',null,'','color: #525d6b;',null,'','color: #c8089c;',null,'','color: #dba9c1;',null,'','color: #1ce49e;',null,'','color: #a280e1;',null,'','color: #3d3503;',null,'','color: #ca0860;',null,'','color: #69c88e;',null,'','color: #392201;',null,'','color: #e00dfb;',null,'','color: #d9cb0b;',null,'','color: #1b4eb7;',null,'','color: #12c4fd;',null,'','color: #0caa2f;',null,'','color: #e44bff;',null,'','color: #709489;',null,'','color: #f6efec;',null,'','color: #61561c;',null,'','color: #d66749;',null,'','color: #788d24;',null,'','color: #7753c4;',null,'','color: #a4d0c9;',null,'','color: #ea64d6;',null,'','color: #de518d;',null,'','color: #b93d1c;',2,'17922: SD card reader explorer hang','color: #e92411;',null,'','color: #35710e;',0,'18352: Peripheral Control interfering with FSLogic','color: #38587c;',null,'','color: #45218e;',null,'','color: #889f31;',null,'','color: #f10999;',null,'','color: #33ca1f;',null,'','color: #39e046;',null,'','color: #044f99;',null,'','color: #439dad;',null,'','color: #08a686;',null,'','color: #2eb5fe;',null,'','color: #dd0f08;',null,'','color: #b76b5f;'],
@@ -466,9 +471,7 @@ function createCollapse(tag)
 
 //wrapper for incrementing value in col 1 by col 0 value
 function incrementCount(data, property)
-{
-	//LOG console.log("+incrementCount");
-	
+{	
 	var limit = data.getNumberOfRows();
 	for (var i = 0; i < limit; i++)
 	{
@@ -480,7 +483,6 @@ function incrementCount(data, property)
 		}
 	}
 	
-	//LOG console.log("-incrementCount");
 	return data;
 }
 
@@ -592,20 +594,43 @@ function drawPieCharts(pieData)
 	//Similar to PieData, except PieChartWrappers maps the tag to a google chartWrapper object
 	pieChartWrappers = {};
 	
+	var w = 300;
+	
 	//iterate tags
 	for (var tag in pieData)
 	{
 		//other count is total - sum of other filter counts
 		pieData[tag] = getOtherCount(pieData[tag]);
 			
+		
+		w = $('#' + tag + 'Header').width();
+		
 		//chart options
 		var opts = {
-			height:300,
-			width:500,
 			title: tag,
+			pieSliceText: 'none',
+			height: 300,
+			width: w,
+			chartArea:
+			{
+				width: w
+			},
 			legend:
 			{
-				position:'left'
+				position:'labeled',
+				textStyle:
+				{
+					fontSize: 12
+				}
+			},
+			titleTextStyle:
+			{
+				fontSize: 16
+			},
+			tooltip:
+			{
+				ignoreBounds: true,
+				showColorCode: true
 			},
 			slices: {}
 		}
@@ -635,7 +660,7 @@ function drawPieCharts(pieData)
 		function onPieError(googleError) 
 		{
 			google.visualization.errors.removeError(googleError.id);
-			console.log("Google Error: " + googleError.message);
+			//LOG console.log("Google Error: " + googleError.message);
 		}
 		
 		//PieChart onclick - same for all pies as all need to be parsed by the filter
@@ -651,18 +676,21 @@ function drawPieCharts(pieData)
 					//options object for currently selected pie
 					var offsets = pieChartWrappers[tag].getOption('slices');
 					
-					//console.log(tag + " : " + JSON.stringify(selected));
-					//console.log(tag + " : " + JSON.stringify(opts));
+					//LOG console.log(tag + " : " + JSON.stringify(selected));
+					//LOG console.log(tag + " : " + JSON.stringify(opts));
 					
 					var slice = selected[0]["row"];
 					
 					//option might not exist yet, try to flip value
 					try 
-					{
-						offsets[slice]["offset"] = abs(offsets[slice]["offset"] - PIE_CHART_OFFSET);
+					{						
+						offsets[slice]["offset"] = Math.abs(offsets[slice]["offset"] - PIE_CHART_OFFSET);
+						
+						//LOG console.log("offset set to " + Math.abs(offsets[slice]["offset"] - PIE_CHART_OFFSET));
 					}
 					catch(error)
 					{
+						//LOG console.log("offset error: " + error +" - Creating");
 						offsets[slice] = { "offset": PIE_CHART_OFFSET };
 					}
 					
@@ -671,8 +699,7 @@ function drawPieCharts(pieData)
 					
 					//Draw new pie with exploded sectors
 					pieChartWrappers[tag].draw();
-					
-					
+										
 					//Clear selection to act like radio buttons
 					pieChartWrappers[tag].getChart().setSelection([]);
 					
@@ -802,8 +829,23 @@ function getFilter()
 }
 
 //Filter graph on resize as well
-window.onresize = getFilter;
+window.onresize = doResize;
 
+function doResize()
+{
+	wrapper.setOption('width', $('#curve_chart').width());
+	
+	wrapper.draw();
+	
+	for (var tag in pieChartWrappers)
+	{
+		pieChartWrappers[tag].setOption('width', $('#' + tag + 'Header').width());
+		pieChartWrappers[tag].setOption('chartArea.width', $('#' + tag + 'Header').width());
+					
+		//Draw new pie with exploded sectors
+		pieChartWrappers[tag].draw();
+	}
+}
 
 //If case matches one of each filter, push all case columns to the include list
 function listFromResolution(values)
@@ -834,7 +876,7 @@ function listFromResolution(values)
 				//Special case for "Other" checkbox - checks for cases where the value is undefined
 				if (typeof CaseInfo[caseNum][property] === 'undefined' && filter[j].slice(0,5) == "Other")
 				{
-					//console.log(caseNum + " has no property: " + property + ", matching 'Other'");
+					//LOG console.log(caseNum + " has no property: " + property + ", matching 'Other'");
 					
 					//Update push flag to i. If it falls behind the loop then the case has missed a filter
 					push = i;
@@ -845,7 +887,7 @@ function listFromResolution(values)
 				//If its not the "Other" checkbox then check the object property to see if it matches
 				else if (CaseInfo[caseNum][property] == filter[j])
 				{
-					//console.log(caseNum + " matched property: " + property + " = " + filter[j]);
+					//LOG console.log(caseNum + " matched property: " + property + " = " + filter[j]);
 					
 					//Update push flag to i. If it falls behind the loop then the case has missed a filter
 					push = i;
@@ -858,7 +900,7 @@ function listFromResolution(values)
 			if (push != i) 
 			{
 				//Case has gone through a whole filter of values without matching, filtered out.
-				//console.log(caseNum + " did not match property:" + property);
+				//LOG console.log(caseNum + " did not match property:" + property);
 				break;
 			}
 		}
@@ -899,7 +941,6 @@ function filterGraph(columns)
 function setAll(name,value)
 {
 	//LOG console.log("+setAll");
-	//LOG console.log(name + " " + value*PIE_CHART_OFFSET);
 	
 	var offsets = {} //pieChartWrappers[name].getOption('slices');
 	

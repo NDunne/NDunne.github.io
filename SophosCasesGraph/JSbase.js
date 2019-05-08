@@ -3,7 +3,8 @@
 */
 
 /*
-	Replace "//LOG " with "" to enable full logging
+	Logging enabled?
+	//LOG console.log
 */
 
 //global CaseInfo object
@@ -259,20 +260,43 @@ function drawPieCharts(pieData)
 	//Similar to PieData, except PieChartWrappers maps the tag to a google chartWrapper object
 	pieChartWrappers = {};
 	
+	var w = 300;
+	
 	//iterate tags
 	for (var tag in pieData)
 	{
 		//other count is total - sum of other filter counts
 		pieData[tag] = getOtherCount(pieData[tag]);
 			
+		
+		w = $('#' + tag + 'Header').width();
+		
 		//chart options
 		var opts = {
-			height:300,
-			width:500,
 			title: tag,
+			pieSliceText: 'none',
+			height: 300,
+			width: w,
+			chartArea:
+			{
+				width: w
+			},
 			legend:
 			{
-				position:'left'
+				position:'labeled',
+				textStyle:
+				{
+					fontSize: 12
+				}
+			},
+			titleTextStyle:
+			{
+				fontSize: 16
+			},
+			tooltip:
+			{
+				ignoreBounds: true,
+				showColorCode: true
 			},
 			slices: {}
 		}
@@ -325,11 +349,14 @@ function drawPieCharts(pieData)
 					
 					//option might not exist yet, try to flip value
 					try 
-					{
-						offsets[slice]["offset"] = abs(offsets[slice]["offset"] - PIE_CHART_OFFSET);
+					{						
+						offsets[slice]["offset"] = Math.abs(offsets[slice]["offset"] - PIE_CHART_OFFSET);
+						
+						//LOG console.log("offset set to " + Math.abs(offsets[slice]["offset"] - PIE_CHART_OFFSET));
 					}
 					catch(error)
 					{
+						//LOG console.log("offset error: " + error +" - Creating");
 						offsets[slice] = { "offset": PIE_CHART_OFFSET };
 					}
 					
@@ -338,8 +365,7 @@ function drawPieCharts(pieData)
 					
 					//Draw new pie with exploded sectors
 					pieChartWrappers[tag].draw();
-					
-					
+										
 					//Clear selection to act like radio buttons
 					pieChartWrappers[tag].getChart().setSelection([]);
 					
@@ -469,8 +495,23 @@ function getFilter()
 }
 
 //Filter graph on resize as well
-window.onresize = getFilter;
+window.onresize = doResize;
 
+function doResize()
+{
+	wrapper.setOption('width', $('#curve_chart').width());
+	
+	wrapper.draw();
+	
+	for (var tag in pieChartWrappers)
+	{
+		pieChartWrappers[tag].setOption('width', $('#' + tag + 'Header').width());
+		pieChartWrappers[tag].setOption('chartArea.width', $('#' + tag + 'Header').width());
+					
+		//Draw new pie with exploded sectors
+		pieChartWrappers[tag].draw();
+	}
+}
 
 //If case matches one of each filter, push all case columns to the include list
 function listFromResolution(values)
