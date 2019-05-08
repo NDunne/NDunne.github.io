@@ -1,6 +1,5 @@
 /* TODO
-- CSS? Bootstrap? Tabs for caselog just generally more pretty
-- animate button?
+- Pie Chart?
 */
 
 //global CaseInfo object
