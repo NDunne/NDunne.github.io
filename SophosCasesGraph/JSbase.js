@@ -1,11 +1,12 @@
 /* TODO
-- Pie Chart?
+- Clean and Comment
 */
 
 //global CaseInfo object
 var CaseInfo = new Object();
 var massFlag = 0;
 
+//Good practice ato avoid magic numbers, -allows easy modification.
 const PIE_CHART_OFFSET = 0.4;
 
 //powershell variable replaced by values
@@ -18,10 +19,12 @@ var view;
 google.charts.load('current', {'packages':['corechart', 'controls']});
 
 //once loaded call drawChar
-google.charts.setOnLoadCallback(drawChart);
+google.charts.setOnLoadCallback(drawLineChart);
 
-function drawChart() 
+
+function drawLineChart() 
 {	
+	//Might rename this function
 	addHTML()
 	
 	data = new google.visualization.DataTable();
@@ -69,7 +72,7 @@ function drawChart()
 		crosshair: 
 		{ 
 			trigger: 'selection',
-			orientation: 'vertical'
+			orientation: 'vertical' //draws a line showing points in the same week
 		},
 	};
 	
@@ -106,74 +109,31 @@ function addSorted(parentDiv,inWrapper)
 	
 }
 
-//Create a new slider for a filter that doesn't exist yet
-function createCheckbox(parentDiv,property,value)
-{
-	var wrapper = document.createElement('label');
-	wrapper.id = value + "Wrapper";
-	wrapper.className = "wrapper";
-	
-	var newCheckBox = document.createElement('input');
-	newCheckBox.type = "checkbox";
-	newCheckBox.name = property + "Filter";
-	newCheckBox.id = value;
-	newCheckBox.checked = true;
-	
-	//Set as Bootstrap toggle type
-	$(function() 
-	{
-		$(newCheckBox).bootstrapToggle(
-		{
-			on:value,
-			off:value,
-			onstyle:"success",
-			offstyle:'danger',
-			width: '130px',
-			height: '60px',
-			
-		});
-		
-		$(newCheckBox).change(function( event ) 
-		{			
-			if (massFlag == 0)
-			{
-				//Generate new DataView
-				getFilter();
-			}
-		})
-	});
-	
-	wrapper.appendChild(newCheckBox);
-		
-	//Ensure alphabetical order	
-	addSorted(parentDiv,wrapper);
-}
-
 //This has to be JQuery-y otherwise it breaks any existing sliders
-function createCollapse(property)
+function createCollapse(tag)
 {
 	var parent = $('#controls');
 	
 	//Some bootstrap wizardry
 	parent.append("\
 <div class=\"card\">\
-    <div class=\"card-header\" id=" + property + "Header>\
-        <button class=\"btn btn-secondary btn-block\" type=\"button\" data-toggle=\"collapse\" data-target=\"#" + property + "Collapse\" aria-expanded=\"true\" aria-controls=\"" + property + "Collapse\">\
-            " + property + "\
+    <div class=\"card-header\" id=" + tag + "Header>\
+        <button class=\"btn btn-secondary btn-block\" type=\"button\" data-toggle=\"collapse\" data-target=\"#" + tag + "Collapse\" aria-expanded=\"true\" aria-controls=\"" + tag + "Collapse\">\
+            " + tag + "\
         </button>\
     </div>\
-    <div id=\"" + property + "Collapse\" class=\"collapse\">\
-        <div class=\"card-body\" id=\"" + property + "CollapseBody\">\
-			<div class=text-center id=\"" + property + "chart\"</div>\
+    <div id=\"" + tag + "Collapse\" class=\"collapse\">\
+        <div class=\"card-body\" id=\"" + tag + "CollapseBody\">\
+			<div class=text-center id=\"" + tag + "chart\"</div>\
         </div>\
     </div>\
  </div>");
 }
 
-//wrapper for incrementing a row by column 0 value
+//wrapper for incrementing value in col 1 by col 0 value
 function incrementCount(data, property)
 {
-	//console.log("+incrementCount");
+	//LOG console.log("+incrementCount");
 	
 	var limit = data.getNumberOfRows();
 	for (var i = 0; i < limit; i++)
@@ -186,30 +146,32 @@ function incrementCount(data, property)
 		}
 	}
 	
-	//console.log("-incrementCount");
+	//LOG console.log("-incrementCount");
 	return data;
 }
 
 function getOtherCount(data)
 {
-	console.log("+getOtherCount");
+	//LOG console.log("+getOtherCount");
 	
 	var limit = data.getNumberOfRows();
 	var total = 0;
 	
-	
+	//sum all cases assigned to a tag	
 	for (var i = 0; i < limit; i++)
 	{
 		total += data.getValue(i,1);
 	}
 	
+	//CaseInfo has one property per case, giving us the actual total
 	var otherCount = Object.keys(CaseInfo).length - total;
 	
-	console.log("Other: " + otherCount);
+	//LOG console.log("Other: " + otherCount);
 	
+	//Other row is always row 0
 	data.setValue(0,1,otherCount);
 	
-	console.log("-getOtherCount");
+	//LOG console.log("-getOtherCount");
 	
 	return data;
 }
@@ -217,9 +179,12 @@ function getOtherCount(data)
 //Generate the HTML from the data provided - filter collapses are generated dynamically
 function addHTML()
 {
+	//Pre-made controls div
 	var controls = document.getElementById('controls');
 	
+	//PieData is a Map of Tags (Result, Component) to DataViews containing their values
 	var pieData = {};
+	
 	
 	//Iterate Cases
 	for (var caseNum in CaseInfo)
@@ -227,51 +192,60 @@ function addHTML()
 		var caseObj = CaseInfo[caseNum];
 	
 		//Iterate properties of current case
-		for (var caseProp in caseObj)
+		for (var tag in caseObj)
 		{
 			//Required fields do not need filters, skip them
-			if (caseProp == "description" || caseProp == "caseLog" || caseProp == "color") continue;
+			if (tag == "description" || tag == "caseLog" || tag == "color") continue;
+			
 			
 			//Find existing div if it exists
-			var currentDiv = document.getElementById(caseProp + "CollapseBody");
-			//Can be null
+			var currentDiv = document.getElementById(tag + "CollapseBody");
+			//Can be null at this point
 			
-			if (pieData[caseProp] == null)
-			{
-				//Create Data Table if doesn't exist
+			//pieData doesn't yet contain a DataView for the tag found
+			if (pieData[tag] == null)
+			{				
+				//LOG console.log("Created Data table for " + tag);
 				
-				//console.log("Created Data table for " + caseProp);
-				pieData[caseProp] = new google.visualization.DataTable();
-				pieData[caseProp].addColumn('string', caseProp);
-				pieData[caseProp].addColumn('number', "cases");
+				pieData[tag] = new google.visualization.DataTable();
+				
+				pieData[tag].addColumn('string', tag);
+				pieData[tag].addColumn('number', "cases");
 		
+				//tag hasn't been parsed yet, so a bootstrap collapse is added to the accordian for it.
+				createCollapse(tag);
 				
-				createCollapse(caseProp);
-				//Re-assign variable
-				currentDiv = document.getElementById(caseProp + "CollapseBody");
+				//Re-assign variable as it must have been null
+				currentDiv = document.getElementById(tag + "CollapseBody");
 
 				//All catagories must have "Other" checkbox to match undefined
-				pieData[caseProp].addRow(["Other",0]);	
+				pieData[tag].addRow(["Other",0]);	
+				//This also allows us to know that other is row 0, rather than adding at the end
 				
+				//ButtonsDiv contains the multi buttons "all" and "none"
 				buttonsDiv = document.createElement('Div');
-				buttonsDiv.id = caseProp + "Buttons";
+				buttonsDiv.id = tag + "Buttons";
 				buttonsDiv.className = "buttons";
 				
-				buttonsDiv.innerHTML = "<button onclick='setAll(\"" + caseProp + "\",0)' id=\"" + caseProp +"All\" class=\"btn btn-success\">ALL</button>"
-				buttonsDiv.innerHTML += "<button onclick='setAll(\"" + caseProp + "\",1)' id=\"" + caseProp +"Clear\" class=\"btn btn-danger\">NONE</button>"
+				buttonsDiv.innerHTML = "<button onclick='setAll(\"" + tag + "\",true)' id=\"" + tag +"All\" class=\"btn btn-success\">ALL</button>"
+				buttonsDiv.innerHTML += "<button onclick='setAll(\"" + tag + "\",false)' id=\"" + tag +"Clear\" class=\"btn btn-danger\">NONE</button>"
 				
+				//Appears below the pie chart.
 				currentDiv.appendChild(buttonsDiv);
 			}
 			
-			//Check if the filter has been created already, and if not create a row			
-			if (!pieData[caseProp].getDistinctValues(0).includes(caseObj[caseProp]))
+			//Check if the filter has been created already, and if not create a row	
+
+			//pieData[tag] is a DataTable, getDistinctViews returns a list of all unique values in column [p1],
+			//includes is a javascript function to check if a list contains a passed value.
+			if (!pieData[tag].getDistinctValues(0).includes(caseObj[tag]))
 			{
-				//console.log("Created Row for: " + caseObj[caseProp]);
-				pieData[caseProp].addRow([caseObj[caseProp],0]);
+				//If not already there, add a row for it.
+				pieData[tag].addRow([caseObj[tag],0]);
 			}
 			
-			//increment the count value
-			pieData[caseProp] = incrementCount(pieData[caseProp], caseObj[caseProp]);				
+			//always increment the count value, row is initialised at 0
+			pieData[tag] = incrementCount(pieData[tag], caseObj[tag]);				
 		}
 	}
 	
@@ -281,42 +255,46 @@ function addHTML()
 
 function drawPieCharts(pieData)
 {
+	//Similar to PieData, except PieChartWrappers maps the tag to a google chartWrapper object
 	pieChartWrappers = {};
 	
-	//pc is a filter
-	for (var pc in pieData)
+	//iterate tags
+	for (var tag in pieData)
 	{
 		//other count is total - sum of other filter counts
-		pieData[pc] = getOtherCount(pieData[pc]);
+		pieData[tag] = getOtherCount(pieData[tag]);
 			
 		//chart options
 		var opts = {
 			height:300,
 			width:500,
-			title: pc,
+			title: tag,
 			legend:
 			{
 				position:'left'
 			},
 			slices: {}
 		}
+		//slices item is initialised empty to avoid null issues later.
 	
-		pieChartWrappers[pc] = new google.visualization.ChartWrapper({
+		//Create the wrapper
+		pieChartWrappers[tag] = new google.visualization.ChartWrapper({
 			chartType: 'PieChart',
-			dataTable: pieData[pc],
+			dataTable: pieData[tag],
 			options: opts,
-			containerId: pc + "chart"
+			containerId: tag + "chart" //This will exist in the accordian already
 		});
 		
-		google.visualization.events.addListener(pieChartWrappers[pc], 'ready', onPieReady(pc));
+		//Have to pass a parameter to the ready function so it knowns where to attach the real listeners to
+		google.visualization.events.addListener(pieChartWrappers[tag], 'ready', onPieReady(tag));
 		
-		function onPieReady(pc) 
+		function onPieReady(tag) 
 		{
-			console.log("ready event: " + pc);
+			//LOG console.log("ready event: " + tag);
 			
-			//there is a strange error related to passing onReady a parameter I believe, moved it to the console rather than the ui.
-			google.visualization.events.addListener(pieChartWrappers[pc], 'error', onPieError);
-			google.visualization.events.addListener(pieChartWrappers[pc], 'select', onPieSelect);
+			//there is a strange error related to passing onReady a parameter, moved it to the console rather than the ui.
+			google.visualization.events.addListener(pieChartWrappers[tag], 'error', onPieError);
+			google.visualization.events.addListener(pieChartWrappers[tag], 'select', onPieSelect);
 		}
 		
 		//Moves Google errors to the console rather than the ui
@@ -329,31 +307,25 @@ function drawPieCharts(pieData)
 		//PieChart onclick - same for all pies as all need to be parsed by the filter
 		function onPieSelect()
 		{
-			for (var pc in pieChartWrappers)
+			for (var tag in pieChartWrappers)
 			{
-				var selected = pieChartWrappers[pc].getChart().getSelection();
+				var selected = pieChartWrappers[tag].getChart().getSelection();
+				
 				//empty check
 				if (Object.keys(selected).length > 0)
 				{
 					//options object for currently selected pie
-					var offsets = pieChartWrappers[pc].getOption('slices');
+					var offsets = pieChartWrappers[tag].getOption('slices');
 					
-					//console.log(pc + " : " + JSON.stringify(selected));
-					//console.log(pc + " : " + JSON.stringify(opts));
+					//console.log(tag + " : " + JSON.stringify(selected));
+					//console.log(tag + " : " + JSON.stringify(opts));
 					
 					var slice = selected[0]["row"];
 					
-					//option might not exist yet
+					//option might not exist yet, try to flip value
 					try 
 					{
-						if (offsets[slice]["offset"] == PIE_CHART_OFFSET)
-						{
-							offsets[slice]["offset"] = 0;
-						}
-						else
-						{
-							offsets[slice]["offset"] = PIE_CHART_OFFSET;
-						}
+						offsets[slice]["offset"] = abs(offsets[slice]["offset"] - PIE_CHART_OFFSET);
 					}
 					catch(error)
 					{
@@ -361,23 +333,23 @@ function drawPieCharts(pieData)
 					}
 					
 					//Set new options
-					pieChartWrappers[pc].setOption('slices',offsets);
+					pieChartWrappers[tag].setOption('slices',offsets);
 					
 					//Draw new pie with exploded sectors
-					pieChartWrappers[pc].draw();
+					pieChartWrappers[tag].draw();
 					
 					
 					//Clear selection to act like radio buttons
-					pieChartWrappers[pc].getChart().setSelection([]);
+					pieChartWrappers[tag].getChart().setSelection([]);
 					
-					//Filter main graph
+					//Filter main graph after a selection has been made
 					getFilter();
 				}
 			}
 		}
 		
 		//Initial draw is all the way down here
-		pieChartWrappers[pc].draw();
+		pieChartWrappers[tag].draw();
 	}
 }
 
@@ -416,55 +388,90 @@ function newTab(color,number,description,caseLog,first)
 //Show CaseLog in div below. 
 function onLineSelect()
 {		
+	//Clear the Case Info currently being displayed
 	clearTabs();
+	
 	var selection = wrapper.getChart().getSelection();			
 	
-	console.log(selection);
+	//LOG console.log(selection);
 	
 	if (selection == null || selection[0] == null)
 		return;
-	if (selection[0].row == null)
-	{
-		//Legend clicked
-		var caseNumber = view.getColumnLabel(selection[0].column);
-		document.getElementById("CaseLog").innerHTML = "<p><b>" + caseNumber + ": " + CaseInfo[caseNumber].description +"</b><br>" + CaseInfo[caseNumber].caseLog + "<br></p>";
-	}
-	else
-	{
-		// Point Clicked. This is non-trivial as multiple cases might have a point behind the one clicked,
-		//but getSelection only returns the top one
 	
-		var row = selection[0].row;
-		
-		//This must be the view rather than the DataTable as otherwise the column will likely be wrong
-		var val = view.getValue(row, selection[0].column);
-		
-		//loop limit
-		var limit = view.getNumberOfColumns();
-		
-		var first = true;
-		
-		//document.getElementById("CaseLog").innerHTML = "<p>";
-		//If value in this row (week) is the same for another column(case) they share this point on the graph
-		//+= 2 to skip over tooltip columns
-		for (i = 2; i < limit; i+=3)
+	// Point Clicked. This is non-trivial as multiple cases might have a point behind the one clicked,
+	// but getSelection only returns the top one
+
+	var row = selection[0].row;
+	
+	//This must be the view rather than the DataTable as otherwise the column will likely be wrong
+	var val = view.getValue(row, selection[0].column);
+	
+	//loop limit
+	var limit = view.getNumberOfColumns();
+	
+	var first = true;
+	
+	//If value in this row (week) is the same for another column(case) they share this point on the graph
+	for (i = 2; i < limit; i+=3) //start = 2 for label and dummy columns, step is 3 for colour and tooltip columns
+	{
+		if (val == view.getValue(row, i))
 		{
-			if (val == view.getValue(row, i))
-			{
-				caseNumber = view.getColumnLabel(i);
-				//try
-				//{
-					//document.getElementById("CaseLog").innerHTML += "<span style='color:" + CaseInfo[caseNumber].color + "'><b>" + caseNumber + ":</span> " + CaseInfo[caseNumber].description +"</b><br>" + CaseInfo[caseNumber].caseLog + "<br></p>";
-					newTab(CaseInfo[caseNumber].color, caseNumber, CaseInfo[caseNumber].description, CaseInfo[caseNumber].caseLog, first);
-					first = false
-				//}
-				//catch(err) {} //Sometimes tries to read from tooltip columns, not sure why
-			}
+			caseNumber = view.getColumnLabel(i);
+			//Create a tab in the caseInfo section.
+			newTab(CaseInfo[caseNumber].color, caseNumber, CaseInfo[caseNumber].description, CaseInfo[caseNumber].caseLog, first);
+			first = false //First flag allows first tag to be set as shown and the rest hidden.
 		}
 	}
 }
 
-//If case matches one of each filter, push case number and case number tooltip to list of included columns
+//Get the values to search each tag for and filter the graph on them
+function getFilter()
+{	
+	//LOG console.log("+GetFilter: " + (new Date).getTime());
+	
+	//Clear CaseLog
+	clearTabs();
+	
+	//Object maps tags to the values to be included in the filter
+	var values = {};
+	
+	for (var tag in pieChartWrappers)
+	{
+		//LOG console.log("Filtering " + tag);
+		values[tag] = [];
+		
+		var offsets = pieChartWrappers[tag].getOption('slices');
+		
+		var tagDataTable = pieChartWrappers[tag].getDataTable();
+		
+		//Iterate over rows
+		for (var i = 0; i < tagDataTable.getNumberOfRows(); i++)
+		{
+			//Skip if offset exists and is offset
+			if (offsets[i] != undefined && offsets[i].offset == PIE_CHART_OFFSET)
+			{			
+				continue;
+			}
+			//Otherwise add to the include filter the value in column 0 of row i
+			values[tag].push(pieChartWrappers[tag].getDataTable().getValue(i,0));
+			
+			//Can't just iterate over the offsets object, as undefined = include.
+		}
+	}
+	
+	//LOG console.log(values);
+	
+	//Build list of selected filters from checkboxes
+	filterGraph(listFromResolution(values));
+	
+	//LOG console.log("-GetFilter: " + (new Date).getTime());
+}
+
+//Filter graph on resize as well
+window.onresize = getFilter;
+
+
+//If case matches one of each filter, push all case columns to the include list
 function listFromResolution(values)
 {	
 	var list = [0,1]; //Columns 0 and 1 are always included so there will always be enough to draw a graph
@@ -530,56 +537,22 @@ function listFromResolution(values)
 			list.push(caseNum+'S'); //also push Style column
 		}
 	}
-	//console.log(list);
+	//LOG console.log(list);
 	return list;
 }
-
-//Get the values to search each tag for and filter the graph on them
-function getFilter()
-{	
-	console.log("+GetFilter: " + (new Date).getTime());
-	
-	//Clear CaseLog
-	clearTabs();
-	
-	var values = {};
-	
-	for (var pc in pieChartWrappers)
-	{
-		console.log("Filtering " + pc);
-		values[pc] = [];
-		var offsets = pieChartWrappers[pc].getOption('slices');
-		
-		var pcDataTable = pieChartWrappers[pc].getDataTable();
-		
-		for (var i = 0; i < pcDataTable.getNumberOfRows(); i++)
-		{
-			if (offsets[i] != undefined && offsets[i].offset == PIE_CHART_OFFSET)
-			{			
-				continue;
-			}
-			values[pc].push(pieChartWrappers[pc].getDataTable().getValue(i,0));
-		}
-	}
-	
-	console.log(values);
-	
-	//Build list of selected filters from checkboxes
-	filterGraph(listFromResolution(values));
-	
-	console.log("-GetFilter: " + (new Date).getTime());
-}
-
-//Filter graph on resize as well
-window.onresize = getFilter;
 
 //Re-Draw graph with only given columns
 function filterGraph(columns)
 {
 	view = new google.visualization.DataView(data);
+	
+	//Include only the passed columns
 	view.setColumns(columns);
+	
+	//Set the Graph Wrapper's view to the new filter
 	wrapper.setView(view.toJSON());
 	
+	//update total of how many cases are visible
 	$("#caseTotal").html("<h4> " + (view.getNumberOfColumns() - 2) / 3 + " Cases</h>");
 	
 	//Re-read screen width to auto resize graph
@@ -591,22 +564,21 @@ function filterGraph(columns)
 //Check or uncheck all checkboxes based on parameter
 function setAll(name,value)
 {
-	console.log("+setAll");
-	console.log(name + " " + value*PIE_CHART_OFFSET);
+	//LOG console.log("+setAll");
+	//LOG console.log(name + " " + value*PIE_CHART_OFFSET);
 	
-	var offsets = pieChartWrappers[name].getOption('slices');
+	var offsets = {} //pieChartWrappers[name].getOption('slices');
 	
-	var pcDataTable = pieChartWrappers[name].getDataTable();
+	var tagDataTable = pieChartWrappers[name].getDataTable();
 	
-	for (var i = 0; i < pcDataTable.getNumberOfRows(); i++)
+	if (!value)
 	{
-		if (offsets[i] != undefined && offsets[i].offset == value*PIE_CHART_OFFSET)
-		{			
-			continue;
+		for (var i = 0; i < tagDataTable.getNumberOfRows(); i++)
+		{
+			offsets[i] = { 'offset': PIE_CHART_OFFSET };
 		}
-		offsets[i] = { 'offset': value*PIE_CHART_OFFSET };
 	}
-	console.log(offsets);
+	//LOG console.log(offsets);
 	
 	//Set new options
 	pieChartWrappers[name].setOption('slices',offsets);
@@ -614,11 +586,12 @@ function setAll(name,value)
 	//Draw new pie with exploded sectors
 	pieChartWrappers[name].draw();
 	
-	//Clear selection to act like radio buttons
+	//Clear selection
 	pieChartWrappers[name].getChart().setSelection([]);
 	
+	//Filter the graph
 	getFilter();
 	
 	massFlag = 0;
-	console.log("-setAll");
+	//LOG console.log("-setAll");
 }
