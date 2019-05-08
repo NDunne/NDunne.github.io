@@ -497,9 +497,9 @@ function createCollapse(property)
             " + property + "\
         </button>\
     </div>\
-    <div id=\"" + property + "Collapse\" class=\"collapse show\">\
+    <div id=\"" + property + "Collapse\" class=\"collapse\">\
         <div class=\"card-body\" id=\"" + property + "CollapseBody\">\
-			<div id=\"" + property + "chart\"</div>\
+			<div class=text-center id=\"" + property + "chart\"</div>\
         </div>\
     </div>\
  </div>");
@@ -592,8 +592,8 @@ function addHTML()
 				buttonsDiv.id = caseProp + "Buttons";
 				buttonsDiv.className = "buttons";
 				
-				buttonsDiv.innerHTML = "<button onclick='setAll(\"" + caseProp + "Filter\",true)' id=\"" + caseProp +"All\" class=\"btn btn-success\">ALL</button>"
-				buttonsDiv.innerHTML += "<button onclick='setAll(\"" + caseProp + "Filter\",false)' id=\"" + caseProp +"Clear\" class=\"btn btn-danger\">NONE</button>"
+				buttonsDiv.innerHTML = "<button onclick='setAll(\"" + caseProp + "\",0)' id=\"" + caseProp +"All\" class=\"btn btn-success\">ALL</button>"
+				buttonsDiv.innerHTML += "<button onclick='setAll(\"" + caseProp + "\",1)' id=\"" + caseProp +"Clear\" class=\"btn btn-danger\">NONE</button>"
 				
 				currentDiv.appendChild(buttonsDiv);
 			}
@@ -601,7 +601,7 @@ function addHTML()
 			//Check if the filter has been created already, and if not create a row			
 			if (!pieData[caseProp].getDistinctValues(0).includes(caseObj[caseProp]))
 			{
-				console.log("Created Row for: " + caseObj[caseProp]);
+				//console.log("Created Row for: " + caseObj[caseProp]);
 				pieData[caseProp].addRow([caseObj[caseProp],0]);
 			}
 			
@@ -623,7 +623,7 @@ function drawPieCharts(pieData)
 	{
 		//other count is total - sum of other filter counts
 		pieData[pc] = getOtherCount(pieData[pc]);
-		
+			
 		//chart options
 		var opts = {
 			height:300,
@@ -671,7 +671,7 @@ function drawPieCharts(pieData)
 				if (Object.keys(selected).length > 0)
 				{
 					//options object for currently selected pie
-					var opts = pieChartWrappers[pc].getOptions();
+					var offsets = pieChartWrappers[pc].getOption('slices');
 					
 					//console.log(pc + " : " + JSON.stringify(selected));
 					//console.log(pc + " : " + JSON.stringify(opts));
@@ -681,22 +681,22 @@ function drawPieCharts(pieData)
 					//option might not exist yet
 					try 
 					{
-						if (opts.slices[slice]["offset"] == PIE_CHART_OFFSET)
+						if (offsets[slice]["offset"] == PIE_CHART_OFFSET)
 						{
-							opts.slices[slice]["offset"] = 0;
+							offsets[slice]["offset"] = 0;
 						}
 						else
 						{
-							opts.slices[slice]["offset"] = PIE_CHART_OFFSET;
+							offsets[slice]["offset"] = PIE_CHART_OFFSET;
 						}
 					}
 					catch(error)
 					{
-						opts.slices[slice] = { "offset": PIE_CHART_OFFSET };
+						offsets[slice] = { "offset": PIE_CHART_OFFSET };
 					}
 					
 					//Set new options
-					pieChartWrappers[pc].setOptions(opts);
+					pieChartWrappers[pc].setOption('slices',offsets);
 					
 					//Draw new pie with exploded sectors
 					pieChartWrappers[pc].draw();
@@ -885,11 +885,7 @@ function getFilter()
 		values[pc] = [];
 		var offsets = pieChartWrappers[pc].getOption('slices');
 		
-		console.log(offsets);
-		
 		var pcDataTable = pieChartWrappers[pc].getDataTable();
-		
-		console.log(pcDataTable);
 		
 		for (var i = 0; i < pcDataTable.getNumberOfRows(); i++)
 		{
@@ -930,25 +926,34 @@ function filterGraph(columns)
 //Check or uncheck all checkboxes based on parameter
 function setAll(name,value)
 {
-	//JQuery get all inputs by name
-	var checkboxes = $("input[name='" + name + "']");
-
-	massFlag = 1;
+	console.log("+setAll");
+	console.log(name + " " + value*PIE_CHART_OFFSET);
 	
-	checkboxes.each(function() 
+	var offsets = pieChartWrappers[name].getOption('slices');
+	
+	var pcDataTable = pieChartWrappers[name].getDataTable();
+	
+	for (var i = 0; i < pcDataTable.getNumberOfRows(); i++)
 	{
-		//Triggers event on slider that is actually switching
-		if ($(this).prop('checked') != value)
+		if (offsets[i] != undefined && offsets[i].offset == value*PIE_CHART_OFFSET)
 		{			
-			
-			//Set CB to checked and trigger event for filtering
-			$(this).prop('checked', value).change();
-			
+			continue;
 		}
-		//Bonus - don't sort if all clicked and nothing changes.
-	});
+		offsets[i] = { 'offset': value*PIE_CHART_OFFSET };
+	}
+	console.log(offsets);
+	
+	//Set new options
+	pieChartWrappers[name].setOption('slices',offsets);
+	
+	//Draw new pie with exploded sectors
+	pieChartWrappers[name].draw();
+	
+	//Clear selection to act like radio buttons
+	pieChartWrappers[name].getChart().setSelection([]);
 	
 	getFilter();
 	
 	massFlag = 0;
+	console.log("-setAll");
 }
