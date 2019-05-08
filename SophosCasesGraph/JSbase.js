@@ -2,6 +2,10 @@
 - Clean and Comment
 */
 
+/*
+	Replace "//LOG " with "" to enable full logging
+*/
+
 //global CaseInfo object
 var CaseInfo = new Object();
 var massFlag = 0;
@@ -132,9 +136,7 @@ function createCollapse(tag)
 
 //wrapper for incrementing value in col 1 by col 0 value
 function incrementCount(data, property)
-{
-	//LOG console.log("+incrementCount");
-	
+{	
 	var limit = data.getNumberOfRows();
 	for (var i = 0; i < limit; i++)
 	{
@@ -146,7 +148,6 @@ function incrementCount(data, property)
 		}
 	}
 	
-	//LOG console.log("-incrementCount");
 	return data;
 }
 
@@ -301,7 +302,7 @@ function drawPieCharts(pieData)
 		function onPieError(googleError) 
 		{
 			google.visualization.errors.removeError(googleError.id);
-			console.log("Google Error: " + googleError.message);
+			//LOG console.log("Google Error: " + googleError.message);
 		}
 		
 		//PieChart onclick - same for all pies as all need to be parsed by the filter
@@ -317,8 +318,8 @@ function drawPieCharts(pieData)
 					//options object for currently selected pie
 					var offsets = pieChartWrappers[tag].getOption('slices');
 					
-					//console.log(tag + " : " + JSON.stringify(selected));
-					//console.log(tag + " : " + JSON.stringify(opts));
+					//LOG console.log(tag + " : " + JSON.stringify(selected));
+					//LOG console.log(tag + " : " + JSON.stringify(opts));
 					
 					var slice = selected[0]["row"];
 					
@@ -500,7 +501,7 @@ function listFromResolution(values)
 				//Special case for "Other" checkbox - checks for cases where the value is undefined
 				if (typeof CaseInfo[caseNum][property] === 'undefined' && filter[j].slice(0,5) == "Other")
 				{
-					//console.log(caseNum + " has no property: " + property + ", matching 'Other'");
+					//LOG console.log(caseNum + " has no property: " + property + ", matching 'Other'");
 					
 					//Update push flag to i. If it falls behind the loop then the case has missed a filter
 					push = i;
@@ -511,7 +512,7 @@ function listFromResolution(values)
 				//If its not the "Other" checkbox then check the object property to see if it matches
 				else if (CaseInfo[caseNum][property] == filter[j])
 				{
-					//console.log(caseNum + " matched property: " + property + " = " + filter[j]);
+					//LOG console.log(caseNum + " matched property: " + property + " = " + filter[j]);
 					
 					//Update push flag to i. If it falls behind the loop then the case has missed a filter
 					push = i;
@@ -524,7 +525,7 @@ function listFromResolution(values)
 			if (push != i) 
 			{
 				//Case has gone through a whole filter of values without matching, filtered out.
-				//console.log(caseNum + " did not match property:" + property);
+				//LOG console.log(caseNum + " did not match property:" + property);
 				break;
 			}
 		}
@@ -565,7 +566,6 @@ function filterGraph(columns)
 function setAll(name,value)
 {
 	//LOG console.log("+setAll");
-	//LOG console.log(name + " " + value*PIE_CHART_OFFSET);
 	
 	var offsets = {} //pieChartWrappers[name].getOption('slices');
 	
