@@ -13,6 +13,8 @@ $addCaseInfo;
 var data;
 var view;
 
+const PIE_CHART_OFFSET = 0.25;
+
 //Load google things
 google.charts.load('current', {'packages':['corechart', 'controls']});
 
@@ -338,18 +340,18 @@ function drawPieCharts(pieData)
 					
 					try 
 					{
-						if (opts.slices[slice]["offset"] == 0.25)
+						if (opts.slices[slice]["offset"] == PIE_CHART_OFFSET)
 						{
 							opts.slices[slice]["offset"] = 0;
 						}
 						else
 						{
-							opts.slices[slice]["offset"] = 0.25;
+							opts.slices[slice]["offset"] = PIE_CHART_OFFSET;
 						}
 					}
 					catch(error)
 					{
-						opts.slices[slice] = { "offset": 0.25 };
+						opts.slices[slice] = { "offset": PIE_CHART_OFFSET };
 					}
 					
 					pieChartWrappers[pc].setOptions(opts);

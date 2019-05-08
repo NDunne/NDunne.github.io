@@ -7,6 +7,8 @@
 var CaseInfo = new Object();
 var massFlag = 0;
 
+const PIE_CHART_OFFSET = 0.25;
+
 //powershell variable replaced by values
 CaseInfo['00000'] = {description:'Health Trails Tool', caseLog:'<b>W5:</b> Creating a C++/.NET tool to view and query JSON objects created by SophosHealth in a GUI. <br><br><b>W6:</b>  Functional now, but more to do<br>~ Groups Health Events by various categories<br>~ Sorts<br>~ View data<br><br><b>W7:</b> Added setup batch file to install C++ redistributale, and create reg keys to allow context right-click launch for sdu root and Trails folder.<br>Also updated UI to show a table of a child events when parent is clicked. More css is required tho!<br>', color:'693410', Result:'Suggested Fix'};
 CaseInfo['00001'] = {description:'Case Grapher', caseLog:'<b>W32:</b> Working on powershell/javascript to parse case notes into progress graph using google charts api. Clicking on graph shows case history, and now all cases below the point clicked (this is not in the api as far as I can see). Powershell is used to take html notes files and compress cases into objects, then tabulate in javascript and draw with google charts. Output is a single html file that is easily transported and opened on any computer. <br><br><b>W33:</b> Working in Javascript to allow filtering of the graph using DataView class from Google charts API. Also commited to github for easier working. <br><br>Added button to filter and changed caseLog grouping to always pull from a view as it didn&#x27;t work when filtered before, due to reading row/column from the original dataTable when the columns don&#x27;t line up any more. Also implemented CaseLog info when clicking on the legend.<br><br><b>W34:</b> Trying to scrape data from webpage instead of manual takeout, by creating a browser instance and interacting with html elements via powershell, but its not easy as nothing has an id :/ Moving to a python 3rd party api with strong results. The format received is different so having to alter main though. It seems to be working after some fiddling to get everything in the right order, but I don&#x27;t think the description is right?<br><br>Managed to get it working with the scraper and very happy with it. Did have to add a credentials section and handling for various cases including cancel, wrong password, google captcha required and correct. Also, swapped the buttons in HTML out for checkboxes and updated the onclick functions to handle this. Currently the implementation isn&#x27;t great {O(n^2)} but meh I can&#x27;t think of a better way immediately, seeing as the filtering has to be pure javascript and can&#x27;t go back to powershell.<br><br>Its now hosted live on github so I hope I dont get in trouble for having my notes public... I also added a style column to the table for each line, and set the line colour based on the SHA1 hash of the case number, meaning it can stay constant when re-filtering (by default column number defines colour). The styling is supposed to be section specific though, so the legend has the wrong colours. Don&#x27;t think there is an easy workaround here so it&#x27;s hidden for now.<br><br>Next up: make it pretty! Tabs for cases being shown, a help section on how to read the graph now there is no Legend, maybe some CSS<br><br><b>W38:</b> Swapped the result tag for a tagging system where any word can be applied as a key:value pair. to support this the JS map now contains an object with K:V pairs rather than an array requiring context. This means that any new word used as a key in a case note will generate a new row of checkboxes (based on the order they are found), and can be filtered using it. New values for that tag are also data driven rather than pre-defined. Also allowed the graph to draw empty when there are no matches, and re-wrote the filtering system to be less stupid. Should probably add an &quot;other&quot; checkbox by default as now if a case does not have a value for a checkbox it is gone as soon as you filter.<br><br><b>W39:</b> using more bootstrap for the filters, struggling to not have it sort the graph 18 times (performance noticable) when clicking all buttons as each slider receives a change event. Also component - other is broken somehow.<br>Fixed the performance issue by having the onChange listener check a global flag to see if it was changed by a mass button, and not call the filter if it was. The mass buttons then call the filter separately so it is always called once. I also added tabs for the caselog, which took a while as I didn&#x27;t know html ids cannot start with a number.<br><br>Spent quite a while trying to animate entry and exit of cases, but the animation doesn&#x27;t work very well, and the customer colour is only applied after, so I&#x27;m not sure if it&#x27;s worth pursuing.<br><br><b>W44:</b> had an idea to replace the buttons with pie charts. So far pie charts get drawn, but need to get onclick sorting working, and hopefully can blow out segments that are not in the filter.', color:'9d97a5', Result:'Suggested Fix'};
@@ -664,26 +666,26 @@ function drawPieCharts(pieData)
 				{
 					var opts = pieChartWrappers[pc].getOptions();
 					
-					console.log(pc + " : " + JSON.stringify(selected));
-					console.log(pc + " : " + JSON.stringify(opts));
+					//console.log(pc + " : " + JSON.stringify(selected));
+					//console.log(pc + " : " + JSON.stringify(opts));
 					
 					var slice = selected[0]["row"];
 					
 					
 					try 
 					{
-						if (opts.slices[slice]["offset"] == 0.25)
+						if (opts.slices[slice]["offset"] == PIE_CHART_OFFSET)
 						{
 							opts.slices[slice]["offset"] = 0;
 						}
 						else
 						{
-							opts.slices[slice]["offset"] = 0.25;
+							opts.slices[slice]["offset"] = PIE_CHART_OFFSET;
 						}
 					}
 					catch(error)
 					{
-						opts.slices[slice] = { "offset": 0.25 };
+						opts.slices[slice] = { "offset": PIE_CHART_OFFSET };
 					}
 					
 					pieChartWrappers[pc].setOptions(opts);
