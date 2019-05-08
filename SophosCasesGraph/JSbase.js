@@ -6,6 +6,8 @@
 var CaseInfo = new Object();
 var massFlag = 0;
 
+const PIE_CHART_OFFSET = 0.4;
+
 //powershell variable replaced by values
 $addCaseInfo;
 
@@ -26,7 +28,7 @@ function drawChart()
 	//powershell variable replaced by values
 	$data
 	
-		var chartwidth = $('#curve_chart').width();
+	var chartwidth = $('#curve_chart').width();
 	
 	//Graph options
 	var opts = {
@@ -81,7 +83,7 @@ function drawChart()
 	});
 	
 	//Once ready event is fired the onReady function is called
-	google.visualization.events.addListener(wrapper, 'ready', onReady);
+	google.visualization.events.addListener(wrapper, 'ready', onLineReady);
 	
 	getFilter();
 }
@@ -161,68 +163,228 @@ function createCollapse(property)
         </button>\
     </div>\
     <div id=\"" + property + "Collapse\" class=\"collapse\">\
-        <div class=\"card-body\">\
-			<div class=\"btn-group-toggle\" id=\"" + property + "CollapseBody\">\
-			</div>\
+        <div class=\"card-body\" id=\"" + property + "CollapseBody\">\
+			<div class=text-center id=\"" + property + "chart\"</div>\
         </div>\
     </div>\
  </div>");
-}	
+}
+
+//wrapper for incrementing a row by column 0 value
+function incrementCount(data, property)
+{
+	//console.log("+incrementCount");
+	
+	var limit = data.getNumberOfRows();
+	for (var i = 0; i < limit; i++)
+	{
+		if (data.getValue(i,0) == property)
+		{
+			var t = data.getValue(i,1);
+			data.setValue(i,1,t+1);
+			return data;
+		}
+	}
+	
+	//console.log("-incrementCount");
+	return data;
+}
+
+function getOtherCount(data)
+{
+	console.log("+getOtherCount");
+	
+	var limit = data.getNumberOfRows();
+	var total = 0;
+	
+	
+	for (var i = 0; i < limit; i++)
+	{
+		total += data.getValue(i,1);
+	}
+	
+	var otherCount = Object.keys(CaseInfo).length - total;
+	
+	console.log("Other: " + otherCount);
+	
+	data.setValue(0,1,otherCount);
+	
+	console.log("-getOtherCount");
+	
+	return data;
+}
 
 //Generate the HTML from the data provided - filter collapses are generated dynamically
 function addHTML()
 {
 	var controls = document.getElementById('controls');
 	
+	var pieData = {};
+	
 	//Iterate Cases
 	for (var caseNum in CaseInfo)
 	{
 		var caseObj = CaseInfo[caseNum];
 	
+		//Iterate properties of current case
 		for (var caseProp in caseObj)
 		{
-			//Required fields do not need filters
+			//Required fields do not need filters, skip them
 			if (caseProp == "description" || caseProp == "caseLog" || caseProp == "color") continue;
 			
 			//Find existing div if it exists
 			var currentDiv = document.getElementById(caseProp + "CollapseBody");
+			//Can be null
 			
-			//If not create a new one
-			if (currentDiv == null)
+			if (pieData[caseProp] == null)
 			{
+				//Create Data Table if doesn't exist
+				
+				//console.log("Created Data table for " + caseProp);
+				pieData[caseProp] = new google.visualization.DataTable();
+				pieData[caseProp].addColumn('string', caseProp);
+				pieData[caseProp].addColumn('number', "cases");
+		
+				
 				createCollapse(caseProp);
 				//Re-assign variable
 				currentDiv = document.getElementById(caseProp + "CollapseBody");
 
 				//All catagories must have "Other" checkbox to match undefined
-				createCheckbox(currentDiv, caseProp, "Other");	
-			}
-			else if(document.getElementById(caseProp + "Buttons") == null)
-			{
-				//Buttons are only created if there is more than 1 option
+				pieData[caseProp].addRow(["Other",0]);	
+				
 				buttonsDiv = document.createElement('Div');
 				buttonsDiv.id = caseProp + "Buttons";
 				buttonsDiv.className = "buttons";
 				
-				buttonsDiv.innerHTML = "<button onclick='setAll(\"" + caseProp + "Filter\",true)' id=\"" + caseProp +"All\" class=\"btn btn-success\">ALL</button>"
-				buttonsDiv.innerHTML += "<button onclick='setAll(\"" + caseProp + "Filter\",false)' id=\"" + caseProp +"Clear\" class=\"btn btn-danger\">NONE</button>"
+				buttonsDiv.innerHTML = "<button onclick='setAll(\"" + caseProp + "\",0)' id=\"" + caseProp +"All\" class=\"btn btn-success\">ALL</button>"
+				buttonsDiv.innerHTML += "<button onclick='setAll(\"" + caseProp + "\",1)' id=\"" + caseProp +"Clear\" class=\"btn btn-danger\">NONE</button>"
 				
 				currentDiv.appendChild(buttonsDiv);
 			}
 			
-			//Check if the filter has been created already, and if not create a checkbox
-			if (!currentDiv.contains(document.getElementById(caseObj[caseProp])))
+			//Check if the filter has been created already, and if not create a row			
+			if (!pieData[caseProp].getDistinctValues(0).includes(caseObj[caseProp]))
 			{
-				createCheckbox(currentDiv, caseProp, caseObj[caseProp]);
-			}	
+				//console.log("Created Row for: " + caseObj[caseProp]);
+				pieData[caseProp].addRow([caseObj[caseProp],0]);
+			}
+			
+			//increment the count value
+			pieData[caseProp] = incrementCount(pieData[caseProp], caseObj[caseProp]);				
 		}
+	}
+	
+	//Seperated for ease of reading
+	drawPieCharts(pieData);
+}
+
+function drawPieCharts(pieData)
+{
+	pieChartWrappers = {};
+	
+	//pc is a filter
+	for (var pc in pieData)
+	{
+		//other count is total - sum of other filter counts
+		pieData[pc] = getOtherCount(pieData[pc]);
+			
+		//chart options
+		var opts = {
+			height:300,
+			width:500,
+			title: pc,
+			legend:
+			{
+				position:'left'
+			},
+			slices: {}
+		}
+	
+		pieChartWrappers[pc] = new google.visualization.ChartWrapper({
+			chartType: 'PieChart',
+			dataTable: pieData[pc],
+			options: opts,
+			containerId: pc + "chart"
+		});
+		
+		google.visualization.events.addListener(pieChartWrappers[pc], 'ready', onPieReady(pc));
+		
+		function onPieReady(pc) 
+		{
+			console.log("ready event: " + pc);
+			
+			//there is a strange error related to passing onReady a parameter I believe, moved it to the console rather than the ui.
+			google.visualization.events.addListener(pieChartWrappers[pc], 'error', onPieError);
+			google.visualization.events.addListener(pieChartWrappers[pc], 'select', onPieSelect);
+		}
+		
+		//Moves Google errors to the console rather than the ui
+		function onPieError(googleError) 
+		{
+			google.visualization.errors.removeError(googleError.id);
+			console.log("Google Error: " + googleError.message);
+		}
+		
+		//PieChart onclick - same for all pies as all need to be parsed by the filter
+		function onPieSelect()
+		{
+			for (var pc in pieChartWrappers)
+			{
+				var selected = pieChartWrappers[pc].getChart().getSelection();
+				//empty check
+				if (Object.keys(selected).length > 0)
+				{
+					//options object for currently selected pie
+					var offsets = pieChartWrappers[pc].getOption('slices');
+					
+					//console.log(pc + " : " + JSON.stringify(selected));
+					//console.log(pc + " : " + JSON.stringify(opts));
+					
+					var slice = selected[0]["row"];
+					
+					//option might not exist yet
+					try 
+					{
+						if (offsets[slice]["offset"] == PIE_CHART_OFFSET)
+						{
+							offsets[slice]["offset"] = 0;
+						}
+						else
+						{
+							offsets[slice]["offset"] = PIE_CHART_OFFSET;
+						}
+					}
+					catch(error)
+					{
+						offsets[slice] = { "offset": PIE_CHART_OFFSET };
+					}
+					
+					//Set new options
+					pieChartWrappers[pc].setOption('slices',offsets);
+					
+					//Draw new pie with exploded sectors
+					pieChartWrappers[pc].draw();
+					
+					
+					//Clear selection to act like radio buttons
+					pieChartWrappers[pc].getChart().setSelection([]);
+					
+					//Filter main graph
+					getFilter();
+				}
+			}
+		}
+		
+		//Initial draw is all the way down here
+		pieChartWrappers[pc].draw();
 	}
 }
 
 //onSelect Listener can only be added once ready
-function onReady()
+function onLineReady()
 {
-	google.visualization.events.addListener(wrapper, 'select', onSelect);
+	google.visualization.events.addListener(wrapper, 'select', onLineSelect);
 }
 
 function clearTabs()
@@ -252,7 +414,7 @@ function newTab(color,number,description,caseLog,first)
 }
 
 //Show CaseLog in div below. 
-function onSelect()
+function onLineSelect()
 {		
 	clearTabs();
 	var selection = wrapper.getChart().getSelection();			
@@ -372,7 +534,7 @@ function listFromResolution(values)
 	return list;
 }
 
-//Passed a string to find the columns for
+//Get the values to search each tag for and filter the graph on them
 function getFilter()
 {	
 	console.log("+GetFilter: " + (new Date).getTime());
@@ -380,29 +542,25 @@ function getFilter()
 	//Clear CaseLog
 	clearTabs();
 	
-	//All checkboxes
-	var checkboxes = $(":checkbox");
-	
 	var values = {};
 	
-	checkboxes.each( function() 
+	for (var pc in pieChartWrappers)
 	{
-		//Slice off [property]Filter
-		var property = this.name.slice(0,-6);
+		console.log("Filtering " + pc);
+		values[pc] = [];
+		var offsets = pieChartWrappers[pc].getOption('slices');
 		
-		//Create new property
-		if(values[property] == null)
-		{
-			//console.log("new property " + property);
-			values[property] = [];
-		}
+		var pcDataTable = pieChartWrappers[pc].getDataTable();
 		
-		if(this.checked)
+		for (var i = 0; i < pcDataTable.getNumberOfRows(); i++)
 		{
-			//console.log(property + ": " + this.id);
-			values[property].push(this.id);
+			if (offsets[i] != undefined && offsets[i].offset == PIE_CHART_OFFSET)
+			{			
+				continue;
+			}
+			values[pc].push(pieChartWrappers[pc].getDataTable().getValue(i,0));
 		}
-	});
+	}
 	
 	console.log(values);
 	
@@ -433,25 +591,34 @@ function filterGraph(columns)
 //Check or uncheck all checkboxes based on parameter
 function setAll(name,value)
 {
-	//JQuery get all inputs by name
-	var checkboxes = $("input[name='" + name + "']");
-
-	massFlag = 1;
+	console.log("+setAll");
+	console.log(name + " " + value*PIE_CHART_OFFSET);
 	
-	checkboxes.each(function() 
+	var offsets = pieChartWrappers[name].getOption('slices');
+	
+	var pcDataTable = pieChartWrappers[name].getDataTable();
+	
+	for (var i = 0; i < pcDataTable.getNumberOfRows(); i++)
 	{
-		//Triggers event on slider that is actually switching
-		if ($(this).prop('checked') != value)
+		if (offsets[i] != undefined && offsets[i].offset == value*PIE_CHART_OFFSET)
 		{			
-			
-			//Set CB to checked and trigger event for filtering
-			$(this).prop('checked', value).change();
-			
+			continue;
 		}
-		//Bonus - don't sort if all clicked and nothing changes.
-	});
+		offsets[i] = { 'offset': value*PIE_CHART_OFFSET };
+	}
+	console.log(offsets);
+	
+	//Set new options
+	pieChartWrappers[name].setOption('slices',offsets);
+	
+	//Draw new pie with exploded sectors
+	pieChartWrappers[name].draw();
+	
+	//Clear selection to act like radio buttons
+	pieChartWrappers[name].getChart().setSelection([]);
 	
 	getFilter();
 	
 	massFlag = 0;
+	console.log("-setAll");
 }
